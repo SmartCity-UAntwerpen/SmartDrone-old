@@ -21,6 +21,8 @@ class GCStoFC (threading.Thread):
                 datasplit=[]
                 datasplit = data_gcs[data_gcs.find('3C'):].split(" :")
                 topic =''.join(str(e) for e in datasplit[4:8])
+                if (topic == 'DC5238D2' or topic == 'F4D44860' or topic == '00D5F582' or topic=='468F7E38'):
+                    print (data_gcs)
                 ##TODO Filter topic
                 lenbefore= len(list(whitelist))
                 whitelist.add(topic)
