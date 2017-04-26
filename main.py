@@ -1,25 +1,18 @@
-from mqtt import mqtt
-import time
+from drone import Drone
 
-mqttclient=mqtt("iot.eclipse.org",1883,"Drone", "test")
+list = []
 
-def publish():
-    mqttclient.publish("test", "I like "+str(1));
+def create_drone():
+    list.append(Drone())
 
+def remove_drone(id):
+    for drone in list:
+        if (drone.id==id):
+            print ("Drone "+ str(drone.id)+" removed")
+            list.remove(drone)
 
-#Connecteer met Mqtt Host
-def start_mqtt_listener():
-    mqttclient.connect()
-    mqttclient.add_listener_func(mqtt_recieve)
-
-#Wordt opgeroepen wanneer er een Mqtt bericht binnenkomt
-def mqtt_recieve(msg):
-    print(msg)
-    if (msg == "I like 1"):
-        print("1")
-
-start_mqtt_listener()
-
-
-publish()
-time.sleep(0.1)
+create_drone()
+create_drone()
+remove_drone(2)
+for drone in list:
+    print(drone)
