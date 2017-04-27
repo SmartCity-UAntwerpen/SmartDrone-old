@@ -25,8 +25,8 @@ class Drone:
     # get an id from the server
     @staticmethod
     def _get_id():
-        return 2
-        #  return requests.get("http://newDrone").content  # TODO send home location to server ?
+        #  return 2
+        return int(requests.get("http://newDrone").text)  # TODO send home location to server ?
 
     # helper function for creating drone mqtt client
     # set internal to avoid confusion
@@ -39,15 +39,14 @@ class Drone:
     # loop for position update heartbeat
     def _pos_loop(self, _id):
         while 1:
-            self.pos_client.publish("pos/"+str(_id), str(self.x)+","+str(self.y)+","+str(self.z))  # TODO send position
-            time.sleep(1)
+            self.pos_client.publish("pos/"+str(_id), str(self.x)+","+str(self.y)+","+str(self.z))
+            time.sleep(1)  # heartbeat frequency 1 sec
 
     # register to the job receiving channel
     def _reg_jobs(self, _id):
         client = self._create_client(self)
         client.subscribe("job/"+str(_id))
-        client.on_message = self._job
-        # TODO client.on_message = - code to accept and execute jobs -
+        client.on_message = self._job  # register job execution function
         client.loop_start()
         return client
 
@@ -57,20 +56,22 @@ class Drone:
         return client  # no messages should be received on position channel for now
 
     # simulate job execution behavior
+    # signature must match expected on_message signature
     def _job(self, client, userdata, msg):
-        speed_vertical = 5
-        height = 50
-        speed_horizontal = 5
-        data = str(msg.payload)
-        coord = data.split(",")
-        coord = map(float, coord)
+        s_coord = requests.get("server/coords/"+str(msg.payload)).text  # received point X from server, get coord
+        coord = s_coord.split(",")
+        coord = map(float, coord)  # coord = {x, y, z}
         distance = Drone._calc_dist(self.x, self.y, coord[0], coord[1])
         dist_x = coord[0]-self.x
         dist_y = coord[1]-self.y
-        print(coord)
         if simulation:
-            self._sim_takeoff(speed_vertical, height)
-            self._sim_fly(speed_horizontal, distance, dist_x, dist_y)
+            speed_takeoff = 0.5
+            speed_landing = 0.5
+            fly_height = 4  # drone wil go to this height during takeoff sequence
+            speed_horizontal = 5
+            self._sim_vertical(speed_takeoff, fly_height)  # takeoff to fly height
+            self._sim_fly(speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
+            self._sim_vertical(speed_landing, coord[2])  # move to end height
 
     # calculate distance between points
     @staticmethod
@@ -79,22 +80,28 @@ class Drone:
         b = pow(y2 - y1, 2)
         return math.sqrt(a+b)
 
-    # takeoff function
-    def _sim_takeoff(self, speed, height):
-        remainder = height % speed
-        height -= remainder
-        if height > self.z:
+    # takeoff + landing simulation
+    def _sim_vertical(self, speed, height):
+        dist_z = height-self.z
+        remainder = dist_z % speed
+        dist_z -= remainder
+        if dist_z > 0:
             lift = 1
         else:
             lift = -1
-        while self.z != height:
+        traveled = 0
+        while traveled != dist_z:
+            traveled += lift*speed
             self.z += lift*speed
             time.sleep(1)
-        self.z += remainder
+        self.z += lift*remainder
 
     # flying
     def _sim_fly(self, speed, distance, dist_x, dist_y):
-        a = math.atan(dist_y/dist_x)
+        if dist_x == 0:  # catch divide by zero issues
+            a = math.pi/2
+        else:
+            a = math.atan(dist_y/dist_x)  # determine fly angle
         if dist_x > 0:
             sx = 1
         else:
@@ -104,15 +111,13 @@ class Drone:
         else:
             sy = -1
         remainder = distance % speed
-        print(remainder)
         distance -= remainder
-        print(distance)
         traveled = 0
         while traveled != distance:
             traveled += speed
-            self.x += sx*speed*math.cos(a)
-            self.y += sy*speed*math.sin(a)
+            self.x += sx*speed*abs(math.cos(a))
+            self.y += sy*speed*abs(math.sin(a))
             time.sleep(1)
 
-        self.x += remainder*math.cos(a)
-        self.y += remainder*math.sin(a)
+        self.x += sx*remainder*abs(math.cos(a))
+        self.y += sy*remainder*abs(math.sin(a))
