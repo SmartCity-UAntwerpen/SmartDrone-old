@@ -29,28 +29,48 @@ class godfather:
 
     def create_drone(self):
         self.list.append(Drone(0, 0, 0))
+    def run_drone(self, id):
+        drone = self.find_drone_by_id(id)
+        drone.run()
 
-    def remove_drone(self, id):
+    def stop_drone(self, id):
+        drone = self.find_drone_by_id(id)
+        drone.stop()
+
+    def restart_drone(self, id):
+        drone = self.find_drone_by_id(id)
+        drone.restart()
+
+    def set_drone(self, id, x,y,z):
+        drone= self.find_drone_by_id(id)
+        drone.set(x,y,z)
+
+    def kill_drone(self, id):
         for drone in self.list:
-            if (drone.id==id):
+            if (str(drone.id)==str(id)):
                 print ("Drone "+ str(drone.id)+" removed")
                 self.list.remove(drone)
+                drone.kill()
+
+    def find_drone_by_id(self, id):
+        for drone in self.list:
+            if (drone.id==id):
+                return drone
+        return 0
 
     def wait_for_instruction(self):
     #now keep talking with the client
         while (1):
             #wait to accept a connection - blocking call
             conn, addr = self.s.accept()
-            print 'Connected with ' + addr[0] + ':' + str(addr[1])
-            print 'Data:'
+            #print 'Connected with ' + addr[0] + ':' + str(addr[1])
             data= conn.recv(1024)
-            print data
             data = data.split(" ")
             if data[0]=="create":
                 self.create_drone()
                 print "create"
             elif data[0]=="run":
-                self.start_drone(data[1])
+                self.run_drone(data[1])
                 print "run"
             elif data[0]=="stop":
                 self.stop_drone(data[1])
@@ -59,11 +79,15 @@ class godfather:
                 self.restart_drone(data[1])
                 print "restart"
             elif data[0]=="set":
-                self.set_drone(data[1], data[2], data[3])
+                self.set_drone(data[1], data[2], data[3], data[4])
                 print "set"
             elif data[0]=="kill":
-                self.remove_drone(data[1])
-                print "kill"
+                self.kill_drone(data[1])
+                print "kill: "+data[1]
+            elif data[0]=="list":
+                print ("List")
+                for drone in self.list:
+                    print (drone.id)
         self.s.close()
 
 godfather()

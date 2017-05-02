@@ -3,7 +3,7 @@ import math
 import requests
 import thread
 import time
-
+from random import randint
 simulation = True
 
 
@@ -25,8 +25,13 @@ class Drone:
     # get an id from the server
     @staticmethod
     def _get_id():
-        #  return 2
-        return int(requests.get("http://newDrone").text)  # TODO send home location to server ?
+        a=randint(0, 99)
+        print (a)
+        return a
+        #return int(requests.get("http://newDrone").text)  # TODO send home location to server ?
+
+    def kill(self):
+        del self
 
     # helper function for creating drone mqtt client
     # set internal to avoid confusion
