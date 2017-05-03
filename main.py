@@ -9,7 +9,7 @@ class godfather:
         self.wait_for_instruction()
 
     def init_socket(self):
-        HOST = '192.168.1.48'# Symbolic name, meaning all available interfaces
+        HOST = '192.168.1.160'# Symbolic name, meaning all available interfaces
         PORT = 8888 # Arbitrary non-privileged port
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,25 +69,32 @@ class godfather:
             if data[0]=="create":
                 self.create_drone()
                 print "create"
+                conn.send('ACK')
             elif data[0]=="run":
-                self.run_drone(data[1])
+                response = self.run_drone(data[1])
                 print "run"
+                #conn.send(response)
             elif data[0]=="stop":
-                self.stop_drone(data[1])
+                response = self.stop_drone(data[1])
                 print "stop"
+                #conn.send(response)
             elif data[0]=="restart":
-                self.restart_drone(data[1])
+                response = self.restart_drone(data[1])
                 print "restart"
+                #conn.send(response)
             elif data[0]=="set":
-                self.set_drone(data[1], data[2], data[3], data[4])
+                response = self.set_drone(data[1], data[2], data[3], data[4])
                 print "set"
+                #conn.send(response)
             elif data[0]=="kill":
-                self.kill_drone(data[1])
+                response = self.kill_drone(data[1])
                 print "kill: "+data[1]
+                #conn.send(response)
             elif data[0]=="list":
                 print ("List")
                 for drone in self.list:
                     print (drone.id)
+                #conn.send('ACK')
         self.s.close()
 
 godfather()
