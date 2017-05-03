@@ -7,6 +7,11 @@ from random import randint
 
 simulation = True
 
+speed_takeoff = 0.5
+speed_landing = 0.5
+fly_height = 4  # drone wil go to this height during takeoff sequence
+speed_horizontal = 5
+
 
 class Drone:
 
@@ -15,6 +20,8 @@ class Drone:
         self.id = Drone._get_id()
         self.job_client = mqttclient.Client()
         self.pos_client = mqttclient.Client()
+        self.app_listener = mqttclient.Client()
+        self.app_publisher = mqttclient.Client()
         self.x = 0
         self.y = 0
         self.z = 0
@@ -28,7 +35,7 @@ class Drone:
     # set the initial x/y/z coordinates
     def set(self, x, y, z):
         if self.running:
-            return 1
+            return "NACK"
 
         else:
             self.init_x = x
@@ -39,22 +46,24 @@ class Drone:
             self.y = y
             self.z = z
             self.is_set = True
-            return 0
+            return "ACK"
 
     # start the drone
     def run(self):
         if self.running or not self.is_set:  # don't start another thread if already running
-            return 1
+            return "NACK"
         else:
             self.running = True
             self._reg_jobs()
             self._reg_pos()
+            self._reg_app_listener()
+            self._reg_app_publisher()
             try:
                 thread.start_new_thread(self._pos_loop, (self.id,))
             except thread.error as e:
                 print(e)
-                return 1
-            return 0
+                return "NACK"
+            return "ACK"
 
     # reset current location
     def _reset(self):
@@ -66,12 +75,14 @@ class Drone:
     def stop(self):
         if self.running:
             self.running = False
+            self._unregister_app_listener()
+            self._unregister_app_publisher()
             self._unregister_job()
             self._unregister_pos()
             self._reset()
-            return 0
+            return "ACK"
         else:
-            return 1
+            return "NACK"
 
     # restart drone
     def restart(self):
@@ -96,7 +107,7 @@ class Drone:
     @staticmethod
     def _create_client(_id):
         client = mqttclient.Client("Drone " + str(_id))
-        client.connect("iot.eclipse.org", 1883, 60)
+        client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
 
     # loop for position update heartbeat
@@ -107,7 +118,7 @@ class Drone:
 
     # register to the job receiving channel
     def _reg_jobs(self):
-        self.job_client = self._create_client(self)
+        self.job_client = self._create_client(self.id)
         self.job_client.subscribe("job/"+str(self.id))
         self.job_client.on_message = self._job  # register job execution function
         self.job_client.loop_start()
@@ -115,6 +126,17 @@ class Drone:
     # register to the position publishing channel
     def _reg_pos(self):
         self.pos_client = self._create_client(self.id)
+
+    # register to the app channel
+    def _reg_app_listener(self):
+        self.app_listener = self._create_client(self.id)
+        self.app_listener.subscribe("app")
+        self.app_listener.on_message = self._calc_weight
+        self.app_listener.loop_start()
+
+    # register to the response channel
+    def _reg_app_publisher(self):
+        self.app_publisher = self._create_client(self.id)
 
     # unregister position channel
     def _unregister_pos(self):
@@ -125,20 +147,44 @@ class Drone:
         self.job_client.disconnect()
         self.job_client.loop_stop()
 
+    # unregister app channel listener
+    def _unregister_app_listener(self):
+        self.app_listener.disconnect()
+        self.app_listener.loop_stop()
+
+    # unregister app channel publisher
+    def _unregister_app_publisher(self):
+        self.app_publisher.disconnect()
+
+    # calculate the weight for a job
+    def _calc_weight(self, client, userdata, msg):
+        data = str(msg.payload).split(",")
+        coorda = self._get_coord(data[0])
+        coordb = self._get_coord(data[1])
+
+        flytime = abs(fly_height-self.z)/speed_takeoff
+        flytime += abs(fly_height-coorda[2])/speed_landing
+        flytime += Drone._calc_dist(self.x, self.y, coorda[0], coordb[1])/speed_horizontal
+
+        flytime += abs(coorda[2]-fly_height)/speed_takeoff
+        flytime += abs(fly_height-coordb[2])/speed_landing
+        flytime += Drone._calc_dist(coorda[0], coorda[1], coordb[0], coordb[1])
+        self.app_publisher.publish("app/time/"+str(flytime))
+
+    # get coordinates from server for point X
+    def _get_coord(self,x):
+        s_coord = requests.get("server/coords/"+str(x)).text
+        coord = s_coord.split(",")
+        return map(float, coord)
+
     # simulate job execution behavior
     # signature must match expected on_message signature
     def _job(self, client, userdata, msg):
-        s_coord = requests.get("server/coords/"+str(msg.payload)).text  # received point X from server, get coord
-        coord = s_coord.split(",")
-        coord = map(float, coord)  # coord = {x, y, z}
+        coord = self._get_coord(str(msg.payload))
         distance = Drone._calc_dist(self.x, self.y, coord[0], coord[1])
         dist_x = coord[0]-self.x
         dist_y = coord[1]-self.y
         if simulation:
-            speed_takeoff = 0.5
-            speed_landing = 0.5
-            fly_height = 4  # drone wil go to this height during takeoff sequence
-            speed_horizontal = 5
             self._sim_vertical(speed_takeoff, fly_height)  # takeoff to fly height
             self._sim_fly(speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
             self._sim_vertical(speed_landing, coord[2])  # move to end height
