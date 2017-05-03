@@ -26,7 +26,7 @@ class Drone:
     @staticmethod
     def _get_id():
         #  return 2
-        return int(requests.get("http://newDrone").text)  # TODO send home location to server ?
+        return int(requests.get("http://newDrone").text)  # TODO catch bad request
 
     # helper function for creating drone mqtt client
     # set internal to avoid confusion
