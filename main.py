@@ -11,8 +11,8 @@ class dronecore:
         self.wait_for_instruction()
 
     def init_socket(self):
-        HOST = '146.175.140.38'# Symbolic name, meaning all available interfaces
-        PORT = 8889 # Arbitrary non-privileged port
+        HOST = '192.168.1.199'# Symbolic name, meaning all available interfaces
+        PORT = 8888 # Arbitrary non-privileged port
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print 'Socket created'
@@ -36,19 +36,22 @@ class dronecore:
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
-        drone.run()
+        return drone.run()
 
     def stop_drone(self, simid):
-        drone = self.find_drone_by_simid(simid).drone
-        drone.stop()
+        drone = self.find_drone_by_simid(simid)
+        return drone.stop()
 
     def restart_drone(self, simid):
-        drone = self.find_drone_by_simid(simid).drone
-        drone.restart()
+        drone = self.find_drone_by_simid(simid)
+        return drone.restart()
 
-    def set_drone(self, simid, x,y,z):
-        drone= self.find_drone_by_simid(simid).drone
-        drone.set(x,y,z)
+    def set_drone(self, simid, point):
+        drone = self.find_drone_by_simid(simid)
+        x = 5+int(point)
+        y = 9+int(point)
+        z = 10+int(point)
+        return drone.set(x, y, z)
 
     def kill_drone(self, simid):
         id = self.simid_id.get(str(simid))
@@ -56,9 +59,10 @@ class dronecore:
         self.id_drone.pop(str(id), None)
         return 'ACK\n'
 
-    def find_drone_by_simid(self, simid):
+    def find_drone_by_simid(self, simid):#todo if drone doesn't exist, NACK!
+        print self.simid_id
         id = self.simid_id.get(str(simid))
-        return self.id_drone.get(str(id))
+        return self.id_drone.get(str(id)).drone
 
     def wait_for_instruction(self):
     #now keep talking with the client
@@ -84,15 +88,16 @@ class dronecore:
                 response = self.restart_drone(data[1])
                 print "restart"
                 conn.send(response)
-            elif data[0]=="set":
-                response = self.set_drone(data[1], data[2], data[3], data[4])
+            elif data[0]=="set" and data[2]=="startpoint":
+                response = self.set_drone(data[1], data[3])
                 print "set"
                 conn.send(response)
             elif data[0]=="kill":
                 response = self.kill_drone(data[1])
                 print "kill: "+data[1]
                 conn.send(response)
-
+            else:
+                conn.send('NACK\n')
             conn.close()
         self.s.close()
 
