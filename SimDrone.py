@@ -54,6 +54,7 @@ class SimDrone(Drone):
         self.stop()
         self._reset()
         self.run()
+        return 'ACK\n'
 
     # start the drone
     def run(self):
