@@ -51,10 +51,13 @@ class SimDrone(Drone):
 
     # restart drone
     def restart(self):
-        self.stop()
-        self._reset()
-        self.run()
-        return 'ACK\n'
+        if  self.is_set:
+            self.stop()
+            self._reset()
+            self.run()
+            return 'ACK\n'
+        else:
+            return 'NACK\n'
 
     # start the drone
     def run(self):
