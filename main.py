@@ -1,14 +1,36 @@
+import requests as requests
+
 from drone import Drone
+import requests
 from droneparameters import DroneParameters
+import paho.mqtt.client as mqttclient
 import socket
 import sys
 class dronecore:
     def __init__(self):
         self.simid_id={}
         self.id_drone={}
-        self.s=0
         self.init_socket()
+        self._reg_pos()
         self.wait_for_instruction()
+
+
+    # register to the job receiving channel
+    def _reg_pos(self):
+        self.pos_client = mqttclient.Client()
+        self.pos_client = self._create_client("Dronecore")
+        self.pos_client.subscribe("pos/#")
+        self.pos_client.on_message = self._pos_update  # register position execution function
+        self.pos_client.loop_start()
+        print "MQTT subscibe"
+
+    def _create_client(self, marker):
+        client = mqttclient.Client(str(marker))
+        client.username_pw_set("root", "smartcity")
+        client.connect("iot.eclipse.org", 1883, 60)
+
+        #client.connect("smartcity-ua.ddns.net", 1883, 60)
+        return client
 
     def init_socket(self):
         HOST = '146.175.140.38'# Symbolic name, meaning all available interfaces
@@ -53,7 +75,7 @@ class dronecore:
         else:
             return "Wrong ID\n"
 
-    def set_drone(self, simid, point):
+    def set_drone(self, simid, point):#TODO hardcoded waypoints
         drone = self.find_drone_by_simid(simid)
         if not drone=="error":
             x = 5+int(point)
@@ -73,7 +95,7 @@ class dronecore:
             self.simid_id.pop(str(simid), None)
             return 'ACK\n'
 
-    def find_drone_by_simid(self, simid):#todo if drone doesn't exist, NACK!
+    def find_drone_by_simid(self, simid):
         print self.simid_id
         id = self.simid_id.get(str(simid))
         if self.id_drone.get(str(id)) is None:
@@ -81,13 +103,18 @@ class dronecore:
         else:
             return self.id_drone.get(str(id)).drone
 
+    def find_drone_by_id(self, id):
+        if self.id_drone.get(str(id)) is None:
+            return "error"
+        else:
+            return self.id_drone.get(str(id)).drone
+
     def wait_for_instruction(self):
-    #now keep talking with the client
         while (1):
             #wait to accept a connection - blocking call
             conn, addr = self.s.accept()
             data= conn.recv(1024)
-            print data
+            print "Comand: "+data
             data = data.split(" ")
             if data[0]=="create":
                 self.create_drone(data[1].rstrip())
@@ -109,4 +136,18 @@ class dronecore:
             conn.close()
         self.s.close()
 
+    def _pos_update(self, client, userdata, msg):
+        msgtopic = msg.topic.split("/")
+        drone = self.find_drone_by_id(msgtopic[1])
+        if not drone=="error":
+            msgmsg = msg.payload.split(",")
+            drone.x=int(msgmsg[0])
+            drone.y=int(msgmsg[1])
+            drone.z=int(msgmsg[2])
+            print "Pos ID:" + msgtopic[1]+" "+str(drone.x) +" "+ str(drone.y)+" "+str(drone.z)
+        else:
+            print "Wrong ID"
+url = 'http://146.175.140.38/test'
+data = 'test'
+response = requests.post(url, data=data)#todo fix it!
 dronecore()
