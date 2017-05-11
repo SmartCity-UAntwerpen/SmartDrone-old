@@ -7,20 +7,20 @@ class dronecore:
         self.id_drone={}
         self._reg_pos()
 
-        interfacecore=coreinterface(self.id_drone)
+        coreinterface(self.id_drone, self.mqtt_client)
         simcore=simdronecore(self.id_drone)
         simcore.wait_for_instruction()
 
 
-
     # register to the job receiving channel
     def _reg_pos(self):
-        self.pos_client = mqttclient.Client()
-        self.pos_client = self._create_client("Dronecore")
-        self.pos_client.subscribe("pos/#")
-        self.pos_client.on_message = self._pos_update  # register position execution function
-        self.pos_client.loop_start()
+        self.mqtt_client = mqttclient.Client()
+        self.mqtt_client = self._create_client("Dronecore")
+        self.mqtt_client.subscribe("pos/#")
+        self.mqtt_client.on_message = self._pos_update  # register position execution function
+        self.mqtt_client.loop_start()
         print "MQTT subscibe"
+
 
     def _create_client(self, marker):
         client = mqttclient.Client(str(marker))
@@ -29,12 +29,6 @@ class dronecore:
 
         #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
-
-    def find_drone_by_id(self, id):
-        if self.id_drone.get(str(id)) is None:
-            return "error"
-        else:
-            return self.id_drone.get(str(id)).drone
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
