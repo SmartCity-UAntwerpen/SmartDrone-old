@@ -65,9 +65,7 @@ class SimDrone(Drone):
 
     # delete drone
     def kill(self):
-        self.running = False
-        self._unregister_pos()
-        self._unregister_job()
+        self.stop()
         del self
 
     # flying

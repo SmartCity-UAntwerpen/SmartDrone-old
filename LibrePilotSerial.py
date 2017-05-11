@@ -24,20 +24,18 @@ ser = serial.Serial('/dev/ttyS0', 57600)
 
 
 def send(objectId, data, length):
-    header = []
-    header[0] = 0x3c
-    header[1] = 0x22
+    header = [0x3c, 0x22]
     pLen = length+ 10
 
-    header[2] = (pLen >> (8*0)) & 0xFF
-    header[3] = (pLen >> (8*1)) & 0xFF
+    header.append((pLen >> (8*0)) & 0xFF)
+    header.append((pLen >> (8*1)) & 0xFF)
 
-    header[4] = (objectId >> (8*0)) & 0xFF
-    header[5] = (objectId >> (8*1)) & 0xFF
-    header[6] = (objectId >> (8*2)) & 0xFF
-    header[7] = (objectId >> (8*3)) & 0xFF
-    header[8] = 0x00
-    header[9] = 0x00
+    header.append((objectId >> (8*0)) & 0xFF)
+    header.append((objectId >> (8*1)) & 0xFF)
+    header.append((objectId >> (8*2)) & 0xFF)
+    header.append((objectId >> (8*3)) & 0xFF)
+    header.append(0x00)
+    header.append(0x00)
     crc = _crc2(header, data, length)
     ser.write(header)
     ser.write(data)
