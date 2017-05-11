@@ -4,12 +4,11 @@ from droneparameters import DroneParameters
 import paho.mqtt.client as mqttclient
 class dronecore:
     def __init__(self):
-        global id_drone
-        id_drone={}
+        self.id_drone={}
         self._reg_pos()
 
-        interfacecore=coreinterface(id_drone)
-        simcore=simdronecore(id_drone)
+        interfacecore=coreinterface(self.id_drone)
+        simcore=simdronecore(self.id_drone)
         simcore.wait_for_instruction()
 
 
@@ -32,21 +31,20 @@ class dronecore:
         return client
 
     def find_drone_by_id(self, id):
-        global id_drone
-        if id_drone.get(str(id)) is None:
+        if self.id_drone.get(str(id)) is None:
             return "error"
         else:
-            return id_drone.get(str(id)).drone
+            return self.id_drone.get(str(id)).drone
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
-        drone = self.find_drone_by_id(msgtopic[1])
-        if not drone=="error":
+        droneparam = self.id_drone.get(str(msgtopic[1]))
+        if not droneparam=="error":#todo
             msgmsg = msg.payload.split(",")
-            drone.x=int(msgmsg[0])
-            drone.y=int(msgmsg[1])
-            drone.z=int(msgmsg[2])
-            print "Pos ID:" + msgtopic[1]+" "+str(drone.x) +" "+ str(drone.y)+" "+str(drone.z)
+            droneparam.x=int(msgmsg[0])
+            droneparam.y=int(msgmsg[1])
+            droneparam.z=int(msgmsg[2])
+            print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"
 

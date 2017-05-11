@@ -6,3 +6,4 @@ class DroneParameters:
         self.y=0
         self.z=0
         self.job=0
+        self.buzy=0
