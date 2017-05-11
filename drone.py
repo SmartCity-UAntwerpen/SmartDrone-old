@@ -2,6 +2,7 @@ import paho.mqtt.client as mqttclient
 import thread
 import time
 from random import randint
+import requests
 
 
 class Drone(object):
@@ -32,6 +33,7 @@ class Drone(object):
     @staticmethod
     def _get_id():
         a = randint(0, 99)
+        a=int(requests.get("http://127.0.0.1:8080/advertise").text)
         print a
         return a
         # return int(requests.get("http://newDrone").text)  # TODO fix ID request

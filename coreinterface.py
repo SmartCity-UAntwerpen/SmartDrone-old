@@ -43,7 +43,10 @@ class job():
         #print data
         self.mqtt_client.publish("job/" , "test")
         return 'job'
+
 class advertise():
     @cherrypy.expose
     def index(self):
-        return 'advertise'
+        #id request to corecore
+        #send id request to drone via return
+        return '2'
