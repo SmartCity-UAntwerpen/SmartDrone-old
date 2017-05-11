@@ -1,4 +1,3 @@
-from drone import Drone
 from SimDrone import SimDrone
 class DroneParameters:
     def __init__(self):
