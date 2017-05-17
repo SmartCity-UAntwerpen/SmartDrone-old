@@ -32,6 +32,7 @@ class Drone(object):
     @staticmethod
     def _get_id():
         a = randint(0, 99)
+        print a
         return a
         # return int(requests.get("http://newDrone").text)  # TODO fix ID request
 
@@ -41,7 +42,8 @@ class Drone(object):
     def _create_client(_id, marker):
         client = mqttclient.Client("Drone " + str(_id)+str(marker))
         client.username_pw_set("root", "smartcity")
-        client.connect("smartcity-ua.ddns.net", 1883, 60)
+        client.connect("iot.eclipse.org", 1883, 60)
+        #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
 
     # loop for position update heartbeat
