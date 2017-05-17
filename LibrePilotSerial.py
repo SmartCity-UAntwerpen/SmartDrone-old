@@ -1,7 +1,9 @@
+# python implementation of the librepilotserial libraries
+# note this file should not need editing unless a newer version changes these communication protocols
 import serial as serial
-# variables
 
-CRC_TABLE = {
+# variables
+CRC_TABLE = [
     0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31, 0x24, 0x23, 0x2a, 0x2d,
     0x70, 0x77, 0x7e, 0x79, 0x6c, 0x6b, 0x62, 0x65, 0x48, 0x4f, 0x46, 0x41, 0x54, 0x53, 0x5a, 0x5d,
     0xe0, 0xe7, 0xee, 0xe9, 0xfc, 0xfb, 0xf2, 0xf5, 0xd8, 0xdf, 0xd6, 0xd1, 0xc4, 0xc3, 0xca, 0xcd,
@@ -18,41 +20,106 @@ CRC_TABLE = {
     0x3e, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2c, 0x2b, 0x06, 0x01, 0x08, 0x0f, 0x1a, 0x1d, 0x14, 0x13,
     0xae, 0xa9, 0xa0, 0xa7, 0xb2, 0xb5, 0xbc, 0xbb, 0x96, 0x91, 0x98, 0x9f, 0x8a, 0x8d, 0x84, 0x83,
     0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
-}
+]
 
 ser = serial.Serial('/dev/ttyS0', 57600)
 
 
-def send(objectId, data, length):
-    header = [0x3c, 0x22]
-    pLen = length+ 10
-
-    header.append((pLen >> (8*0)) & 0xFF)
-    header.append((pLen >> (8*1)) & 0xFF)
-
-    header.append((objectId >> (8*0)) & 0xFF)
-    header.append((objectId >> (8*1)) & 0xFF)
-    header.append((objectId >> (8*2)) & 0xFF)
-    header.append((objectId >> (8*3)) & 0xFF)
-    header.append(0x00)
-    header.append(0x00)
+# send information about object
+def send(object_id, instance, data, length):
+    # 0x3c sync, 0x22 = send with ack
+    p_len = length + 10  # add header portion to data length
+    header = [0x3c, 0x22, (p_len >> (8 * 0)) & 0xFF, (p_len >> (8 * 1)) & 0xFF, (object_id >> (8 * 0)) & 0xFF,
+              (object_id >> (8 * 1)) & 0xFF, (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF,
+              instance >> (4 * 0) & 0xFF, instance >> (4 * 1) & 0xFF]
     crc = _crc2(header, data, length)
     ser.write(header)
     ser.write(data)
     ser.write(crc)
-    print(crc)
 
 
-def _crc2(header, data , length):
+# request data from flight controller
+def request(object_id, instance=0x0000):
+    # 0x3c sync, 0x21 = request, length = 0x000a
+    header = [0x3c, 0x21, 0x0a, 0x00, (object_id >> (8 * 0)) & 0xFF, (object_id >> (8 * 1)) & 0xFF,
+              (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, instance >> (4 * 0),
+              instance >> (4 * 1)]
+    crc = _crc1(header)
+    ser.write(header)
+    ser.write(crc)
+
+
+# receive serial data
+def receive(object_id, ret, instance=None):
+    while 1:
+        message_ok = 1
+        data = []
+        temp = ser.read()
+        if temp == 0x3c:
+            data.append(temp)
+            # receive message type & length
+            data.append(ser.read())   # replace by data.extend(ser.read(3))?
+            data.append(ser.read())
+            data.append(ser.read())
+
+            length = int(data[2] | data[3] << 8)
+
+            # check length valid
+            if 10 < length < 265:
+                #  receive object id
+                data.append(ser.read())
+                data.append(ser.read())
+                data.append(ser.read())
+                data.append(ser.read())
+
+                object_id_received = data[4]+data[5]*(2 ^ 8) + data[6]*(2 ^ 16) + data[7]*2 ^ 24
+
+                # receive instance id
+                data.append(ser.read())
+                data.append(ser.read())
+
+                instance_id_received = data[8] + data[9]*(2 ^ 8)
+
+                # receive data
+                for j in range(10, length):
+                    data.append(ser.read())
+
+                # check crc
+                ccrc = ser.read()
+                crc = _crc1(data, length)
+
+                # check if object id matches
+                if object_id_received != object_id:
+                    message_ok = 0
+
+                # check instance id if demanded
+                if instance:
+                    if instance_id_received != instance:
+                        message_ok = 0
+
+                # if the object & instance id match
+                if message_ok:
+                    for j in range(10, length):
+                        ret.append(data[j])  # add data to output buffer
+                    if ccrc != crc:
+                        return 1  # return 1 if crc doesnt match -> detect corrupted message
+                    return 0
+
+
+# calculates crc for requests
+def _crc1(header, length=10):
     crc = 0
-    for k in range(0,10):
-        crc = CRC_TABLE[(bytes(crc ^ header[k])) & 0xFF]
-
-    for k in range(0, length):
-        crc = CRC_TABLE[(bytes(crc ^ data[k])) & 0xFF]
-
+    for x in range(0, length):
+        crc = CRC_TABLE[(int(crc ^ header[x])) & 0xFF]
     return crc & 0xFF
 
 
+# calculates crc for sending data
+def _crc2(header, data, length):
+    crc = 0x00
+    for k in range(0, 10):
+        crc = CRC_TABLE[(int(crc ^ header[k])) & 0xFF]
 
-
+    for k in range(0, length):
+        crc = CRC_TABLE[(int(crc ^ data[k])) & 0xFF]
+    return crc & 0xFF
