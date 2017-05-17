@@ -4,11 +4,11 @@ from droneparameters import DroneParameters
 import paho.mqtt.client as mqttclient
 class dronecore:
     def __init__(self):
-        self.id_drone={}
+        self.id_droneparam={}
         self._reg_pos()
 
-        coreinterface(self.id_drone, self.mqtt_client)
-        simcore=simdronecore(self.id_drone)
+        coreinterface(self.id_droneparam, self.mqtt_client)
+        simcore=simdronecore()
         simcore.wait_for_instruction()
 
 
@@ -32,8 +32,8 @@ class dronecore:
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
-        droneparam = self.id_drone.get(str(msgtopic[1]))
-        if not droneparam=="error":#todo
+        droneparam = self.id_droneparam.get(str(msgtopic[1]))
+        if not droneparam==None:#todo
             msgmsg = msg.payload.split(",")
             droneparam.x=int(msgmsg[0])
             droneparam.y=int(msgmsg[1])

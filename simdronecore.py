@@ -1,11 +1,10 @@
 
 import socket
 import sys
-from droneparameters import DroneParameters
+from SimDrone import SimDrone
 class simdronecore:
-    def __init__(self, id_drone):
-        self.id_drone=id_drone
-        self.simid_id={}
+    def __init__(self):
+        self.simid_drone={}
         self.init_socket()
         print "simdroneinit"
 
@@ -54,10 +53,7 @@ class simdronecore:
         self.s.close()
 
     def create_drone(self, simid):
-        #global id_drone
-        newdroneparameters = DroneParameters()
-        self.simid_id[str(simid)] = newdroneparameters.drone.id
-        self.id_drone[str(newdroneparameters.drone.id)] = newdroneparameters
+        self.simid_drone[str(simid)] = SimDrone()
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
@@ -92,20 +88,19 @@ class simdronecore:
 
     def kill_drone(self, simid):
         #global id_drone
-        id = self.simid_id.get(str(simid))
-        if id is None:
+        drone = self.simid_drone.get(str(simid))
+        if drone is None:
             return "Wrong ID\n"
         else:
-            self.id_drone.get(str(id)).drone.kill()
-            self.id_drone.pop(str(id), None)
-            self.simid_id.pop(str(simid), None)
+            drone.kill()
+            self.simid_drone.pop(str(simid), None)
             return 'ACK\n'
 
     def find_drone_by_simid(self, simid):
         #global id_drone
-        print self.simid_id
-        id = self.simid_id.get(str(simid))
-        if self.id_drone.get(str(id)) is None:
+        print self.simid_drone
+        drone = self.simid_drone.get(str(simid))
+        if drone is None:
             return "error"
         else:
-            return self.id_drone.get(str(id)).drone
+            return drone
