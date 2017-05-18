@@ -42,7 +42,7 @@ def _package(data, length):
 def _unpack(data, length):
     result = 0
     for i in range(0, length):
-        result += data[i]*(2 ^ (8*i))
+        result += data[i]*pow(2,8*i)
     return result
 
 
