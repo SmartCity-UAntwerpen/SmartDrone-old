@@ -1,104 +1,56 @@
-from drone import Drone
+from simdronecore import simdronecore
+from coreinterface import coreinterface
 from droneparameters import DroneParameters
-import socket
-import sys
+import paho.mqtt.client as mqttclient
 class dronecore:
     def __init__(self):
-        self.simid_id={}
-        self.id_drone={}
-        self.s=0
-        self.init_socket()
-        self.wait_for_instruction()
+        self.id_droneparam={}
+        self._reg_pos()
+        self._reg_jobdone()
 
-    def init_socket(self):
-        HOST = '192.168.1.199'# Symbolic name, meaning all available interfaces
-        PORT = 8888 # Arbitrary non-privileged port
-
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print 'Socket created'
-        try:
-            self.s.bind((HOST, PORT))
-        except socket.error as msg:
-            print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-            sys.exit()
-        print 'Socket bind complete'
-
-        #Start listening on socket
-        self.s.listen(10)
-        print 'Socket now listening'
+        coreinterface(self.id_droneparam, self.mqtt_client)
+        simcore=simdronecore()
+        simcore.wait_for_instruction()
 
 
+    # register to the job receiving channel
+    def _reg_pos(self):
+        self.mqtt_client = mqttclient.Client()
+        self.mqtt_client = self._create_client("Dronecore")
+        self.mqtt_client.subscribe("pos/#")
+        self.mqtt_client.on_message = self._pos_update  # register position execution function
+        self.mqtt_client.loop_start()
+        print "MQTT subscibe"
 
-    def create_drone(self, simid):
-        newdroneparameters=DroneParameters()
-        self.simid_id[str(simid)]=newdroneparameters.drone.id
-        self.id_drone[str(newdroneparameters.drone.id)]=newdroneparameters
+    # register to the jobdone receiving channel
+    def _reg_jobdone(self):
+        self.mqtt_client = mqttclient.Client()
+        self.mqtt_client = self._create_client("Dronecore_jobdone")
+        self.mqtt_client.subscribe("jobdone/#")
+        self.mqtt_client.on_message = self._job_done  # register position execution function
+        self.mqtt_client.loop_start()
+        print "MQTT jobdone subscibe"
 
-    def run_drone(self, simid):
-        drone = self.find_drone_by_simid(simid)
-        return drone.run()
+    def _create_client(self, marker):
+        client = mqttclient.Client(str(marker))
+        client.username_pw_set("root", "smartcity")
+        client.connect("iot.eclipse.org", 1883, 60)
 
-    def stop_drone(self, simid):
-        drone = self.find_drone_by_simid(simid)
-        return drone.stop()
+        #client.connect("smartcity-ua.ddns.net", 1883, 60)
+        return client
 
-    def restart_drone(self, simid):
-        drone = self.find_drone_by_simid(simid)
-        return drone.restart()
+    def _pos_update(self, client, userdata, msg):
+        msgtopic = msg.topic.split("/")
+        droneparam = self.id_droneparam.get(str(msgtopic[1]))
+        if not droneparam==None:#todo
+            msgmsg = msg.payload.split(",")
+            droneparam.x=int(msgmsg[0])
+            droneparam.y=int(msgmsg[1])
+            droneparam.z=int(msgmsg[2])
+            print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
+        else:
+            print "Wrong ID"
 
-    def set_drone(self, simid, point):
-        drone = self.find_drone_by_simid(simid)
-        x = 5+int(point)
-        y = 9+int(point)
-        z = 10+int(point)
-        return drone.set(x, y, z)
 
-    def kill_drone(self, simid):
-        id = self.simid_id.get(str(simid))
-        self.id_drone.get(str(id)).drone.kill()
-        self.id_drone.pop(str(id), None)
-        return 'ACK\n'
-
-    def find_drone_by_simid(self, simid):#todo if drone doesn't exist, NACK!
-        print self.simid_id
-        id = self.simid_id.get(str(simid))
-        return self.id_drone.get(str(id)).drone
-
-    def wait_for_instruction(self):
-    #now keep talking with the client
-        while (1):
-            #wait to accept a connection - blocking call
-            conn, addr = self.s.accept()
-            data= conn.recv(1024)
-            data = data.split(" ")
-            if data[0]=="create":
-                self.create_drone(data[1])
-                print "create"
-                conn.send('ACK\n')
-
-            elif data[0]=="run":
-                response = self.run_drone(data[1])
-                print "run"
-                conn.send(response)
-            elif data[0]=="stop":
-                response = self.stop_drone(data[1])
-                print "stop"
-                conn.send(response)
-            elif data[0]=="restart":
-                response = self.restart_drone(data[1])
-                print "restart"
-                conn.send(response)
-            elif data[0]=="set" and data[2]=="startpoint":
-                response = self.set_drone(data[1], data[3])
-                print "set"
-                conn.send(response)
-            elif data[0]=="kill":
-                response = self.kill_drone(data[1])
-                print "kill: "+data[1]
-                conn.send(response)
-            else:
-                conn.send('NACK\n')
-            conn.close()
-        self.s.close()
 
 dronecore()
