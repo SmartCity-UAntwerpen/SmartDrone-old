@@ -6,6 +6,7 @@ class dronecore:
     def __init__(self):
         self.id_droneparam={}
         self._reg_pos()
+        self._reg_jobdone()
 
         coreinterface(self.id_droneparam, self.mqtt_client)
         simcore=simdronecore()
@@ -21,6 +22,14 @@ class dronecore:
         self.mqtt_client.loop_start()
         print "MQTT subscibe"
 
+    # register to the jobdone receiving channel
+    def _reg_jobdone(self):
+        self.mqtt_client = mqttclient.Client()
+        self.mqtt_client = self._create_client("Dronecore_jobdone")
+        self.mqtt_client.subscribe("jobdone/#")
+        self.mqtt_client.on_message = self._job_done  # register position execution function
+        self.mqtt_client.loop_start()
+        print "MQTT jobdone subscibe"
 
     def _create_client(self, marker):
         client = mqttclient.Client(str(marker))

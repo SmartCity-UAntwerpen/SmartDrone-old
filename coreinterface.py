@@ -1,5 +1,4 @@
 from random import randint
-from waypoint import waypoint
 import cherrypy
 import json
 
@@ -10,48 +9,60 @@ class coreinterface():
     def __init__(self, id_droneparam, mqtt_client):
         print "core interface started"
         self.id_droneparam=id_droneparam
-
-        self.waypoints={}
         self.mqtt_client= mqtt_client
 
         cherrypy.server.socket_host = '0.0.0.0'
-        cherrypy.tree.mount(calcWeight(), '/calcWeight', {'/': {'tools.gzip.on': True}})
-        cherrypy.tree.mount(posAll(self.id_droneparam),'/posall', {'/': {'tools.gzip.on': True}})
-        cherrypy.tree.mount(job(self.id_droneparam, self.mqtt_client),'/job', {'/': {'tools.gzip.on': True}})
+        cherrypy.tree.mount(calcWeight(self.id_droneparam), '/calcWeight', {'/': {'tools.gzip.on': True}})
+        cherrypy.tree.mount(posAll(self.id_droneparam),'/posAll', {'/': {'tools.gzip.on': True}})
+        cherrypy.tree.mount(job(self.id_droneparam, self.mqtt_client),'/executeJob', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(advertise(self.id_droneparam), '/advertise', {'/': {'tools.gzip.on': True}})
+        cherrypy.tree.mount(getWaypoints(), '/fakewaypoints', {'/': {'tools.gzip.on': True}})
         cherrypy.engine.start()
+        self.getWaypoints()
+        #print self.waypoints[1]['ID']
 
-#class getWaypoints:
-    #a=requests.get("http://146.175.140.44:1994/get").text
+    def getWaypoints(self):
+        self.waypoints = requests.get("http://127.0.0.1:8080/fakewaypoints").json()
 
-
-
-class calcWeight:
+class getWaypoints:#fake Quentin heeft de echte, testdata
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
-       return [{'status':False,'weightToStart':5,'weight':5,'idVehicle':0},{'status':True,'weightToStart':5,'weight':5,'idVehicle':1},{'status':False,'weightToStart':5,'weight':5,'idVehicle':2}]
+       return [{'ID':0,'x':5,'y':5,'z':0},{'ID':45,'x':5,'y':5,'z':1},{'ID':3,'x':5,'y':5,'z':2}]
+
+class calcWeight:
+    def __init__(self, id_droneparam):
+        self.id_droneparam=id_droneparam
+    def _cp_dispatch(self, vpath):
+        if len(vpath)== 3:
+            self.start = vpath.pop(0)#start
+            vpath.pop(0)#to
+            self.end = vpath.pop(0)#end
+            return self
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def index(self):
+        jsonstring = []
+        for key, value in self.id_droneparam.items():
+            droneparam = self.id_droneparam.get(key)
+            #TODO calc weigt
+            weight=2
+            weighttostart=3
+            jsonstring.append({'status': droneparam.buzy, 'weightToStart':weighttostart,'weight':weight,'idVehicle':key})
+        return jsonstring
 
 class posAll():
     def __init__(self, id_droneparam):
         self.id_droneparam=id_droneparam
     @cherrypy.expose
-   # @cherrypy.tools.json_out()
+    @cherrypy.tools.json_out()
     def index(self):#long vehicleID, long startID, long EndID, int percentage
-        jsonstring = '['
-        a=0
+        jsonstring = []
         for key, value in self.id_droneparam.items():
             droneparam=self.id_droneparam.get(key)
-            jsonstring += "{\"vehicleID\":" + str(key) + ","
-            jsonstring += "\"startID\":" + str(droneparam.startID) + ","
-            jsonstring += "\"endID\":" + str(droneparam.endID) + ","
-            jsonstring += "\"percentage\":" + str(droneparam.percentage) + "},"
-            a=1
-        if a==1:
-            jsonstring=jsonstring[:-1]
-            jsonstring +=']'
-            print jsonstring
-        return json.dumps(jsonstring)
+            jsonstring.append({'vehicleID':int(key), 'startID': droneparam.startID,'endID': droneparam.endID,'percentage': droneparam.percentage})
+        return jsonstring
 
 class job():
     def __init__(self, id_droneparam, mqtt_client):
@@ -76,6 +87,4 @@ class advertise():
         if self.id_droneparam.get(str(a))==None:
             newdroneparameters = DroneParameters()
             self.id_droneparam[str(a)] = newdroneparameters
-            print "new drone detect"
-
         return str(a)
