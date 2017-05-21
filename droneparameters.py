@@ -7,5 +7,5 @@ class DroneParameters:
         self.job=0
         self.buzy=0
         self.percentage=0
-        self.startID=0
-        self.endID=0
+        self.idStart=0
+        self.idEnd=0

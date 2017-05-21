@@ -96,7 +96,6 @@ class simdronecore:
 
             return drone.setspeed(speed)
         else:
-            print drone
             return "Wrong ID\n"
 
     def kill_drone(self, simid):

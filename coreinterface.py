@@ -61,7 +61,7 @@ class posAll():
         jsonstring = []
         for key, value in self.id_droneparam.items():
             droneparam=self.id_droneparam.get(key)
-            jsonstring.append({'vehicleID':int(key), 'startID': droneparam.startID,'endID': droneparam.endID,'percentage': droneparam.percentage})
+            jsonstring.append({'idVehicle':int(key), 'idStart': droneparam.startID,'idEnd': droneparam.endID,'percentage': droneparam.percentage})
         return jsonstring
 
 class job():
@@ -69,11 +69,14 @@ class job():
         self.id_droneparam=id_droneparam
         self.mqtt_client = mqtt_client
     @cherrypy.expose
-    #@cherrypy.tools.json_in()
-    def index(self):
-        #data = cherrypy.request.json
-        #print data
-        self.mqtt_client.publish("job/" , "test")
+    @cherrypy.tools.json_in()
+    def index(self):#{"jobID":1,"idStart":2,"idEnd":3,"idVehicle":1}
+        data = cherrypy.request.json
+        print "banaan"
+        print data
+        idVehicle=0
+        self.id_droneparam.get(idVehicle).buzy=1
+        self.mqtt_client.publish("job/", "test")
         return 'job'
 
 class advertise():
