@@ -38,6 +38,8 @@ class dronecore:
 
         #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
+    def _job_done(self, client, userdata, msg):
+        print "jobdone"
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")

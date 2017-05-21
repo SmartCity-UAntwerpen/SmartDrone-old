@@ -42,7 +42,11 @@ class simdronecore:
             elif data[0]=="restart":
                 response = self.restart_drone(data[1].rstrip())
             elif data[0]=="set" and data[2]=="startpoint":
-                response = self.set_drone(data[1], data[3].rstrip())
+                response = self.set_drone_startpoint(data[1], data[3].rstrip())
+            elif data[0]=="set" and data[2]=="name":
+                response = "ACK"
+            elif data[0]=="set" and data[2]=="speed":
+                response = self.set_drone_speed(data[1], data[3].rstrip())
             elif data[0]=="kill":
                 response = self.kill_drone(data[1].rstrip())
             else:
@@ -57,33 +61,42 @@ class simdronecore:
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
-        if not drone == "error":
+        if not drone is None:
             return drone.run()
         else:
             return "Wrong ID\n"
 
     def stop_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
-        if not drone == "error":
+        if not drone is None:
             return drone.stop()
         else:
             return "Wrong ID\n"
 
     def restart_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
-        if not drone == "error":
+        if not drone is None:
             return drone.restart()
         else:
             return "Wrong ID\n"
 
-    def set_drone(self, simid, point):  # TODO hardcoded waypoints
+    def set_drone_startpoint(self, simid, point):
         drone = self.find_drone_by_simid(simid)
-        if not drone == "error":
+        if not drone is None:
             x = 5 + int(point)
             y = 9 + int(point)
             z = 10 + int(point)
-            return drone.set(x, y, z)
+            return drone.setstartpoint(x, y, z)
         else:
+            return "Wrong ID\n"
+
+    def set_drone_speed(self, simid, speed):
+        drone= self.find_drone_by_simid(simid)
+        if not drone is None:
+
+            return drone.setspeed(speed)
+        else:
+            print drone
             return "Wrong ID\n"
 
     def kill_drone(self, simid):

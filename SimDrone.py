@@ -14,11 +14,13 @@ class SimDrone(Drone):
         self.init_x = 0
         self.init_y = 0
         self.init_z = 0
+        self.speed = 100
         self.is_set = False
+        self.running = False
         super(SimDrone, self).__init__()
 
     # set the initial x/y/z coordinates
-    def set(self, x, y, z):
+    def setstartpoint(self, x, y, z):
         if self.running:
             return "NACK\n"
 
@@ -32,6 +34,12 @@ class SimDrone(Drone):
             self.z = z
             self.is_set = True
             return "ACK\n"
+    def setspeed (self, speed):
+        if self.running:
+            return 'NACK'
+        else:
+            self.speed = speed
+            return 'ACK'
 
     # reset current location
     def _reset(self):
