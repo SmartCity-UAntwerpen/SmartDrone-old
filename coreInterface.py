@@ -5,7 +5,7 @@ import json
 from droneparameters import DroneParameters
 import requests
 
-class coreinterface():
+class coreInterface():
     def __init__(self, id_droneparam, mqtt_client):
         print "core interface started"
         self.id_droneparam=id_droneparam
