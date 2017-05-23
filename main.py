@@ -1,5 +1,5 @@
-from simdronecore import simdronecore
-from coreinterface import coreinterface
+from coreSimDrone import coreSimDrone
+from coreInterface import coreInterface
 from droneparameters import DroneParameters
 import paho.mqtt.client as mqttclient
 class dronecore:
@@ -8,12 +8,13 @@ class dronecore:
         self._reg_pos()
         self._reg_jobdone()
 
-        coreinterface(self.id_droneparam, self.mqtt_client)
-        simcore=simdronecore()
+        coreint =coreInterface(self.id_droneparam, self.mqtt_client)
+
+        simcore=coreSimDrone(coreint.waypoints)
         simcore.wait_for_instruction()
 
 
-    # register to the job receiving channel
+    # register to the pos receiving channel
     def _reg_pos(self):
         self.mqtt_client = mqttclient.Client()
         self.mqtt_client = self._create_client("Dronecore")
