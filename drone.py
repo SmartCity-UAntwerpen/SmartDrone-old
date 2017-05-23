@@ -85,4 +85,4 @@ class Drone(object):
         self.job = True
         pass  # todo implement
         self.job = False
-
+        self.job_client.publish("jobdone/"+str(self.id), "done")
