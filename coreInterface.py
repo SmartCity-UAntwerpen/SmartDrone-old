@@ -74,9 +74,12 @@ class job():
         data = cherrypy.request.json
         print "banaan"
         print data
-        idVehicle=0
+        idVehicle=0#todo replace value
         self.id_droneparam.get(idVehicle).buzy=1
-        self.mqtt_client.publish("job/", "test")
+        self.id_droneparam.get(idVehicle).idStart = 2#todo replace value
+        self.id_droneparam.get(idVehicle).idEnd = 3 #todo replace value
+
+        self.mqtt_client.publish("job/", str(data['idEnd']))
         return 'job'
 
 class advertise():

@@ -2,7 +2,7 @@ from coreSimDrone import coreSimDrone
 from coreInterface import coreInterface
 from droneparameters import DroneParameters
 import paho.mqtt.client as mqttclient
-class dronecore:
+class coreDrone:
     def __init__(self):
         self.id_droneparam={}
         self._reg_pos()
@@ -60,4 +60,4 @@ class dronecore:
 
 
 
-dronecore()
+coreDrone()
