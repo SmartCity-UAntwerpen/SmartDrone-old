@@ -1,7 +1,5 @@
 from LibrePilotSerial import *
 import struct
-import sys
-from ctypes import c_uint32
 
 
 # create a new waypoint
@@ -37,7 +35,7 @@ def get_thrust():
     object_id = 0xEAE65C28  # object id = actuator desired
     request(object_id)
     data = _get_data(object_id)
-    thrust = struct.pack('<f', _unpack(data[12:16], 4))[0]  # thrust, 4th field, float
+    thrust = _unpack_float(data[12:16])  # thrust, 4th field, float
     return thrust
 
 
@@ -46,7 +44,7 @@ def get_waypoint_count():
     object_id = 0x82F5D500  # object id = path plan
     request(object_id)
     data = _get_data(object_id)
-    waypoint_count = struct.pack('<H', _unpack(data[0:1], 2))[0]  # waypoint count, first field, uint16
+    waypoint_count = _unpack(data[0:2], 2)  # waypoint count, first field, uint16
     return waypoint_count
 
 
@@ -61,16 +59,22 @@ def _get_data(object_id, instance=None):
 def _package(data, length):
     result = []
     for i in range(0, length):
-        result.append((data >> (length * 2 * i)) & 0xFF)
+        result.append((data >> (8 * i)) & 0xFF)
     return result
 
 
-# unpack bytes to number
+# unpack bytes to int number
 def _unpack(data, length):
     result = 0
     for i in range(0, length):
-        result += data[i] * pow(2, 8 * i)
+        result += data[i] * pow(2, 8 * i)  # invert shift from send
     return result
+
+
+# unpack a float from the network
+def _unpack_float(data):
+    arranged = _unpack(data, len(data))  # rearrange the data
+    return struct.unpack('f', struct.pack('I', arranged))[0]  # convert arranged int to float
 
 
 # convert float to hex values

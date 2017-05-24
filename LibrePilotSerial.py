@@ -32,22 +32,22 @@ def send(object_id, instance, data, length):
     p_len = length + 10  # add header portion to data length
     header = [0x3c, 0x22, (p_len >> (8 * 0)) & 0xFF, (p_len >> (8 * 1)) & 0xFF, (object_id >> (8 * 0)) & 0xFF,
               (object_id >> (8 * 1)) & 0xFF, (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF,
-              instance >> (4 * 0) & 0xFF, instance >> (4 * 1) & 0xFF]
+              (instance >> (8 * 0)) & 0xFF, (instance >> (8 * 1)) & 0xFF]
     crc = _crc2(header, data, length)
+    data.append(crc)
     ser.write(header)
     ser.write(data)
-    ser.write(crc)
 
 
 # request data from flight controller
 def request(object_id, instance=0x0000):
     # 0x3c sync, 0x21 = request, length = 0x000a
     header = [0x3c, 0x21, 0x0a, 0x00, (object_id >> (8 * 0)) & 0xFF, (object_id >> (8 * 1)) & 0xFF,
-              (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, instance >> (4 * 0),
-              instance >> (4 * 1)]
+              (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, (instance >> (8 * 0)) & 0xFF,
+              (instance >> (8 * 1)) & 0xFF]
     crc = _crc1(header)
+    header.append((crc >> (8*0)) & 0xFF)
     ser.write(header)
-    ser.write(crc)
 
 
 # receive serial data

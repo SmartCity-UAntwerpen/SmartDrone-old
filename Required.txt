@@ -1,3 +1,5 @@
-waypoints
-acties
-waypoint count
+GPS
+PoiLocation
+Actions
+fly function
+Pathplan
