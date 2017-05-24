@@ -51,9 +51,9 @@ class coreDrone:
         droneparam = self.id_droneparam.get(str(msgtopic[1]))
         if not droneparam==None:#todo
             msgmsg = msg.payload.split(",")
-            droneparam.x=int(msgmsg[0])
-            droneparam.y=int(msgmsg[1])
-            droneparam.z=int(msgmsg[2])
+            droneparam.x=float(msgmsg[0])
+            droneparam.y=float(msgmsg[1])
+            droneparam.z=float(msgmsg[2])
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"

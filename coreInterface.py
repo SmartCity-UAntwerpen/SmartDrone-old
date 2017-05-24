@@ -22,7 +22,9 @@ class coreInterface():
         #print self.waypoints[1]['ID']
 
     def getWaypoints(self):
-        self.waypoints = requests.get("http://127.0.0.1:8080/fakewaypoints").json()
+        #self.waypoints = requests.get("http://127.0.0.1:8080/fakewaypoints").json()
+        self.waypoints = requests.get("http://146.175.140.44:1994/map/stringmapjson/drone").json()
+        print self.waypoints
 
 class getWaypoints:#fake Quentin heeft de echte, testdata
     @cherrypy.expose
