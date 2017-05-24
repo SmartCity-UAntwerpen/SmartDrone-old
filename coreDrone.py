@@ -2,6 +2,7 @@ from coreSimDrone import coreSimDrone
 from coreInterface import coreInterface
 from droneparameters import DroneParameters
 import paho.mqtt.client as mqttclient
+import time
 class coreDrone:
     def __init__(self):
         self.id_droneparam={}
@@ -54,6 +55,9 @@ class coreDrone:
             droneparam.x=float(msgmsg[0])
             droneparam.y=float(msgmsg[1])
             droneparam.z=float(msgmsg[2])
+
+            droneparam.timestamp=time.time()
+            print droneparam.timestamp
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"
