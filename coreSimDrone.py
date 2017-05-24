@@ -85,7 +85,7 @@ class coreSimDrone:
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             for i in range(len(self.waypoints)):
-                if int(self.waypoints[i]['ID'])==int(point):
+                if int(self.waypoints[i]['id'])==int(point):
                     waypoint =self.waypoints[i]
                     x = waypoint['x']
                     y = waypoint['y']
