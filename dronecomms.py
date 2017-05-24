@@ -1,5 +1,7 @@
 from LibrePilotSerial import *
 import struct
+import sys
+from ctypes import c_uint32
 
 
 # create a new waypoint
@@ -35,7 +37,7 @@ def get_thrust():
     object_id = 0xEAE65C28  # object id = actuator desired
     request(object_id)
     data = _get_data(object_id)
-    thrust = struct.pack('<f', _unpack(data[12:15], 4))  # thrust, 4th field, float
+    thrust = struct.pack('<f', _unpack(data[12:16], 4))[0]  # thrust, 4th field, float
     return thrust
 
 
@@ -44,7 +46,7 @@ def get_waypoint_count():
     object_id = 0x82F5D500  # object id = path plan
     request(object_id)
     data = _get_data(object_id)
-    waypoint_count = struct.pack('<H', _unpack(data[0:1], 2))  # waypoint count, first field, uint16
+    waypoint_count = struct.pack('<H', _unpack(data[0:1], 2))[0]  # waypoint count, first field, uint16
     return waypoint_count
 
 
