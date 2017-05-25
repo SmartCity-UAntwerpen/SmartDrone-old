@@ -1,6 +1,9 @@
 from random import randint
 import cherrypy
 import json
+
+import math
+
 from env import env
 
 from droneparameters import DroneParameters
@@ -39,7 +42,7 @@ class coreInterface():
 
     def getWaypoints(self):
         return requests.get("http://127.0.0.1:8080/fakewaypoints").json()
-        return requests.get("http://146.175.140.44:1994/map/stringmapjson/drone").json()
+        return requests.get(env.addrwaypoints).json()
 
 class getWaypoints:#fake Quentin heeft de echte, testdata
     @cherrypy.expose
@@ -67,30 +70,37 @@ class calcWeight(object):
 
         if coorda==None or coordb== None:
             return "Wrong waypoint ID"
-
+        jsonstring = []
         for key, value in self.id_droneparam.items():
             # time to finish job
-            #flytime = 0
+            if value.buzy==0:
+                weightToStart = 0
+            else:
+                weightToStart=0
+
             #  flytime = time to reach initial point + time to reach end point
-            flytime = abs(env.fly_height - value.z) / env.speed_takeoff
-            # flytime += abs(fly_height - coorda[2]) / speed_landing
-            # flytime += SimDrone._calc_dist(self.x, self.y, coorda[0], coordb[1]) / speed_horizontal
-            # #
-            # flytime += abs(coorda[2] - fly_height) / speed_takeoff
-            # flytime += abs(fly_height - coordb[2]) / speed_landing
-            # flytime += SimDrone._calc_dist(coorda[0], coorda[1], coordb[0], coordb[1])
-        return flytime
-    # @cherrypy.expose
-    # @cherrypy.tools.json_out()
-    # def index(self):
-    #     jsonstring = []
-    #     for key, value in self.id_droneparam.items():
-    #         droneparam = self.id_droneparam.get(key)
-    #         #TODO calc weigt
-    #         weight=2
-    #         weighttostart=3
-    #         jsonstring.append({'status': droneparam.buzy, 'weightToStart':weighttostart,'weight':weight,'idVehicle':key})
-    #     return jsonstring
+            if str(value.idEnd)==str(start):
+                weightToStart=0
+            else:
+                weightToStart += abs(env.fly_height - self.waypoints.get(str(value.idEnd)).z) / env.speed_takeoff
+                weightToStart += abs(env.fly_height - coorda.z) / env.speed_landing
+                weightToStart += env.settletime
+                weightToStart += self._calc_dist(self.waypoints.get(str(value.idEnd)).x, self.waypoints.get(str(value.idEnd)).y, coorda.x, coorda.y) / env.speed_horizontal
+            # time to fly from a to b
+            weight = abs(env.fly_height - coorda.z) / env.speed_takeoff
+            weight += abs(env.fly_height - coordb.z) / env.speed_landing
+            weight += env.settletime
+            weight += self._calc_dist(coorda.x, coorda.y, coordb.x, coordb.y) / env.speed_horizontal
+
+            jsonstring.append(
+                {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
+
+        return jsonstring
+
+    def _calc_dist(self, x1, y1, x2, y2):
+        a = pow(x2 - x1, 2)
+        b = pow(y2 - y1, 2)
+        return math.sqrt(a+b)
 
 class posAll():
     def __init__(self, id_droneparam):
@@ -127,7 +137,7 @@ class advertise():
         self.id_droneparam=id_droneparam
     @cherrypy.expose
     def index(self):
-        #a= int(requests.get("http://146.175.140.44:1994/bot/newBot/drone").text)#todo right adress
+        #a= int(requests.get(env.addrnewid).text)#todo right adress
 
         a = randint(0, 99)
         if self.id_droneparam.get(str(a))==None:

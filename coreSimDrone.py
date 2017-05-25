@@ -2,6 +2,7 @@
 import socket
 import sys
 from SimDrone import SimDrone
+from env import env
 class coreSimDrone:
     def __init__(self,waypoints):
         self.simid_drone={}
@@ -11,7 +12,7 @@ class coreSimDrone:
 
     def init_socket(self):
         HOST = '0.0.0.0'# Symbolic name, meaning all available interfaces
-        PORT = 8888 # Arbitrary non-privileged port
+        PORT = env.tcpport # Arbitrary non-privileged port
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print 'Socket created'

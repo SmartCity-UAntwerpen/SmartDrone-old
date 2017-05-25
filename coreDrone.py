@@ -2,6 +2,7 @@ from coreSimDrone import coreSimDrone
 from coreInterface import coreInterface
 from droneparameters import DroneParameters
 from waypoints import Waypoints
+from env import env
 import paho.mqtt.client as mqttclient
 import time
 class coreDrone:
@@ -37,10 +38,10 @@ class coreDrone:
 
     def _create_client(self, marker):
         client = mqttclient.Client(str(marker))
-        client.username_pw_set("root", "smartcity")
-        client.connect("iot.eclipse.org", 1883, 60)
+        client.username_pw_set(env.mqttusername, env.mqttpassword)
+        client.connect(env.mqttbroker, env.mqttport, 60)
 
-        #client.connect("smartcity-ua.ddns.net", 1883, 60)
+
         return client
     def _job_done(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
@@ -63,7 +64,5 @@ class coreDrone:
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"
-
-
 
 coreDrone()
