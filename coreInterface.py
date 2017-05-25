@@ -76,22 +76,17 @@ class calcWeight(object):
             if value.buzy==0:
                 weightToStart = 0
             else:
-                weightToStart=0
+                waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
+                weightToStart=self._calc_time_between_points(value,waypointEndPrevJob)
 
             #  flytime = time to reach initial point + time to reach end point
             if str(value.idEnd)==str(start):
                 weightToStart=0
             else:
-                weightToStart += abs(env.fly_height - self.waypoints.get(str(value.idEnd)).z) / env.speed_takeoff
-                weightToStart += abs(env.fly_height - coorda.z) / env.speed_landing
-                weightToStart += env.settletime
-                weightToStart += self._calc_dist(self.waypoints.get(str(value.idEnd)).x, self.waypoints.get(str(value.idEnd)).y, coorda.x, coorda.y) / env.speed_horizontal
+                waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
+                weightToStart += self._calc_time_between_points(waypointEndPrevJob,coorda)
             # time to fly from a to b
-            weight = abs(env.fly_height - coorda.z) / env.speed_takeoff
-            weight += abs(env.fly_height - coordb.z) / env.speed_landing
-            weight += env.settletime
-            weight += self._calc_dist(coorda.x, coorda.y, coordb.x, coordb.y) / env.speed_horizontal
-
+            weight = self._calc_time_between_points(coorda,coordb)
             jsonstring.append(
                 {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
 
@@ -101,6 +96,13 @@ class calcWeight(object):
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
         return math.sqrt(a+b)
+    def _calc_time_between_points(self,point1,point2):
+        time = abs(env.fly_height - point1.z) / env.speed_takeoff
+        time += abs(env.fly_height -point2.z) / env.speed_landing
+        time += env.settletime
+        time += self._calc_dist(point1.x, point1.y,point2.x, point2.y) / env.speed_horizontal
+        return time
+
 
 class posAll():
     def __init__(self, id_droneparam):
