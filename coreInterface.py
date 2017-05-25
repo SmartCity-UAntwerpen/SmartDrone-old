@@ -23,26 +23,17 @@ class coreInterface():
         cherrypy.tree.mount(advertise(self.id_droneparam), '/advertise', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(getWaypoints(), '/fakewaypoints', {'/': {'tools.gzip.on': True}})
         cherrypy.engine.start()
-
-        waypoint = Waypoints()
-        self.waypoints[str(0)] = waypoint
-        waypoint= self.waypoints.get(str(0))
-        waypoint.x=1
-        waypoint.y=2
-        waypoint.z=3
-
-        waypoint = Waypoints()
-        self.waypoints[str(1)] = waypoint
-        waypoint = self.waypoints.get(str(1))
-        waypoint.x = 2
-        waypoint.y = 3
-        waypoint.z = 4
-        #self.waypoints= self.getWaypoints()
-        print self.waypoints
+        self.getWaypoints()
 
     def getWaypoints(self):
-        return requests.get("http://127.0.0.1:8080/fakewaypoints").json()
-        return requests.get(env.addrwaypoints).json()
+        waypoints= requests.get(env.addrwaypoints).json()
+        for index in waypoints:
+            waypoint=Waypoints()
+            waypoint.x=index['x']
+            waypoint.y=index['y']
+            waypoint.z=index['z']
+            self.waypoints[str(index['id'])]=waypoint
+        return None
 
 class getWaypoints:#fake Quentin heeft de echte, testdata
     @cherrypy.expose
