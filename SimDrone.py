@@ -134,22 +134,6 @@ class SimDrone(Drone):
         self._sim_vertical(speed_landing, coord[2])  # move to end height
         self.job = False
 
-    # calculate the weight for a job
-    def _calc_weight(self, client, userdata, msg):
-        data = str(msg.payload).split(",")
-        data = map(float, data)
-        coorda = (data[0], data[1], data[2])
-        coordb = (data[3], data[4], data[5])
-
-        #  flytime = time to reach initial point + time to reach end point
-        flytime = abs(fly_height-self.z)/speed_takeoff
-        flytime += abs(fly_height-coorda[2])/speed_landing
-        flytime += SimDrone._calc_dist(self.x, self.y, coorda[0], coordb[1])/speed_horizontal
-
-        flytime += abs(coorda[2]-fly_height)/speed_takeoff
-        flytime += abs(fly_height-coordb[2])/speed_landing
-        flytime += SimDrone._calc_dist(coorda[0], coorda[1], coordb[0], coordb[1])
-
     # calculate distance between points
     @staticmethod
     def _calc_dist(x1, y1, x2, y2):

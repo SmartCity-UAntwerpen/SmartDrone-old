@@ -1,58 +1,96 @@
 from random import randint
 import cherrypy
 import json
+from env import env
 
 from droneparameters import DroneParameters
+from waypoints import Waypoints
 import requests
 
 class coreInterface():
-    def __init__(self, id_droneparam, mqtt_client):
+    def __init__(self, id_droneparam, waypoints,  mqtt_client):
         print "core interface started"
         self.id_droneparam=id_droneparam
         self.mqtt_client= mqtt_client
-
+        self.waypoints=waypoints
         cherrypy.server.socket_host = '0.0.0.0'
-        cherrypy.tree.mount(calcWeight(self.id_droneparam), '/calcWeight', {'/': {'tools.gzip.on': True}})
+        cherrypy.tree.mount(calcWeight(self.id_droneparam, self.waypoints), '/calcWeight', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(posAll(self.id_droneparam),'/posAll', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(job(self.id_droneparam, self.mqtt_client),'/executeJob', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(advertise(self.id_droneparam), '/advertise', {'/': {'tools.gzip.on': True}})
         cherrypy.tree.mount(getWaypoints(), '/fakewaypoints', {'/': {'tools.gzip.on': True}})
         cherrypy.engine.start()
-        self.getWaypoints()
-        #print self.waypoints[1]['ID']
+
+        waypoint = Waypoints()
+        self.waypoints[str(0)] = waypoint
+        waypoint= self.waypoints.get(str(0))
+        waypoint.x=1
+        waypoint.y=2
+        waypoint.z=3
+
+        waypoint = Waypoints()
+        self.waypoints[str(1)] = waypoint
+        waypoint = self.waypoints.get(str(1))
+        waypoint.x = 2
+        waypoint.y = 3
+        waypoint.z = 4
+        #self.waypoints= self.getWaypoints()
+        print self.waypoints
 
     def getWaypoints(self):
-        #self.waypoints = requests.get("http://127.0.0.1:8080/fakewaypoints").json()
-        self.waypoints = requests.get("http://146.175.140.44:1994/map/stringmapjson/drone").json()
-        print self.waypoints
+        return requests.get("http://127.0.0.1:8080/fakewaypoints").json()
+        return requests.get("http://146.175.140.44:1994/map/stringmapjson/drone").json()
 
 class getWaypoints:#fake Quentin heeft de echte, testdata
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def index(self):
-       return [{'ID':0,'x':5,'y':5,'z':0},{'ID':1,'x':5,'y':5,'z':1},{'ID':2,'x':5,'y':5,'z':2}]
+       return [{'id':0,'x':5,'y':5,'z':0},{'id':1,'x':5,'y':5,'z':1},{'id':2,'x':5,'y':5,'z':2}]
 
-class calcWeight:
-    def __init__(self, id_droneparam):
+class calcWeight(object):
+    def __init__(self, id_droneparam, waypoints):
         self.id_droneparam=id_droneparam
+        self.waypoints=waypoints
+
     def _cp_dispatch(self, vpath):
         if len(vpath)== 3:
-            self.start = vpath.pop(0)#start
-            vpath.pop(0)#to
-            self.end = vpath.pop(0)#end
+            cherrypy.request.params['start'] = vpath.pop(0)#start
+            vpath.pop(0)
+            cherrypy.request.params['end'] = vpath.pop(0)#end
             return self
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def index(self):
-        jsonstring = []
+    def index(self, start, end):
+        coorda = self.waypoints.get(str(start))
+        coordb = self.waypoints.get(str(end))
+
+        if coorda==None or coordb== None:
+            return "Wrong waypoint ID"
+
         for key, value in self.id_droneparam.items():
-            droneparam = self.id_droneparam.get(key)
-            #TODO calc weigt
-            weight=2
-            weighttostart=3
-            jsonstring.append({'status': droneparam.buzy, 'weightToStart':weighttostart,'weight':weight,'idVehicle':key})
-        return jsonstring
+            # time to finish job
+            #flytime = 0
+            #  flytime = time to reach initial point + time to reach end point
+            flytime = abs(env.fly_height - value.z) / env.speed_takeoff
+            # flytime += abs(fly_height - coorda[2]) / speed_landing
+            # flytime += SimDrone._calc_dist(self.x, self.y, coorda[0], coordb[1]) / speed_horizontal
+            # #
+            # flytime += abs(coorda[2] - fly_height) / speed_takeoff
+            # flytime += abs(fly_height - coordb[2]) / speed_landing
+            # flytime += SimDrone._calc_dist(coorda[0], coorda[1], coordb[0], coordb[1])
+        return flytime
+    # @cherrypy.expose
+    # @cherrypy.tools.json_out()
+    # def index(self):
+    #     jsonstring = []
+    #     for key, value in self.id_droneparam.items():
+    #         droneparam = self.id_droneparam.get(key)
+    #         #TODO calc weigt
+    #         weight=2
+    #         weighttostart=3
+    #         jsonstring.append({'status': droneparam.buzy, 'weightToStart':weighttostart,'weight':weight,'idVehicle':key})
+    #     return jsonstring
 
 class posAll():
     def __init__(self, id_droneparam):

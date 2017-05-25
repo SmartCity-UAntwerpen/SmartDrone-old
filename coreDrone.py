@@ -1,17 +1,19 @@
 from coreSimDrone import coreSimDrone
 from coreInterface import coreInterface
 from droneparameters import DroneParameters
+from waypoints import Waypoints
 import paho.mqtt.client as mqttclient
 import time
 class coreDrone:
     def __init__(self):
         self.id_droneparam={}
+        self.waypoints={}
         self._reg_pos()
         self._reg_jobdone()
 
-        coreint =coreInterface(self.id_droneparam, self.mqtt_client)
+        coreint =coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
 
-        simcore=coreSimDrone(coreint.waypoints)
+        simcore=coreSimDrone(self.waypoints)
         simcore.wait_for_instruction()
 
 

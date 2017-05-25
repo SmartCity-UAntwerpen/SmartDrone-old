@@ -84,16 +84,15 @@ class coreSimDrone:
     def set_drone_startpoint(self, simid, point):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
-            for i in range(len(self.waypoints)):
-                if int(self.waypoints[i]['id'])==int(point):
-                    waypoint =self.waypoints[i]
-                    x = waypoint['x']
-                    y = waypoint['y']
-                    z = waypoint['z']
-                    return drone.setstartpoint(x, y, z)
+
+            waypoint =self.waypoints.get(point)
+            if not waypoint is None:
+                x = waypoint.x
+                y = waypoint.y
+                z = waypoint.z
+                return drone.setstartpoint(x, y, z)
             return 'Wrong startpoint\n'
-        else:
-            return "Wrong ID\n"
+        return "Wrong ID\n"
 
     def set_drone_speed(self, simid, speed):
         drone= self.find_drone_by_simid(simid)
