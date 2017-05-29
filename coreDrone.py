@@ -5,6 +5,7 @@ from waypoints import Waypoints
 from env import env
 import paho.mqtt.client as mqttclient
 import time
+import requests
 class coreDrone:
     def __init__(self):
         self.id_droneparam={}
@@ -47,7 +48,9 @@ class coreDrone:
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[1]))
         droneparam.buzy = 0
-        #TODO send to MaaSkantje?!
+        id = droneparam.idJob
+        a = requests.get(env.addrjobdone,params={"idJob": id}).text
+        print a
         print "jobdone"
 
     def _pos_update(self, client, userdata, msg):
