@@ -13,7 +13,7 @@ class coreDrone:
         self._reg_jobdone()
 
         coreint =coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
-
+        print self.waypoints
         simcore=coreSimDrone(self.waypoints)
         simcore.wait_for_instruction()
 
