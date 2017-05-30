@@ -6,6 +6,7 @@ from env import env
 import paho.mqtt.client as mqttclient
 import time
 import requests
+import threading
 class coreDrone:
     def __init__(self):
         self.id_droneparam={}
@@ -14,9 +15,30 @@ class coreDrone:
         self._reg_jobdone()
 
         coreint =coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
+        thread = threading.Thread(target=self.haertbeatcheck)
+        thread.start()
+
         print self.waypoints
         simcore=coreSimDrone(self.waypoints)
         simcore.wait_for_instruction()
+
+    def haertbeatcheck(self):
+        while 1:
+            time.sleep(1.0)
+            timeout=time.time()-env.haertbeattime
+            timedead=time.time()-env.haertbeattimedead
+
+            for key, value in self.id_droneparam.items():
+                if value.timestamp<=timeout and value.available==1:
+                    value.available=0
+                    print "I shot the sheriff: "+ key
+                    #TODO send to maaskantje
+                elif value.timestamp<=timedead and value.timestamp!=0:
+                    self.id_droneparam.get(key).kill()
+                    self.id_droneparam.pop(key, None)
+
+                    print "I shot the sheriff twice: "+ key
+                    # TODO send to Quentin
 
 
     # register to the pos receiving channel
@@ -44,10 +66,12 @@ class coreDrone:
 
 
         return client
+
     def _job_done(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[1]))
         droneparam.buzy = 0
+        droneparam.percentage=100
         id = droneparam.idJob
         a = requests.get(env.addrjobdone,params={"idJob": id}).text
         print a
@@ -61,9 +85,10 @@ class coreDrone:
             droneparam.x=float(msgmsg[0])
             droneparam.y=float(msgmsg[1])
             droneparam.z=float(msgmsg[2])
-
+            droneparam.available = 1
             droneparam.timestamp=time.time()
-            print droneparam.timestamp
+            if droneparam.buzy ==1:
+                droneparam.percentage +=1
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"

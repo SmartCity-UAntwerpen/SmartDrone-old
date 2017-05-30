@@ -17,10 +17,6 @@ class coreInterface():
         self.mqtt_client= mqtt_client
         self.waypoints=waypoints
         cherrypy.server.socket_host = '0.0.0.0'
-        # cherrypy.tree.mount(calcWeight(self.id_droneparam, self.waypoints), '/calcWeight')
-        # cherrypy.tree.mount(job(self.id_droneparam, self.mqtt_client),'/executeJob',config)
-        #cherrypy.tree.mount(advertise(self.id_droneparam), '/advertise')
-        #
         cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints, self.mqtt_client), '/')
         cherrypy.engine.start()
         self.getWaypoints()
@@ -54,16 +50,29 @@ class restserver:
         jsonstring = []
         for key, value in self.id_droneparam.items():
             droneparam=self.id_droneparam.get(key)
-            jsonstring.append({'idVehicle':int(key), 'idStart': droneparam.idStart,'idEnd': droneparam.idEnd,'percentage': droneparam.percentage})
+            if droneparam.available==1:
+                jsonstring.append({'idVehicle':int(key), 'idStart': droneparam.idStart,'idEnd': droneparam.idEnd,'percentage': droneparam.percentage})
         return jsonstring
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def executeJob(self, idJob,idStart,idEnd,idVehicle):
-        self.id_droneparam.get(idVehicle).buzy=1
-        self.id_droneparam.get(idVehicle).idStart = idStart
-        self.id_droneparam.get(idVehicle).idEnd = idEnd
-        self.id_droneparam.get(idVehicle).idJob=idJob
+        #todo check if point exist
+        if self.waypoints.get(idStart) is None or self.waypoints.get(idEnd) is None:
+            return "Wrong start or end ID"
+
+        droneparam= self.id_droneparam.get(idVehicle)
+        if droneparam is None:
+            return "Wrong idVehicle"
+
+        if droneparam.buzy==1:
+            return "Drone is buzy"
+
+        droneparam.buzy=1
+        droneparam.idStart = idStart
+        droneparam.idEnd = idEnd
+        droneparam.idJob=idJob
+        droneparam.percentage=0
         self.mqtt_client.publish("job/", str(idEnd))
         return "ACK"
 

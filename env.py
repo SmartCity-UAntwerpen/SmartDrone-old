@@ -16,3 +16,6 @@ class env:
     mqttpassword="smartcity"
 
     tcpport=8888
+
+    haertbeattime = 10
+    haertbeattimedead = 60*60*24
