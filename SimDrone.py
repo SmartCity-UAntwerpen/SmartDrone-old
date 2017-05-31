@@ -133,6 +133,7 @@ class SimDrone(Drone):
         self._sim_fly(speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
         self._sim_vertical(speed_landing, coord[2])  # move to end height
         self.job = False
+        self.job_client.publish("jobdone/"+str(self.id), "done")
 
     # calculate distance between points
     @staticmethod

@@ -1,6 +1,7 @@
 # python implementation of the librepilotserial libraries
 # note this file should not need editing unless a newer version changes these communication protocols
 import serial as serial
+import struct
 
 # variables
 CRC_TABLE = [
@@ -22,7 +23,7 @@ CRC_TABLE = [
     0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
 ]
 
-ser = serial.Serial('/dev/ttyS0', 57600)
+ser = serial.Serial('COM3', 57600)
 
 
 # send information about object
@@ -31,22 +32,22 @@ def send(object_id, instance, data, length):
     p_len = length + 10  # add header portion to data length
     header = [0x3c, 0x22, (p_len >> (8 * 0)) & 0xFF, (p_len >> (8 * 1)) & 0xFF, (object_id >> (8 * 0)) & 0xFF,
               (object_id >> (8 * 1)) & 0xFF, (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF,
-              instance >> (4 * 0) & 0xFF, instance >> (4 * 1) & 0xFF]
+              (instance >> (8 * 0)) & 0xFF, (instance >> (8 * 1)) & 0xFF]
     crc = _crc2(header, data, length)
+    data.append(crc)
     ser.write(header)
     ser.write(data)
-    ser.write(crc)
 
 
 # request data from flight controller
 def request(object_id, instance=0x0000):
     # 0x3c sync, 0x21 = request, length = 0x000a
     header = [0x3c, 0x21, 0x0a, 0x00, (object_id >> (8 * 0)) & 0xFF, (object_id >> (8 * 1)) & 0xFF,
-              (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, instance >> (4 * 0),
-              instance >> (4 * 1)]
+              (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, (instance >> (8 * 0)) & 0xFF,
+              (instance >> (8 * 1)) & 0xFF]
     crc = _crc1(header)
+    header.append((crc >> (8*0)) & 0xFF)
     ser.write(header)
-    ser.write(crc)
 
 
 # receive serial data
@@ -54,38 +55,38 @@ def receive(object_id, ret, instance=None):
     while 1:
         message_ok = 1
         data = []
-        temp = ser.read()
+        temp = struct.unpack('B', ser.read())[0]
         if temp == 0x3c:
             data.append(temp)
             # receive message type & length
-            data.append(ser.read())   # replace by data.extend(ser.read(3))?
-            data.append(ser.read())
-            data.append(ser.read())
+            data.append(struct.unpack('B', ser.read())[0])   # replace by data.extend(ser.read(3))?
+            data.append(struct.unpack('B', ser.read())[0])
+            data.append(struct.unpack('B', ser.read())[0])
 
             length = int(data[2] | data[3] << 8)
 
             # check length valid
             if 10 < length < 265:
                 #  receive object id
-                data.append(ser.read())
-                data.append(ser.read())
-                data.append(ser.read())
-                data.append(ser.read())
+                data.append(struct.unpack('B', ser.read())[0])
+                data.append(struct.unpack('B', ser.read())[0])
+                data.append(struct.unpack('B', ser.read())[0])
+                data.append(struct.unpack('B', ser.read())[0])
 
-                object_id_received = data[4]+data[5]*(2 ^ 8) + data[6]*(2 ^ 16) + data[7]*2 ^ 24
+                object_id_received = data[4]+data[5]*256 + data[6]*65536 + data[7]*16777216
 
                 # receive instance id
-                data.append(ser.read())
-                data.append(ser.read())
+                data.append(struct.unpack('B', ser.read())[0])
+                data.append(struct.unpack('B', ser.read())[0])
 
-                instance_id_received = data[8] + data[9]*(2 ^ 8)
+                instance_id_received = data[8] + data[9]*256
 
                 # receive data
                 for j in range(10, length):
-                    data.append(ser.read())
+                    data.append(struct.unpack('B', ser.read())[0])
 
                 # check crc
-                ccrc = ser.read()
+                ccrc = struct.unpack('B', ser.read())[0]
                 crc = _crc1(data, length)
 
                 # check if object id matches
@@ -93,7 +94,7 @@ def receive(object_id, ret, instance=None):
                     message_ok = 0
 
                 # check instance id if demanded
-                if instance:
+                if instance is not None:
                     if instance_id_received != instance:
                         message_ok = 0
 

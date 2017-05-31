@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 LibrePilotSerial.pyc
 PathActions.pyc
 dronecomms.pyc
+=======
+dronecomms.pyc
+LibrePilotSerial.pyc
+SimDrone.pyc
+>>>>>>> DroneComms
