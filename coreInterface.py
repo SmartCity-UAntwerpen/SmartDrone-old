@@ -73,6 +73,11 @@ class restserver:
         droneparam.idEnd = idEnd
         droneparam.idJob=idJob
         droneparam.percentage=0
+
+        coorda = self.waypoints.get(str(idStart))
+        coordb = self.waypoints.get(str(idEnd))
+        weighttotal = self._calc_time_between_points(coorda, coordb)
+        weight = self._calc_time_between_points(coorda, coordb)
         self.mqtt_client.publish("job/", str(idEnd))
         return "ACK"
 
