@@ -37,6 +37,15 @@ class restserver:
         self.waypoints=waypoints
         self.mqtt_client=mqttclient
 
+    def _cp_dispatch(self, vpath):
+        function = vpath.pop()
+        if function=="executeJob":
+            cherrypy.request.params['idJob'] = vpath.pop()
+            cherrypy.request.params['idVehicle'] = vpath.pop()
+            cherrypy.request.params['idStart'] = vpath.pop()
+            cherrypy.request.params['idEnd'] = vpath.pop()
+            return self.executeJob
+
     @cherrypy.expose
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
@@ -56,18 +65,20 @@ class restserver:
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
-    def executeJob(self, idJob,idStart,idEnd,idVehicle):
+    def executeJob(self, idJob,idVehicle, idStart,idEnd,):
         #todo check if point exist
-        if self.waypoints.get(idStart) is None or self.waypoints.get(idEnd) is None:
-            return "Wrong start or end ID"
+        if self.waypoints.get(str(idStart)) is None or self.waypoints.get(str(idEnd)) is None:
+            return "Wrong start"+idStart+" or end ID"+idEnd
 
-        droneparam= self.id_droneparam.get(idVehicle)
+        droneparam= self.id_droneparam.get(str(idVehicle))
         if droneparam is None:
             return "Wrong idVehicle"
 
         if droneparam.buzy==1:
             return "Drone is buzy"
-
+        if droneparam.available==0:
+            return "Drone is unavailable"
+        
         droneparam.buzy=1
         droneparam.idStart = idStart
         droneparam.idEnd = idEnd
@@ -128,6 +139,7 @@ class restserver:
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
         return math.sqrt(a+b)
+
     def _calc_time_between_points(self,point1,point2):
         time = abs(env.fly_height - point1.z) / env.speed_takeoff
         time += abs(env.fly_height -point2.z) / env.speed_landing
