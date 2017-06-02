@@ -4,6 +4,7 @@ from env import env
 import paho.mqtt.client as mqttclient
 import time
 import requests
+from coreCalculator import coreCalculator
 import threading
 import navpy  #https://github.com/NavPy/NavPy/tree/master/navpy
 class coreDrone:
@@ -72,8 +73,11 @@ class coreDrone:
         droneparam.buzy = 0
         droneparam.percentage=100
         id = droneparam.idJob
-        a = requests.get(env.addrjobdone,params={"idJob": id}).text
-        print a
+        try:
+            a = requests.get(env.addrjobdone,params={"idJob": id}).text
+            print a
+        except ValueError, Argument:
+            print Argument
         print "jobdone"
 
     def _pos_update(self, client, userdata, msg):
@@ -91,7 +95,13 @@ class coreDrone:
             droneparam.available = 1
             droneparam.timestamp=time.time()
             if droneparam.buzy ==1:
-                droneparam.percentage +=1
+                #calc percentage
+
+                weighttotal = coreCalculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)), self.waypoints.get(str(droneparam.idEnd)))
+
+                weight = coreCalculator.calc_time_between_points(droneparam, self.waypoints.get(str(droneparam.idEnd)))
+                #print str(weighttotal) +" "+ str(weight) + " "+str(weight/weighttotal)
+                droneparam.percentage +=weight/weighttotal
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"

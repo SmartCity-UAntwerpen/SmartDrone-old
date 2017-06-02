@@ -2,8 +2,7 @@ from random import randint
 import cherrypy
 import json
 
-import math
-
+from coreCalculator import coreCalculator
 from env import env
 
 from droneparameters import DroneParameters
@@ -56,7 +55,7 @@ class restserver:
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
     def fakewaypoints(self):
-       return [{'id':0,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':1},{'id':2,'x':5,'y':5,'z':2}]
+       return [{'id':0,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
@@ -91,10 +90,9 @@ class restserver:
         droneparam.percentage=0
 
         coorda = self.waypoints.get(str(idStart))
+        #todo check drone at startpoint
         coordb = self.waypoints.get(str(idEnd))
-        weighttotal = self._calc_time_between_points(coorda, coordb)
-        weight = self._calc_time_between_points(coorda, coordb)#todo, this code to pos-update
-        self.mqtt_client.publish("job/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))#todo NED
+        self.mqtt_client.publish("job/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))
         return "ACK"
 
 
@@ -125,30 +123,20 @@ class restserver:
                 weightToStart = 0
             else:
                 waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                weightToStart=self._calc_time_between_points(value,waypointEndPrevJob)
+                weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob)
 
             #  flytime = time to reach initial point + time to reach end point
             if str(value.idEnd)==str(idStart):
                 weightToStart=0
             else:
                 waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
-                weightToStart += self._calc_time_between_points(waypointEndPrevJob,coorda)
+                weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda)
             # time to fly from a to b
-            weight = self._calc_time_between_points(coorda,coordb)
+            weight = coreCalculator.calc_time_between_points(coorda,coordb)
             jsonstring.append(
                 {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
 
         return jsonstring
 
-    def _calc_dist(self, x1, y1, x2, y2):
-        a = pow(x2 - x1, 2)
-        b = pow(y2 - y1, 2)
-        return math.sqrt(a+b)
 
-    def _calc_time_between_points(self,point1,point2):
-        time = abs(env.fly_height - point1.z) / env.speed_takeoff
-        time += abs(env.fly_height -point2.z) / env.speed_landing
-        time += env.settletime
-        time += self._calc_dist(point1.x, point1.y,point2.x, point2.y) / env.speed_horizontal
-        return time
 
