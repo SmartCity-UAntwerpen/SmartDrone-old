@@ -1,5 +1,5 @@
 class env:
-    fly_height = 4
+    fly_height = -4
     speed_takeoff = 0.5
     speed_landing=0.5
     speed_horizontal=1
