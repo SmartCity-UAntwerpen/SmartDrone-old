@@ -3,7 +3,7 @@ import paho.mqtt.client as mqttclient
 class mqtt:
     listeners=[]
 
-    def __init__(self, host, port, client_id="DancefloorGrid", topic="dancefloor/dj/#"):
+    def __init__(self, host, port, client_id="mqttclient", topic="topic"):
         self.host=host
         self.port=port
         self.topic=topic
@@ -18,7 +18,7 @@ class mqtt:
 
     def on_connect(self,client, userdata, flags, rc):
         client.subscribe(self.topic)
-        print("Geconnecteerd met "+ self.host)
+        print("Connected with "+ self.host)
     
     def on_message(self,client, userdata, msg):
         self.notify_listeners(str(msg.payload))

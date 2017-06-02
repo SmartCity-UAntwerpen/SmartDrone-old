@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="uavtalk-test" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="uavtalk-test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="/home/eric/ProgrammingExamples/Examples/uavtalk-test/.objs" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="LibrePilotSerial.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Makefile" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.h" />
+		<Unit filename="serlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="uavobj/accelgyrosettings.h" />
+		<Unit filename="uavobj/accelsensor.h" />
+		<Unit filename="uavobj/accelstate.h" />
+		<Unit filename="uavobj/accessorydesired.h" />
+		<Unit filename="uavobj/actuatorcommand.h" />
+		<Unit filename="uavobj/actuatordesired.h" />
+		<Unit filename="uavobj/actuatorsettings.h" />
+		<Unit filename="uavobj/airspeedsensor.h" />
+		<Unit filename="uavobj/airspeedsettings.h" />
+		<Unit filename="uavobj/airspeedstate.h" />
+		<Unit filename="uavobj/altitudefiltersettings.h" />
+		<Unit filename="uavobj/altitudeholdsettings.h" />
+		<Unit filename="uavobj/altitudeholdstatus.h" />
+		<Unit filename="uavobj/attitudesettings.h" />
+		<Unit filename="uavobj/attitudesimulated.h" />
+		<Unit filename="uavobj/attitudestate.h" />
+		<Unit filename="uavobj/auxmagsensor.h" />
+		<Unit filename="uavobj/auxmagsettings.h" />
+		<Unit filename="uavobj/barosensor.h" />
+		<Unit filename="uavobj/callbackinfo.h" />
+		<Unit filename="uavobj/cameracontrolactivity.h" />
+		<Unit filename="uavobj/cameracontrolsettings.h" />
+		<Unit filename="uavobj/cameradesired.h" />
+		<Unit filename="uavobj/camerastabsettings.h" />
+		<Unit filename="uavobj/debuglogcontrol.h" />
+		<Unit filename="uavobj/debuglogentry.h" />
+		<Unit filename="uavobj/debuglogsettings.h" />
+		<Unit filename="uavobj/debuglogstatus.h" />
+		<Unit filename="uavobj/ekfconfiguration.h" />
+		<Unit filename="uavobj/ekfstatevariance.h" />
+		<Unit filename="uavobj/faultsettings.h" />
+		<Unit filename="uavobj/firmwareiapobj.h" />
+		<Unit filename="uavobj/fixedwingpathfollowersettings.h" />
+		<Unit filename="uavobj/fixedwingpathfollowerstatus.h" />
+		<Unit filename="uavobj/flightbatterysettings.h" />
+		<Unit filename="uavobj/flightbatterystate.h" />
+		<Unit filename="uavobj/flightmodesettings.h" />
+		<Unit filename="uavobj/flightplancontrol.h" />
+		<Unit filename="uavobj/flightplansettings.h" />
+		<Unit filename="uavobj/flightplanstatus.h" />
+		<Unit filename="uavobj/flightstatus.h" />
+		<Unit filename="uavobj/flighttelemetrystats.h" />
+		<Unit filename="uavobj/gcsreceiver.h" />
+		<Unit filename="uavobj/gcstelemetrystats.h" />
+		<Unit filename="uavobj/gpsextendedstatus.h" />
+		<Unit filename="uavobj/gpspositionsensor.h" />
+		<Unit filename="uavobj/gpssatellites.h" />
+		<Unit filename="uavobj/gpssettings.h" />
+		<Unit filename="uavobj/gpstime.h" />
+		<Unit filename="uavobj/gpsvelocitysensor.h" />
+		<Unit filename="uavobj/groundpathfollowersettings.h" />
+		<Unit filename="uavobj/groundtruth.h" />
+		<Unit filename="uavobj/gyrosensor.h" />
+		<Unit filename="uavobj/gyrostate.h" />
+		<Unit filename="uavobj/homelocation.h" />
+		<Unit filename="uavobj/hwsettings.h" />
+		<Unit filename="uavobj/i2cstats.h" />
+		<Unit filename="uavobj/magsensor.h" />
+		<Unit filename="uavobj/magstate.h" />
+		<Unit filename="uavobj/manualcontrolcommand.h" />
+		<Unit filename="uavobj/manualcontrolsettings.h" />
+		<Unit filename="uavobj/mixersettings.h" />
+		<Unit filename="uavobj/mixerstatus.h" />
+		<Unit filename="uavobj/mpugyroaccelsettings.h" />
+		<Unit filename="uavobj/nedaccel.h" />
+		<Unit filename="uavobj/objectpersistence.h" />
+		<Unit filename="uavobj/oplinkreceiver.h" />
+		<Unit filename="uavobj/oplinksettings.h" />
+		<Unit filename="uavobj/oplinkstatus.h" />
+		<Unit filename="uavobj/osdsettings.h" />
+		<Unit filename="uavobj/overosyncsettings.h" />
+		<Unit filename="uavobj/overosyncstats.h" />
+		<Unit filename="uavobj/pathaction.h" />
+		<Unit filename="uavobj/pathdesired.h" />
+		<Unit filename="uavobj/pathplan.h" />
+		<Unit filename="uavobj/pathstatus.h" />
+		<Unit filename="uavobj/pathsummary.h" />
+		<Unit filename="uavobj/perfcounter.h" />
+		<Unit filename="uavobj/pidstatus.h" />
+		<Unit filename="uavobj/poilearnsettings.h" />
+		<Unit filename="uavobj/poilocation.h" />
+		<Unit filename="uavobj/positionstate.h" />
+		<Unit filename="uavobj/radiocombridgestats.h" />
+		<Unit filename="uavobj/ratedesired.h" />
+		<Unit filename="uavobj/receiveractivity.h" />
+		<Unit filename="uavobj/receiverstatus.h" />
+		<Unit filename="uavobj/revocalibration.h" />
+		<Unit filename="uavobj/revosettings.h" />
+		<Unit filename="uavobj/sonaraltitude.h" />
+		<Unit filename="uavobj/stabilizationbank.h" />
+		<Unit filename="uavobj/stabilizationdesired.h" />
+		<Unit filename="uavobj/stabilizationsettings.h" />
+		<Unit filename="uavobj/stabilizationsettingsbank1.h" />
+		<Unit filename="uavobj/stabilizationsettingsbank2.h" />
+		<Unit filename="uavobj/stabilizationsettingsbank3.h" />
+		<Unit filename="uavobj/stabilizationstatus.h" />
+		<Unit filename="uavobj/statusgrounddrive.h" />
+		<Unit filename="uavobj/statusvtolautotakeoff.h" />
+		<Unit filename="uavobj/statusvtolland.h" />
+		<Unit filename="uavobj/systemalarms.h" />
+		<Unit filename="uavobj/systemidentsettings.h" />
+		<Unit filename="uavobj/systemidentstate.h" />
+		<Unit filename="uavobj/systemsettings.h" />
+		<Unit filename="uavobj/systemstats.h" />
+		<Unit filename="uavobj/takeofflocation.h" />
+		<Unit filename="uavobj/taskinfo.h" />
+		<Unit filename="uavobj/txpidsettings.h" />
+		<Unit filename="uavobj/txpidstatus.h" />
+		<Unit filename="uavobj/velocitydesired.h" />
+		<Unit filename="uavobj/velocitystate.h" />
+		<Unit filename="uavobj/vtolpathfollowersettings.h" />
+		<Unit filename="uavobj/vtolselftuningstats.h" />
+		<Unit filename="uavobj/watchdogstatus.h" />
+		<Unit filename="uavobj/waypoint.h" />
+		<Unit filename="uavobj/waypointactive.h" />
+		<Unit filename="uavtalk-test.cbp" />
+		<Extensions>
+			<code_completion />
+			<debugger>
+				<remote_debugging target="Debug">
+					<options conn_type="0" serial_baud="115200" additional_cmds_before="file uavtalk-test" />
+				</remote_debugging>
+			</debugger>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
