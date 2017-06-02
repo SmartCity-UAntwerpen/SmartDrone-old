@@ -7,6 +7,7 @@ import paho.mqtt.client as mqttclient
 import time
 import requests
 import threading
+import navpy #https://github.com/NavPy/NavPy/tree/master/navpy
 class coreDrone:
     def __init__(self):
         self.id_droneparam={}
@@ -80,11 +81,15 @@ class coreDrone:
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[1]))
-        if not droneparam==None:#todo
-            msgmsg = msg.payload.split(",")
-            droneparam.x=float(msgmsg[0])
-            droneparam.y=float(msgmsg[1])
-            droneparam.z=float(msgmsg[2])
+        if not droneparam==None:
+            msgmsg = msg.payload.split(",")#latlonalt
+
+            NED = navpy.lla2ned(float(msgmsg[0]), float(msgmsg[1]), float(msgmsg[2]), env.homelat, env.homelon,
+                                 env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+
+            droneparam.x= NED[0]
+            droneparam.y= NED[1]
+            droneparam.z= NED[2]
             droneparam.available = 1
             droneparam.timestamp=time.time()
             if droneparam.buzy ==1:
@@ -92,5 +97,6 @@ class coreDrone:
             print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
         else:
             print "Wrong ID"
+
 
 coreDrone()

@@ -17,6 +17,7 @@ class coreInterface():
         self.mqtt_client= mqtt_client
         self.waypoints=waypoints
         cherrypy.server.socket_host = '0.0.0.0'
+        cherrypy.config.update({'server.socket_port': 8082})
         cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints, self.mqtt_client), '/')
         cherrypy.engine.start()
         self.getWaypoints()
@@ -45,12 +46,17 @@ class restserver:
             cherrypy.request.params['idStart'] = vpath.pop()
             cherrypy.request.params['idEnd'] = vpath.pop()
             return self.executeJob
+        if function=="calcWeight":
+            cherrypy.request.params['idStart'] = vpath.pop()
+            cherrypy.request.params['idEnd'] = vpath.pop()
+            return self.calcWeight
+
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
     def fakewaypoints(self):
-       return [{'id':0,'x':5,'y':5,'z':0},{'id':1,'x':5,'y':5,'z':1},{'id':2,'x':5,'y':5,'z':2}]
+       return [{'id':0,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':1},{'id':2,'x':5,'y':5,'z':2}]
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
@@ -65,10 +71,9 @@ class restserver:
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
-    def executeJob(self, idJob,idVehicle, idStart,idEnd,):
-        #todo check if point exist
+    def executeJob(self, idJob,idVehicle, idStart,idEnd):
         if self.waypoints.get(str(idStart)) is None or self.waypoints.get(str(idEnd)) is None:
-            return "Wrong start"+idStart+" or end ID"+idEnd
+            return "Wrong start or end ID"
 
         droneparam= self.id_droneparam.get(str(idVehicle))
         if droneparam is None:
@@ -78,7 +83,7 @@ class restserver:
             return "Drone is buzy"
         if droneparam.available==0:
             return "Drone is unavailable"
-        
+
         droneparam.buzy=1
         droneparam.idStart = idStart
         droneparam.idEnd = idEnd
@@ -88,8 +93,8 @@ class restserver:
         coorda = self.waypoints.get(str(idStart))
         coordb = self.waypoints.get(str(idEnd))
         weighttotal = self._calc_time_between_points(coorda, coordb)
-        weight = self._calc_time_between_points(coorda, coordb)
-        self.mqtt_client.publish("job/", str(idEnd))
+        weight = self._calc_time_between_points(coorda, coordb)#todo, this code to pos-update
+        self.mqtt_client.publish("job/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))#todo NED
         return "ACK"
 
 
@@ -107,9 +112,9 @@ class restserver:
     @cherrypy.expose
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
-    def calcWeight(self, start, end):
-        coorda = self.waypoints.get(str(start))
-        coordb = self.waypoints.get(str(end))
+    def calcWeight(self, idStart, idEnd):
+        coorda = self.waypoints.get(str(idStart))
+        coordb = self.waypoints.get(str(idEnd))
 
         if coorda==None or coordb== None:
             return "Wrong waypoint ID"
@@ -123,7 +128,7 @@ class restserver:
                 weightToStart=self._calc_time_between_points(value,waypointEndPrevJob)
 
             #  flytime = time to reach initial point + time to reach end point
-            if str(value.idEnd)==str(start):
+            if str(value.idEnd)==str(idStart):
                 weightToStart=0
             else:
                 waypointEndPrevJob=self.waypoints.get(str(value.idEnd))

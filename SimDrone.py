@@ -1,5 +1,8 @@
 from drone import *
 import math
+from env import env
+
+import navpy #https://github.com/NavPy/NavPy/tree/master/navpy
 
 # Simulation values
 speed_takeoff = 0.5
@@ -21,17 +24,21 @@ class SimDrone(Drone):
 
     # set the initial x/y/z coordinates
     def setstartpoint(self, x, y, z):
+
+
         if self.running:
             return "NACK\n"
 
         else:
-            self.init_x = x
-            self.init_y = y
-            self.init_z = z
+            self.init_x,self.init_y,self.init_z= navpy.ned2lla([x, y, z], env.homelat, env.homelon,
+                                env.homealt)  # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            # self.init_x = x
+            # self.init_y = y
+            # self.init_z = z
 
-            self.x = x
-            self.y = y
-            self.z = z
+            self.x = self.init_x
+            self.y = self.init_y
+            self.z = self.init_z
             self.is_set = True
             return "ACK\n"
     def setspeed (self, speed):
@@ -101,10 +108,12 @@ class SimDrone(Drone):
             traveled += speed
             self.x += sx * speed * abs(math.cos(a))
             self.y += sy * speed * abs(math.sin(a))
+            self._updateNEDloc()
             time.sleep(1)
 
         self.x += sx * remainder * abs(math.cos(a))
         self.y += sy * remainder * abs(math.sin(a))
+        self._updateNEDloc()
 
     # takeoff + landing simulation
     def _sim_vertical(self, speed, height):
@@ -119,21 +128,32 @@ class SimDrone(Drone):
         while traveled != dist_z:
             traveled += lift * speed
             self.z += lift * speed
+            self._updateNEDloc()
             time.sleep(1)
         self.z += lift * remainder
+        self._updateNEDloc()
 
     # fly drone
     def _fly(self, coord):
-        self.job = True
-        distance = SimDrone._calc_dist(self.x, self.y, coord[0], coord[1])
-        dist_x = coord[0]-self.x
-        dist_y = coord[1]-self.y
+        #coord in NED
+        #Transform self.(x',y',z') = self.(x,y,z) to NED
+        #calc fly
+        #transform self.(x',y',z') to lla
+        self._updateNEDloc()
+
+        distance = SimDrone._calc_dist(self.locationNED[0], self.locationNED[1], coord[0], coord[1])
+        dist_x = coord[0]-self.locationNED[0]
+        dist_y = coord[1]-self.locationNED[1]
 
         self._sim_vertical(speed_takeoff, fly_height)  # takeoff to fly height
         self._sim_fly(speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
         self._sim_vertical(speed_landing, coord[2])  # move to end height
         self.job = False
         self.job_client.publish("jobdone/"+str(self.id), "done")
+
+    def _updateNEDloc(self):
+        self.locationNED = navpy.lla2ned(self.x, self.y, self.z, env.homelat, env.homelon,
+                                    env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
 
     # calculate distance between points
     @staticmethod

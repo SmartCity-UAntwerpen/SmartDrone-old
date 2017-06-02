@@ -32,7 +32,7 @@ class Drone(object):
     # get an id from the server
     @staticmethod
     def _get_id():
-        a=requests.get("http://127.0.0.1:8080/advertise").text#Todo, deploy on server, right ip addr
+        a=requests.get("http://127.0.0.1:8082/advertise").text#Todo, deploy on server, right ip addr
         print a
         a=int(a)
         return a
@@ -79,11 +79,12 @@ class Drone(object):
         coord = str(msg.payload).split(",")
         coord = map(float, coord)
         if not self.job:  # don't handle new job if job ongoing
+            self.job = True
+            print coord
             thread.start_new_thread(self._fly, (coord,))
 
     # fly to coord
     def _fly(self, coord):
-        self.job = True
         pass  # todo implement
         self.job = False
         self.job_client.publish("jobdone/"+str(self.id), "done")
