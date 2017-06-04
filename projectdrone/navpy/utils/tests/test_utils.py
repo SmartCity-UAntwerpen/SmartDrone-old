@@ -4,9 +4,12 @@ Copyright (c) 2014 NavPy Developers. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be found in
 LICENSE.txt
 """
-from navpy import utils
 import unittest
+
 import numpy as np
+
+from projectdrone.navpy import utils
+
 
 class TestUtilsClass(unittest.TestCase):
     
@@ -33,14 +36,14 @@ class TestUtilsClass(unittest.TestCase):
         Test input checking function for invalid 2D array input
         """
         rho = np.array([[1,2], [3,4], [5,6]])
-        self.assertRaises(ValueError,utils.input_check_Nx1,rho)
+        self.assertRaises(ValueError, utils.input_check_Nx1, rho)
     
     def test_inputcheckNx1_invalid_list(self):
         """
         Test input checking function for invalid 2D array input
         """
         rho = [[1,2], [3,4], [5,6]]
-        self.assertRaises(ValueError,utils.input_check_Nx1,rho)
+        self.assertRaises(ValueError, utils.input_check_Nx1, rho)
         
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestUtilsClass)

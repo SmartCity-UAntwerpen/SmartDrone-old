@@ -1,2 +1,2 @@
-from drone.dronecomms import *
+from projectdrone.drone.dronecomms import *
 get_thrust()

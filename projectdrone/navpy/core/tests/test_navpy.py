@@ -4,9 +4,12 @@ Copyright (c) 2014 NavPy Developers. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be found in
 LICENSE.txt
 """
-import navpy
 import unittest
+
 import numpy as np
+
+from projectdrone import navpy
+
 assert_almost_equal = np.testing.assert_almost_equal
 
 """
@@ -326,7 +329,7 @@ class TestNavClass(unittest.TestCase):
         ecef = np.vstack((ecef_pretoria,ecef_sydney))
         
         # Do conversion and check result
-        ecef_computed = navpy.lla2ecef(lat,lon,alt)
+        ecef_computed = navpy.lla2ecef(lat, lon, alt)
     
         # Note: see comment in test_lla2ecef_Ausralia() as to why
         #       only 2 digits of accuracy is being tested for the example.

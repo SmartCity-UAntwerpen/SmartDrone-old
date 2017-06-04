@@ -5,10 +5,11 @@ LICENSE.txt
 """
 
 import numpy as np
+
 from . import wgs84
+from ..utils import input_check_Nx1 as _input_check_Nx1
 from ..utils import input_check_Nx3 as _input_check_Nx3
 from ..utils import input_check_Nx3x3 as _input_check_Nx3x3
-from ..utils import input_check_Nx1 as _input_check_Nx1
 
 
 def angle2dcm(rotAngle1, rotAngle2, rotAngle3, input_unit='rad',
@@ -300,7 +301,7 @@ def angle2quat(rotAngle1,rotAngle2,rotAngle3,
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import angle2quat
+    >>> from projectdrone.navpy import angle2quat
     >>> psi = 0
     >>> theta = np.pi/4.0
     >>> phi = np.pi/3.0
@@ -405,7 +406,7 @@ def quat2angle(q0,qvec,output_unit='rad',rotation_sequence='ZYX'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import quat2angle
+    >>> from projectdrone.navpy import quat2angle
     >>> q0 = 0.800103145191266
     >>> qvec = np.array([0.4619398,0.3314136,-0.1913417])
     >>> psi, theta, phi = quat2angle(q0,qvec)
@@ -497,7 +498,7 @@ def quat2dcm(q0,qvec,rotation_sequence='ZYX',output_type='ndarray'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import quat2dcm
+    >>> from projectdrone.navpy import quat2dcm
     >>> q0 = 1
     >>> qvec = [0, 0, 0]
     >>> C = quat2dcm(q0,qvec)
@@ -567,7 +568,7 @@ def dcm2quat(C,rotation_sequence='ZYX'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import dcm2quat
+    >>> from projectdrone.navpy import dcm2quat
     >>> C = np.array([[  9.25570440e-01,   3.36869440e-01,  -1.73581360e-01],
                       [ -3.42051760e-01,   9.39837700e-01,   5.75800000e-05],
                       [  1.63132160e-01,   5.93160200e-02,   9.84972420e-01]])
@@ -610,7 +611,7 @@ def qmult(p0,pvec,q0,qvec):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import qmult
+    >>> from projectdrone.navpy import qmult
     >>> p0, pvec = 0.701057, np.array([-0.69034553,  0.15304592,  0.09229596])
     >>> q0, qvec = 0.987228, np.array([ 0.12613659,  0.09199968,  0.03171637])
     >>> qmult(q0,qvec,p0,pvec)
@@ -675,7 +676,7 @@ def llarate(VN,VE,VD,lat,alt,lat_unit='deg',alt_unit='m'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import llarate
+    >>> from projectdrone.navpy import llarate
     >>> llarate(100,0,0,45.0,0) # Moving North at 100 m/s, location is at N45.0
     array([ 0.00089983,  0.        ,  0.        ])
     >>> # That output was in deg/sec
@@ -754,8 +755,8 @@ def earthrate(lat, lat_unit = 'deg', model='wgs84'):
 
     e = np.zeros((N,3))
     if(model=='wgs84'):
-        e[:,0] = wgs84.omega_E*np.cos(lat)
-        e[:,1] = -wgs84.omega_E*np.sin(lat)
+        e[:,0] = wgs84.omega_E * np.cos(lat)
+        e[:,1] = -wgs84.omega_E * np.sin(lat)
     else:
         raise ValueError('Model unknown')
 
@@ -835,7 +836,7 @@ def earthrad(lat, lat_unit='deg', model='wgs84'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import earthrad
+    >>> from projectdrone.navpy import earthrad
     >>> lat = 0
     >>> Rtransverse, Rmeridian = earthrad(lat)
     >>> Rtransverse
@@ -857,8 +858,8 @@ def earthrad(lat, lat_unit='deg', model='wgs84'):
         raise ValueError('Input unit unknown')
 
     if(model=='wgs84'):
-        R_N = wgs84.a/(1-wgs84._ecc_sqrd*np.sin(lat)**2)**0.5
-        R_M = wgs84.a*(1-wgs84._ecc_sqrd)/(1-wgs84._ecc_sqrd*np.sin(lat)**2)**1.5
+        R_N = wgs84.a / (1 - wgs84._ecc_sqrd * np.sin(lat) ** 2) ** 0.5
+        R_M = wgs84.a * (1 - wgs84._ecc_sqrd) / (1 - wgs84._ecc_sqrd * np.sin(lat) ** 2) ** 1.5
     else:
         raise ValueError('Model unknown')
     
@@ -896,7 +897,7 @@ def lla2ecef(lat, lon, alt, latlon_unit='deg', alt_unit='m', model='wgs84'):
     
     x = (Rew + alt)*np.cos(lat)*np.cos(lon)
     y = (Rew + alt)*np.cos(lat)*np.sin(lon)
-    z = ( (1-wgs84._ecc_sqrd)*Rew + alt )*np.sin(lat)
+    z = ((1 - wgs84._ecc_sqrd) * Rew + alt) * np.sin(lat)
     
     ecef = np.vstack((x,y,z)).T
 
@@ -936,7 +937,7 @@ def ecef2lla(ecef, latlon_unit='deg'):
 
     # Iteration to get Latitude and Altitude
     p = np.sqrt(x**2 + y**2)
-    lat = np.arctan2(z,p*(1-wgs84._ecc_sqrd))
+    lat = np.arctan2(z, p * (1 - wgs84._ecc_sqrd))
 
     err = np.ones(N)
 
@@ -944,7 +945,7 @@ def ecef2lla(ecef, latlon_unit='deg'):
         Rew,Rns = earthrad(lat,lat_unit='rad')
         h = p/np.cos(lat) - Rew
         
-        err = np.arctan2(z*(1+wgs84._ecc_sqrd*Rew*np.sin(lat)/z),p) - lat
+        err = np.arctan2(z * (1 + wgs84._ecc_sqrd * Rew * np.sin(lat) / z), p) - lat
         
         lat = lat + err
     
@@ -1048,7 +1049,7 @@ def ned2ecef(ned,lat_ref,lon_ref,alt_ref,latlon_unit='deg',alt_unit='m',model='w
     
     Examples
     --------
-    >>> import navpy
+    >>> from projectdrone import navpy
     >>> ned = [0, 0, 1]
     >>> lat_ref, lon_ref, alt_ref = 45.0, -93.0, 250.0 # deg, meters
     >>> ecef = navpy.ned2ecef(ned, lat_ref, lon_ref, alt_ref)
@@ -1118,7 +1119,7 @@ def ecef2ned(ecef,lat_ref,lon_ref,alt_ref,latlon_unit='deg',alt_unit='m',model='
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import ecef2ned
+    >>> from projectdrone.navpy import ecef2ned
     >>> lat 
     """
     lat_ref,N1 = _input_check_Nx1(lat_ref)
@@ -1177,7 +1178,7 @@ def skew(w,output_type='ndarray'):
     Examples
     --------
     >>> import numpy as np
-    >>> from navpy import skew
+    >>> from projectdrone.navpy import skew
     >>> w = [1, 2, 3]
     >>> skew(w)
     array([[ 0., -3.,  2.],
