@@ -22,3 +22,17 @@ navpy/core/navpy.pyc
 navpy/core/wgs84.pyc
 navpy/utils/__init__.pyc
 navpy/utils/utils.pyc
+projectdrone/core/coreCalculator.pyc
+projectdrone/core/coreInterface.pyc
+projectdrone/core/coreSimDrone.pyc
+projectdrone/core/droneparameters.pyc
+projectdrone/core/waypoints.pyc
+projectdrone/drone/__init__.pyc
+projectdrone/drone/drone.pyc
+projectdrone/navpy/__init__.pyc
+projectdrone/navpy/core/__init__.pyc
+projectdrone/navpy/core/navpy.pyc
+projectdrone/navpy/core/wgs84.pyc
+projectdrone/navpy/utils/__init__.pyc
+projectdrone/navpy/utils/utils.pyc
+*.pyc
