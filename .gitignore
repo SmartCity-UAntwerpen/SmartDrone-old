@@ -7,3 +7,18 @@ dronecomms.pyc
 LibrePilotSerial.pyc
 SimDrone.pyc
 >>>>>>> DroneComms
+.idea/workspace.xml
+core/coreCalculator.pyc
+core/coreInterface.pyc
+core/coreSimDrone.pyc
+core/droneparameters.pyc
+core/waypoints.pyc
+drone/__init__.pyc
+drone/drone.pyc
+env.pyc
+navpy/__init__.pyc
+navpy/core/__init__.pyc
+navpy/core/navpy.pyc
+navpy/core/wgs84.pyc
+navpy/utils/__init__.pyc
+navpy/utils/utils.pyc
