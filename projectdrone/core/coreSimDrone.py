@@ -10,7 +10,6 @@ class coreSimDrone:
         self.simid_drone={}
         self.waypoints=waypoints
         self.init_socket()
-        print "simdroneinit"
 
     def init_socket(self):
         HOST = '0.0.0.0'# Symbolic name, meaning all available interfaces
@@ -114,7 +113,4 @@ class coreSimDrone:
 
     def find_drone_by_simid(self, simid):
         drone = self.simid_drone.get(str(simid))
-        if drone is None:
-            return "error"
-        else:
-            return drone
+        return drone
