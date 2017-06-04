@@ -95,16 +95,19 @@ class coreDrone:
             droneparam.available = 1
             droneparam.timestamp=time.time()
             if droneparam.buzy ==1:
-                #calc percentage
-
                 weighttotal = coreCalculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)), self.waypoints.get(str(droneparam.idEnd)))
 
-                weight = coreCalculator.calc_time_between_points(droneparam, self.waypoints.get(str(droneparam.idEnd)))
-                #print str(weighttotal) +" "+ str(weight) + " "+str(weight/weighttotal)
-                droneparam.percentage +=weight/weighttotal
-            print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) +" "+ str(droneparam.y)+" "+str(droneparam.z)
+                if int(msgmsg[3])==4:  # State: 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
+                    weight= coreCalculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)))
+
+                else:
+                    weight = coreCalculator.calc_time_between_points(droneparam, self.waypoints.get(str(droneparam.idEnd)))
+                print str(weighttotal) +" "+ str(weight) + " "+str((weighttotal-weight)/weighttotal*100)
+                droneparam.percentage = (weighttotal-weight)/weighttotal*100
+            if env.printNewPos:
+                print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) + " " + str(droneparam.y)+" "+str(droneparam.z)
         else:
-            print "Wrong ID"
+            print "New pos, Wrong ID"
 
 
 coreDrone()

@@ -73,6 +73,7 @@ class SimDrone(Drone):
             return "NACK\n"
         else:
             super(SimDrone, self).run()
+            self.state = 0  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
             return "ACK\n"
 
     # delete drone
@@ -137,10 +138,13 @@ class SimDrone(Drone):
         distance = SimDrone._calc_dist(self.locationNED[0], self.locationNED[1], coord[0], coord[1])#meter
         dist_x = coord[0]-self.locationNED[0]
         dist_y = coord[1]-self.locationNED[1]
-
+        self.state = 1  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_takeoff, env.fly_height)  # takeoff to fly height
+        self.state = 2  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_fly(env.speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
+        self.state = 3  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         #TODO hang stable
+        self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
         self.job = False
         self.job_client.publish("jobdone/"+str(self.id), "done")

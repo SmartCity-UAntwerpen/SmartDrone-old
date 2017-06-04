@@ -16,3 +16,8 @@ class coreCalculator():
         time += env.settletime
         time += coreCalculator.calc_dist(point1.x, point1.y,point2.x, point2.y) / env.speed_horizontal
         return time
+
+    @staticmethod
+    def calc_time_land(point1, point2):
+        time = abs(point1.z - point2.z) / env.speed_landing
+        return time

@@ -99,13 +99,18 @@ class restserver:
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def advertise(self):
-        #a= int(requests.get(env.addrnewid).text)#todo right adress
+        try:
+            if env.bedugaddrnewid:
+                r = randint(0, 99)
+            else:
+                r= int(requests.get(env.addrnewid).text)
+        except ValueError, Argument:
+            print Argument
 
-        a = randint(0, 99)
-        if self.id_droneparam.get(str(a))==None:
+        if self.id_droneparam.get(str(r))==None:
             newdroneparameters = DroneParameters()
-            self.id_droneparam[str(a)] = newdroneparameters
-        return str(a)
+            self.id_droneparam[str(r)] = newdroneparameters
+        return str(r)
 
     @cherrypy.expose
     @cherrypy.tools.gzip()

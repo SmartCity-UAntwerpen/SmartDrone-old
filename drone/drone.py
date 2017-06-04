@@ -15,6 +15,7 @@ class Drone(object):
         self.x = 0
         self.y = 0
         self.z = 0
+        self.state = 0  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self.job = False
         self.running = False
         self.run()
@@ -50,7 +51,7 @@ class Drone(object):
     # loop for position update heartbeat
     def _pos_loop(self, _id):
         while self.running:
-            self.pos_client.publish("pos/"+str(_id), str(self.x)+","+str(self.y)+","+str(self.z))
+            self.pos_client.publish("pos/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))
             time.sleep(1)  # heartbeat frequency 1 sec
 
     # register to the job receiving channel

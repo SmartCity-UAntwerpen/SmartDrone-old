@@ -7,6 +7,7 @@ class env:
 
     addrwaypoints="http://127.0.0.1:8082/fakewaypoints"#"http://146.175.140.44:1994/map/stringmapjson/drone"
     addrnewid= "http://146.175.140.44:1994/bot/newBot/drone"
+    bedugaddrnewid = True
 
     addrjobdone=""
 
@@ -23,3 +24,5 @@ class env:
     homelat = 51.1785531
     homelon = 4.4183511
     homealt = 0
+
+    printNewPos = False
