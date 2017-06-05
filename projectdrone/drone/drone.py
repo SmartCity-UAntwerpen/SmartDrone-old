@@ -1,8 +1,12 @@
 import paho.mqtt.client as mqttclient
 import thread
 import time
-from random import randint
 import requests
+from Pathaction import Pathaction
+from Waypoint import Waypoint
+from projectdrone.env import env
+import dronecomms as dc
+import PathActions as pa
 
 
 class Drone(object):
@@ -88,4 +92,29 @@ class Drone(object):
     def _fly(self, coord):
         pass  # todo implement
         self.job = False
+        # load pathactions & waypoints to drone
+        pathactions = [Pathaction(0x00, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
+                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
+                       Pathaction(0x01, pa.PATHACTION_MODE_FIXEDATTITUDE, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
+                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
+                       Pathaction(0x02, pa.PATHACTION_MODE_LAND, pa.PATHACTION_ENDCONDITION_NONE,
+                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT)]
+        waypoints = [Waypoint(0x00, 0.0, 0.0, env.fly_height, env.speed_takeoff, 0x00),
+                     Waypoint(0x01, coord[0], coord[1], env.fly_height, env.speed_horizontal, 0x00),
+                     Waypoint(0x02, coord[0], coord[1], env.fly_height, env.speed_landing, 0x01),
+                     Waypoint(0x03, coord[0], coord[1], 0.0, env.speed_landing, 0x02)]
+        for pathaction in pathactions:
+            dc.set_pathaction(pathaction)
+        for waypoint in waypoints:
+            dc.set_waypoint(waypoint)
+        dc.set_pathplan(waypoints, pathactions)
+        # poll position & state every second
+        while dc.get_thrust() != 0:
+            state = dc.get_waypoint_active()
+            self.state = state+1
+            pos = dc.get_position()
+            self.x = pos[0]
+            self.y = pos[1]
+            self.z = pos[2]
+            time.sleep(1)
         self.job_client.publish("jobdone/"+str(self.id), "done")

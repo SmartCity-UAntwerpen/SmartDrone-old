@@ -3,49 +3,72 @@ import struct
 
 
 # create a new waypoint
-def set_waypoint(instance, north, east, down, velocity, action=0x00):
-    object_id = 0xD23852DC  # object id = waypoint
-    data = []
-    data.extend(_package(_float_to_hex(north), 4))
-    data.extend(_package(_float_to_hex(east), 4))
-    data.extend(_package(_float_to_hex(down), 4))
-    data.extend(_package(_float_to_hex(velocity), 4))
-    data.extend(_package(action, 1))
-    send(object_id, instance, data, len(data))
+def set_waypoint(waypoint):
+    data = _package_waypoint(waypoint)
+    send(waypoint.object_id, waypoint.instance, data, len(data))
 
 
 # add a pathaction - note PathActions.py for more info on options
-def set_pathaction(instance, mode, end_condition, command, jump_destination=0, error_destination=0):
-    object_id = 0x6048D4F4
-    mode_parameters = [0, 0, 0, 0]
-    condition_parameters = [0, 0, 0, 0]
+def set_pathaction(pathaction):
+    data = _package_pathaction(pathaction)
+    send(pathaction.object_id, pathaction.instance, data, len(data))
+
+
+# update the pathplan
+def set_pathplan(waypoints, pathactions):
+    object_id = 0x82F5D500
+    waypoint_count = len(waypoints)
+    pathaction_count = len(pathactions)
+    crc = 0
+    for waypoint in waypoints:
+        data = _package_waypoint(waypoint)
+        crc = crc1(data, len(data), crc)
+    for pathaction in pathactions:
+        data = _package_pathaction(pathaction)
+        crc = crc1(data, len(data), crc)
+
     data = []
-    data.extend(mode_parameters)
-    data.extend(condition_parameters)
-    data.extend(_package(jump_destination, 2))
-    data.extend(_package(error_destination, 2))
-    data.extend(_package(mode, 4))
-    data.extend(_package(end_condition, 4))
-    data.extend(_package(command, 4))
-    send(object_id, instance, data, len(data))
+    data.extend(_package(waypoint_count, 2))
+    data.extend(_package(pathaction_count, 2))
+    data.extend(_package(crc, 1))
+    send(object_id, 0x00, data, len(data))
 
 
 # get the current thrust value
 def get_thrust():
-    object_id = 0xEAE65C28  # object id = actuator desired
-    request(object_id)
-    data = _get_data(object_id)
+    data = _get_uav_obj(0xEAE65C28)
     thrust = _unpack_float(data[12:16])  # thrust, 4th field, float
     return thrust
 
 
+# get the position
+def get_position():
+    data = _get_uav_obj(0x9DF1F67A)
+    longitude = _unpack(data[0:4], 4)
+    latitude = _unpack(data[4:8], 4)
+    altitude = _unpack_float(data[8:12])
+    return [longitude, latitude, altitude]
+
+
 # get the current amount of waypoints
 def get_waypoint_count():
-    object_id = 0x82F5D500  # object id = path plan
-    request(object_id)
-    data = _get_data(object_id)
+    data = _get_uav_obj(0x82F5D500)
     waypoint_count = _unpack(data[0:2], 2)  # waypoint count, first field, uint16
     return waypoint_count
+
+
+# get the active waypoint
+def get_waypoint_active():
+    data = _get_uav_obj(0x1EA5B19C)  # object_id for waypoint active
+    waypoint_active = _unpack(data, 2)
+    return waypoint_active
+
+
+# request & get data for a specific object and instance
+def _get_uav_obj(object_id, instance=None):
+    request(object_id, instance)
+    data = _get_data(object_id, instance)
+    return data
 
 
 # get data about object from UART
@@ -80,3 +103,32 @@ def _unpack_float(data):
 # convert float to hex values
 def _float_to_hex(f):
     return struct.unpack('<I', struct.pack('<f', f))[0]
+
+
+# package waypoint to uavtalk format
+def _package_waypoint(waypoint):
+    data = []
+    data.extend(_package(_float_to_hex(waypoint.north), 4))
+    data.extend(_package(_float_to_hex(waypoint.east), 4))
+    data.extend(_package(_float_to_hex(waypoint.down), 4))
+    data.extend(_package(_float_to_hex(waypoint.velocity), 4))
+    data.extend(_package(waypoint.action, 1))
+    return data
+
+
+# package pathaction to uavtalk format
+def _package_pathaction(pathaction):
+    data = []
+    mode_parameters = []  # usage of mode & condition parameters unknown - setting to 0 seems to be fine
+    condition_parameters = []
+    for i in range (0, 4):
+        mode_parameters.extend(_package(_float_to_hex(0.0), 4))
+        condition_parameters.extend(_package(_float_to_hex(0.0), 4))
+    data.extend(mode_parameters)
+    data.extend(condition_parameters)
+    data.extend(_package(pathaction.jump_destination, 2))
+    data.extend(_package(pathaction.error_destination, 2))
+    data.extend(_package(pathaction.mode, 1))
+    data.extend(_package(pathaction.end_condition, 1))
+    data.extend(_package(pathaction.command, 1))
+    return data

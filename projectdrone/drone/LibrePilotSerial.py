@@ -23,7 +23,7 @@ CRC_TABLE = [
     0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
 ]
 
-ser = serial.Serial('COM3', 57600)
+ser = serial.Serial('COM4', 57600)
 
 
 # send information about object
@@ -45,7 +45,7 @@ def request(object_id, instance=0x0000):
     header = [0x3c, 0x21, 0x0a, 0x00, (object_id >> (8 * 0)) & 0xFF, (object_id >> (8 * 1)) & 0xFF,
               (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, (instance >> (8 * 0)) & 0xFF,
               (instance >> (8 * 1)) & 0xFF]
-    crc = _crc1(header)
+    crc = crc1(header)
     header.append((crc >> (8*0)) & 0xFF)
     ser.write(header)
 
@@ -87,7 +87,7 @@ def receive(object_id, ret, instance=None):
 
                 # check crc
                 ccrc = struct.unpack('B', ser.read())[0]
-                crc = _crc1(data, length)
+                crc = crc1(data, length)
 
                 # check if object id matches
                 if object_id_received != object_id:
@@ -108,8 +108,7 @@ def receive(object_id, ret, instance=None):
 
 
 # calculates crc for requests
-def _crc1(header, length=10):
-    crc = 0
+def crc1(header, length=10, crc=0):
     for x in range(0, length):
         crc = CRC_TABLE[(int(crc ^ header[x])) & 0xFF]
     return crc & 0xFF
