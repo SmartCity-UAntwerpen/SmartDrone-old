@@ -117,6 +117,7 @@ class coreSimDrone:
     def find_drone_by_simid(self, simid):
         drone = self.simid_drone.get(str(simid))
         return drone
+
     def runtest(self):
         self.create_drone("1")
         self.set_drone_speed("1","500")

@@ -22,7 +22,7 @@ class coreDrone:
         thread = threading.Thread(target=self.haertbeatcheck)
         thread.start()
 
-        print (self.waypoints)
+        print ("Waypoints: "+str(self.waypoints))
         simcore=coreSimDrone(self.waypoints, self.id_droneparam)
         #simcore.runtest()
         simcore.wait_for_instruction()
@@ -48,21 +48,25 @@ class coreDrone:
 
     # register to the pos receiving channel
     def _reg_pos(self):
-        self.mqtt_client = mqttclient.Client()
-        self.mqtt_client = self._create_client("Dronecore" + str(randint(0, 99)))
-        self.mqtt_client.subscribe(env.mqttTopicPos+"/#")
-        self.mqtt_client.on_message = self._pos_update  # register position execution function
-        self.mqtt_client.loop_start()
-        print ("MQTT pos subscibe")
+        try:
+            self.mqtt_client = mqttclient.Client()
+            self.mqtt_client = self._create_client("Dronecore" + str(randint(0, 99)))
+            self.mqtt_client.subscribe(env.mqttTopicPos+"/#")
+            self.mqtt_client.on_message = self._pos_update  # register position execution function
+            self.mqtt_client.loop_start()
+        except ValueError, Argument:
+            print (Argument)
 
     # register to the jobdone receiving channel
     def _reg_jobdone(self):
-        self.mqtt_client = mqttclient.Client()
-        self.mqtt_client = self._create_client("Dronecorejobdone" + str(randint(0, 99)))
-        self.mqtt_client.subscribe(env.mqttTopicJobdone+"/#")
-        self.mqtt_client.on_message = self._job_done  # register position execution function
-        self.mqtt_client.loop_start()
-        print ("MQTT jobdone subscibe")
+        try:
+            self.mqtt_client = mqttclient.Client()
+            self.mqtt_client = self._create_client("Dronecorejobdone" + str(randint(0, 99)))
+            self.mqtt_client.subscribe(env.mqttTopicJobdone+"/#")
+            self.mqtt_client.on_message = self._job_done  # register position execution function
+            self.mqtt_client.loop_start()
+        except ValueError, Argument:
+            print (Argument)
 
     def _create_client(self, marker):
         client = mqttclient.Client(str(marker))
@@ -109,12 +113,10 @@ class coreDrone:
                 print (str(weighttotal) +" "+ str(weight) + " "+str((weighttotal-weight)/weighttotal*100))
                 droneparam.percentage = (weighttotal-weight)/weighttotal*100
             else:
-                if droneparam.init==0:
+                if droneparam.init==0:#first time? Set startpoint right!
                     droneparam.idStart = int(coreCalculator.calc_waypoint(self.waypoints, droneparam))
                     droneparam.idEnd=droneparam.idStart
                     droneparam.init=1
-            if env.printNewPos:
-                print ("Pos ID:" + msgtopic[2]+" "+str(droneparam.x) + " " + str(droneparam.y)+" "+str(droneparam.z))
         else:
             print ("New pos, Wrong ID: "+str(msgtopic[2]))
 

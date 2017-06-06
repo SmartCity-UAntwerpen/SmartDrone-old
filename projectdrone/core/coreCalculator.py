@@ -12,6 +12,7 @@ class coreCalculator():
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
         return math.sqrt(a+b)
+
     @staticmethod
     def calc_time_between_points(point1,point2, speedfactor):
         time = abs(env.fly_height - point1.z) / env.speed_takeoff/speedfactor

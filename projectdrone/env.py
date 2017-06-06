@@ -42,5 +42,3 @@ class env:
     rate = 57600
 
     standardspeedSimulation=70
-
-    printNewPos = False

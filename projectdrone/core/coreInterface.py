@@ -11,7 +11,6 @@ from waypoints import Waypoints
 
 class coreInterface():
     def __init__(self, id_droneparam, waypoints,  mqtt_client):
-        print ("core interface started")
         self.id_droneparam=id_droneparam
         self.mqtt_client= mqtt_client
         self.waypoints=waypoints
@@ -90,8 +89,7 @@ class restserver:
         droneparam.idJob=idJob
         droneparam.percentage=0
 
-        coorda = self.waypoints.get(str(idStart))
-        #todo check drone at startpoint
+        #coorda = self.waypoints.get(str(idStart))
         coordb = self.waypoints.get(str(idEnd))
         self.mqtt_client.publish(env.mqttTopicJob+"/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))
         return "ACK"
@@ -105,13 +103,12 @@ class restserver:
                 r = randint(0, 99)
             else:
                 r= int(requests.get(env.addrnewid).text)
-        except (ValueError, Argument):
+        except ValueError, Argument:
             print (Argument)
 
         if self.id_droneparam.get(str(r))==None:
             newdroneparameters = DroneParameters()
-            print (simdrone)
-            if int(simdrone):
+            if int(simdrone):#if param simdrone, store in droneparameters
                 newdroneparameters.simdrone=1
             self.id_droneparam[str(r)] = newdroneparameters
         return str(r)
