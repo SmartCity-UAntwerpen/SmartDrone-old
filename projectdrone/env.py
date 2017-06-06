@@ -36,13 +36,11 @@ class env:
     homelon = 4.4183511
     homealt = 0
 
-<<<<<<< HEAD
     printNewPos = False
 
     port = 'COM4'
     rate = 57600
-=======
+
     standardspeedSimulation=70
 
     printNewPos = False
->>>>>>> dronecore
