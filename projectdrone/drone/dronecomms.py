@@ -64,6 +64,13 @@ def get_waypoint_active():
     return waypoint_active
 
 
+# get the current pathaction
+def get_pathaction_active():
+    waypoint_active = _unpack(_get_uav_obj(0x1EA5B19C), 2)
+    waypoint = _get_uav_obj(0x82F5D500, waypoint_active)  # get the currently active waypoint
+    return _unpack(waypoint[17], 1)
+
+
 # request & get data for a specific object and instance
 def _get_uav_obj(object_id, instance=None):
     request(object_id, instance)
@@ -119,13 +126,10 @@ def _package_waypoint(waypoint):
 # package pathaction to uavtalk format
 def _package_pathaction(pathaction):
     data = []
-    mode_parameters = []  # usage of mode & condition parameters unknown - setting to 0 seems to be fine
-    condition_parameters = []
-    for i in range (0, 4):
-        mode_parameters.extend(_package(_float_to_hex(0.0), 4))
-        condition_parameters.extend(_package(_float_to_hex(0.0), 4))
-    data.extend(mode_parameters)
-    data.extend(condition_parameters)
+    for i in range(0, 4):
+        data.extend(_package(_float_to_hex(pathaction.mode_parameters[i]), 4))
+    for i in range(0, 4):
+        data.extend(_package(_float_to_hex(pathaction.condition_parameters[i]), 4))
     data.extend(_package(pathaction.jump_destination, 2))
     data.extend(_package(pathaction.error_destination, 2))
     data.extend(_package(pathaction.mode, 1))

@@ -1,5 +1,5 @@
 class env:
-    fly_height = -4
+    fly_height = -4.0
     speed_takeoff = 0.5
     speed_landing=0.5
     speed_horizontal=1
@@ -32,3 +32,6 @@ class env:
     homealt = 0
 
     printNewPos = False
+
+    port = 'COM4'
+    rate = 57600

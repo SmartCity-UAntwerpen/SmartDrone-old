@@ -89,25 +89,31 @@ class Drone(object):
     def _fly(self, coord):
         self.job = False
         # load pathactions & waypoints to drone
-        pathactions = [Pathaction(0x00, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
+        pathactions = [Pathaction(0x00, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_ABOVEALTITUDE,
+                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT,
+                                  condition_parameters=[env.fly_height, 0.0, 0.0, 0.0]),
+                       Pathaction(0x01, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
-                       Pathaction(0x01, pa.PATHACTION_MODE_FIXEDATTITUDE, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
+                       Pathaction(0x02, pa.PATHACTION_MODE_BRAKE, pa.PATHACTION_ENDCONDITION_TIMEOUT,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
-                       Pathaction(0x02, pa.PATHACTION_MODE_LAND, pa.PATHACTION_ENDCONDITION_NONE,
+                       Pathaction(0x03, pa.PATHACTION_MODE_LAND, pa.PATHACTION_ENDCONDITION_NONE,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT)]
         waypoints = [Waypoint(0x00, 0.0, 0.0, env.fly_height, env.speed_takeoff, 0x00),
-                     Waypoint(0x01, coord[0], coord[1], env.fly_height, env.speed_horizontal, 0x00),
-                     Waypoint(0x02, coord[0], coord[1], env.fly_height, env.speed_landing, 0x01),
-                     Waypoint(0x03, coord[0], coord[1], 0.0, env.speed_landing, 0x02)]
+                     Waypoint(0x01, coord[0], coord[1], env.fly_height, env.speed_horizontal, 0x01),
+                     Waypoint(0x02, coord[0], coord[1], env.fly_height, env.speed_landing, 0x02),
+                     Waypoint(0x03, coord[0], coord[1], 0.0, env.speed_landing, 0x03)]
         for pathaction in pathactions:
             dc.set_pathaction(pathaction)
         for waypoint in waypoints:
             dc.set_waypoint(waypoint)
         dc.set_pathplan(waypoints, pathactions)
+        # wait until takeoff initiated
+        while dc.get_thrust() == 0:
+            time.sleep(1)
         # poll position & state every second
         while dc.get_thrust() != 0:
-            state = dc.get_waypoint_active()
-            self.state = state+1
+            action = dc.get_pathaction_active()
+            self.state = action+1
             pos = dc.get_position()
             self.x = pos[0]
             self.y = pos[1]

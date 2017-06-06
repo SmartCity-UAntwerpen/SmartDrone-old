@@ -2,6 +2,7 @@
 # note this file should not need editing unless a newer version changes these communication protocols
 import serial as serial
 import struct
+from projectdrone.env import env
 
 # variables
 CRC_TABLE = [
@@ -23,7 +24,10 @@ CRC_TABLE = [
     0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3
 ]
 
-#ser = serial.Serial('COM4', 57600)
+try:
+    ser = serial.Serial(env.port, env.rate)
+except serial.SerialException:
+    pass
 
 
 # send information about object
