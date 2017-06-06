@@ -24,6 +24,7 @@ class coreDrone:
 
         print self.waypoints
         simcore=coreSimDrone(self.waypoints, self.id_droneparam)
+        simcore.runtest()
         simcore.wait_for_instruction()
 
     def haertbeatcheck(self):
@@ -39,8 +40,11 @@ class coreDrone:
                 elif value.timestamp<=timedead and value.timestamp!=0 and not value.simdrone:
                         self.id_droneparam.get(key).kill()
                         self.id_droneparam.pop(key, None)
+                        try:
+                            a = requests.get(env.addrkillid+"/"+key).text
+                        except ValueError, Argument:
+                            print Argument
                         print "Kill: "+ key
-                        # TODO send to Quentin
 
     # register to the pos receiving channel
     def _reg_pos(self):
@@ -70,7 +74,7 @@ class coreDrone:
 
     def _job_done(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
-        droneparam = self.id_droneparam.get(str(msgtopic[1]))
+        droneparam = self.id_droneparam.get(str(msgtopic[2]))
         droneparam.buzy = 0
         droneparam.percentage=100
         id = droneparam.idJob
@@ -83,7 +87,7 @@ class coreDrone:
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
-        droneparam = self.id_droneparam.get(str(msgtopic[1]))
+        droneparam = self.id_droneparam.get(str(msgtopic[2]))
         if not droneparam==None:
             msgmsg = msg.payload.split(",")#latlonalt
 
@@ -96,19 +100,24 @@ class coreDrone:
             droneparam.available = 1
             droneparam.timestamp=time.time()
             if droneparam.buzy ==1:
-                weighttotal = coreCalculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)), self.waypoints.get(str(droneparam.idEnd)))
+                weighttotal = coreCalculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)), self.waypoints.get(str(droneparam.idEnd)), droneparam.speedfactor)
 
                 if int(msgmsg[3])==4:  # State: 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
-                    weight= coreCalculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)))
+                    weight= coreCalculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)), droneparam.speedfactor)
 
                 else:
-                    weight = coreCalculator.calc_time_between_points(droneparam, self.waypoints.get(str(droneparam.idEnd)))
+                    weight = coreCalculator.calc_time_between_points(droneparam, self.waypoints.get(str(droneparam.idEnd)), droneparam.speedfactor)
                 print str(weighttotal) +" "+ str(weight) + " "+str((weighttotal-weight)/weighttotal*100)
                 droneparam.percentage = (weighttotal-weight)/weighttotal*100
             if env.printNewPos:
-                print "Pos ID:" + msgtopic[1]+" "+str(droneparam.x) + " " + str(droneparam.y)+" "+str(droneparam.z)
+                print "Pos ID:" + msgtopic[2]+" "+str(droneparam.x) + " " + str(droneparam.y)+" "+str(droneparam.z)
         else:
-            print "New pos, Wrong ID"
+            print "New pos, Wrong ID: "+str(msgtopic[2])
 
-
+    def generatedNEDwaypoints(self):
+        print navpy.lla2ned(51.1785531, 4.4183511, 0, env.homelat, env.homelon, env.homealt)
+        print navpy.lla2ned(51.1784002, 4.4180879, 0, env.homelat, env.homelon, env.homealt)
+        print navpy.lla2ned(51.1783561, 4.4182861, 0, env.homelat, env.homelon, env.homealt)
+        print navpy.lla2ned(51.1787070, 4.4185652, 0, env.homelat, env.homelon, env.homealt)
+        print navpy.lla2ned(51.1787534, 4.4184587, 0, env.homelat, env.homelon, env.homealt)
 coreDrone()

@@ -72,16 +72,16 @@ class restserver:
     @cherrypy.tools.gzip()
     def executeJob(self, idJob,idVehicle, idStart,idEnd):
         if self.waypoints.get(str(idStart)) is None or self.waypoints.get(str(idEnd)) is None:
-            return "Wrong start or end ID"
+            raise cherrypy.HTTPError(404,"Wrong start or end ID")
 
         droneparam= self.id_droneparam.get(str(idVehicle))
         if droneparam is None:
-            return "Wrong idVehicle"
+            raise cherrypy.HTTPError(404, "Wrong idVehicle")
 
         if droneparam.buzy==1:
-            return "Drone is buzy"
+            raise cherrypy.HTTPError(404, "Drone is buzy")
         if droneparam.available==0:
-            return "Drone is unavailable"
+            raise cherrypy.HTTPError(404, "Drone is unavailable")
 
         droneparam.buzy=1
         droneparam.idStart = idStart
@@ -131,16 +131,16 @@ class restserver:
                 weightToStart = 0
             else:
                 waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob)
+                weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob,value.speedfactor)
 
             #  flytime = time to reach initial point + time to reach end point
             if str(value.idEnd)==str(idStart):
                 weightToStart=0
             else:
                 waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
-                weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda)
+                weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda,value.speedfactor)
             # time to fly from a to b
-            weight = coreCalculator.calc_time_between_points(coorda,coordb)
+            weight = coreCalculator.calc_time_between_points(coorda,coordb,value.speedfactor)
             jsonstring.append(
                 {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
 

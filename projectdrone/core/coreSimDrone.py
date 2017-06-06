@@ -98,8 +98,8 @@ class coreSimDrone:
     def set_drone_speed(self, simid, speed):
         drone= self.find_drone_by_simid(simid)
         if not drone is None:
-
-            return drone.setspeed(speed)
+            self.id_droneparam.get(str(drone.id)).speedfactor=float(speed)/float(env.standardspeedSimulation)
+            return drone.setspeed(float(speed)/float(env.standardspeedSimulation))
         else:
             return "Wrong ID\n"
 
@@ -117,3 +117,8 @@ class coreSimDrone:
     def find_drone_by_simid(self, simid):
         drone = self.simid_drone.get(str(simid))
         return drone
+    def runtest(self):
+        self.create_drone("1")
+        self.set_drone_speed("1","500")
+        self.set_drone_startpoint("1", "1")
+        self.run_drone("1")

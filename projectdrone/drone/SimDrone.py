@@ -11,7 +11,7 @@ class SimDrone(Drone):
         self.init_x = 0
         self.init_y = 0
         self.init_z = 0
-        self.speed = 100
+        self.speedfactor = 1.0
         self.is_set = False
         self.running = False
         super(SimDrone, self).__init__()
@@ -38,7 +38,7 @@ class SimDrone(Drone):
         if self.running:
             return 'NACK'
         else:
-            self.speed = speed
+            self.speedfactor = float(speed)
             return 'ACK'
 
     # reset current location
@@ -103,7 +103,7 @@ class SimDrone(Drone):
             self.locationNED[0] += sx * speed * abs(math.cos(a))
             self.locationNED[1] += sy * speed * abs(math.sin(a))
             self._updateLLAloc()
-            time.sleep(1)
+            time.sleep(1 / self.speedfactor)
 
         self.locationNED[0] += sx * remainder * abs(math.cos(a))
         self.locationNED[1] += sy * remainder * abs(math.sin(a))
@@ -123,7 +123,7 @@ class SimDrone(Drone):
             traveled += lift * speed
             self.locationNED[2] += lift * speed
             self._updateLLAloc()
-            time.sleep(1)
+            time.sleep(1 /float( self.speedfactor))
         self.z += lift * remainder
         self._updateLLAloc()
 
@@ -143,7 +143,7 @@ class SimDrone(Drone):
         self.state = 2  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_fly(env.speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
         self.state = 3  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
-        #TODO hang stable
+        time.sleep(env.settletime / self.speedfactor)
         self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
         self.job = False
