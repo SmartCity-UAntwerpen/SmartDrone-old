@@ -20,19 +20,19 @@ class coreSimDrone:
         try:
             self.s.bind((HOST, PORT))
         except socket.error as msg:
-            print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+            print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
             sys.exit()
 
         #Start listening on socket
         self.s.listen(10)
-        print 'Socket now listening'
+        print ('Socket now listening')
 
     def wait_for_instruction(self):
         while (1):
             #wait to accept a connection - blocking call
             conn, addr = self.s.accept()
             data= conn.recv(1024)
-            print "Comand: "+data
+            print ("Comand: "+data)
             data = data.split(" ")
             if data[0]=="create":
                 self.create_drone(data[1].rstrip())
@@ -53,7 +53,7 @@ class coreSimDrone:
                 response = self.kill_drone(data[1].rstrip())
             else:
                 response='NACK\n'
-            print response
+            print (response)
             conn.send(response)
             conn.close()
         self.s.close()
@@ -120,5 +120,5 @@ class coreSimDrone:
     def runtest(self):
         self.create_drone("1")
         self.set_drone_speed("1","500")
-        self.set_drone_startpoint("1", "1")
+        self.set_drone_startpoint("1", "2")
         self.run_drone("1")

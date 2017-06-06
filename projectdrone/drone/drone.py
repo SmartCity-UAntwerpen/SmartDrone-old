@@ -37,7 +37,7 @@ class Drone(object):
     # get an id from the server
     def get_id(self):
         a=requests.get(env.addradvertise).text
-        print a
+        print (a)
         a=int(a)
         return a
 
@@ -82,7 +82,7 @@ class Drone(object):
         coord = map(float, coord)
         if not self.job:  # don't handle new job if job ongoing
             self.job = True
-            print coord
+            print (coord)
             thread.start_new_thread(self._fly, (coord,))
 
     # fly to coord

@@ -16,7 +16,8 @@ class env:
 
     addrjobdone=""
 
-    mqttbroker="143.129.39.151"#""iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
+    #mqttbroker="143.129.39.151"
+    mqttbroker="iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
     mqttusername="root"
     mqttpassword="smartcity"
     mqttport=1883

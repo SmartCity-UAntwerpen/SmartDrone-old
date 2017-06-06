@@ -11,7 +11,7 @@ from waypoints import Waypoints
 
 class coreInterface():
     def __init__(self, id_droneparam, waypoints,  mqtt_client):
-        print "core interface started"
+        print ("core interface started")
         self.id_droneparam=id_droneparam
         self.mqtt_client= mqtt_client
         self.waypoints=waypoints
@@ -82,7 +82,8 @@ class restserver:
             raise cherrypy.HTTPError(404, "Drone is buzy")
         if droneparam.available==0:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
-
+        if not droneparam.idEnd==int(idStart):
+            raise cherrypy.HTTPError(404, "Drone is not at the right waypoint")
         droneparam.buzy=1
         droneparam.idStart = idStart
         droneparam.idEnd = idEnd
@@ -104,12 +105,12 @@ class restserver:
                 r = randint(0, 99)
             else:
                 r= int(requests.get(env.addrnewid).text)
-        except ValueError, Argument:
-            print Argument
+        except (ValueError, Argument):
+            print (Argument)
 
         if self.id_droneparam.get(str(r))==None:
             newdroneparameters = DroneParameters()
-            print simdrone
+            print (simdrone)
             if int(simdrone):
                 newdroneparameters.simdrone=1
             self.id_droneparam[str(r)] = newdroneparameters

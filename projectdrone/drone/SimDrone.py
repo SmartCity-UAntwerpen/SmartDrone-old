@@ -2,8 +2,9 @@ import math
 
 from drone import *
 from projectdrone import navpy
+from projectdrone.drone.drone import Drone
 from projectdrone.env import env
-
+import requests
 
 class SimDrone(Drone):
 
@@ -164,6 +165,6 @@ class SimDrone(Drone):
 
     def get_id(self):
         a=requests.get(env.addradvertise+"?simdrone=1").text
-        print a
+        print (a)
         a=int(a)
         return a

@@ -24,3 +24,16 @@ class coreCalculator():
     def calc_time_land(point1, point2, speedfactor):
         time = abs(point1.z - point2.z) / env.speed_landing/speedfactor
         return time
+
+    @staticmethod
+    def calc_waypoint(waypoints, droneparam):
+        distancetowaypoint = {}
+        for key, value in waypoints.items():
+            distancetowaypoint[key] = coreCalculator.calc_dist(droneparam.x, droneparam.y, value.x, value.y)
+        mindistance = 65536
+        waypoint = -1
+        for key, value in distancetowaypoint.items():
+            if value < mindistance:
+                waypoint = int(key)
+                mindistance = value
+        return waypoint
