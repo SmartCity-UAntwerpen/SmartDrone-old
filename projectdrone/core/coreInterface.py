@@ -16,7 +16,7 @@ class coreInterface():
         self.mqtt_client= mqtt_client
         self.waypoints=waypoints
         cherrypy.server.socket_host = '0.0.0.0'
-        cherrypy.config.update({'server.socket_port': 8082})
+        cherrypy.config.update({'server.socket_port': env.restport})
         cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints, self.mqtt_client), '/')
         cherrypy.engine.start()
         self.getWaypoints()
@@ -98,7 +98,7 @@ class restserver:
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
-    def advertise(self):
+    def advertise(self, simdrone=0):
         try:
             if env.bedugaddrnewid:
                 r = randint(0, 99)
@@ -109,6 +109,9 @@ class restserver:
 
         if self.id_droneparam.get(str(r))==None:
             newdroneparameters = DroneParameters()
+            print simdrone
+            if int(simdrone):
+                newdroneparameters.simdrone=1
             self.id_droneparam[str(r)] = newdroneparameters
         return str(r)
 

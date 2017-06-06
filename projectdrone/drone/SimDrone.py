@@ -161,3 +161,9 @@ class SimDrone(Drone):
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
         return math.sqrt(a+b)
+
+    def get_id(self):
+        a=requests.get("http://127.0.0.1:8082/advertise?simdrone=1").text#Todo, deploy on server, right ip addr + env
+        print a
+        a=int(a)
+        return a

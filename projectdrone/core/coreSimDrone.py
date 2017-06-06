@@ -6,8 +6,9 @@ from projectdrone.env import env
 
 
 class coreSimDrone:
-    def __init__(self,waypoints):
+    def __init__(self,waypoints,id_droneparam):
         self.simid_drone={}
+        self.id_droneparam=id_droneparam
         self.waypoints=waypoints
         self.init_socket()
 
@@ -107,6 +108,8 @@ class coreSimDrone:
         if drone is None:
             return "Wrong ID\n"
         else:
+            self.id_droneparam.get(str(drone.id)).kill()
+            self.id_droneparam.pop(str(drone.id), None)
             drone.kill()
             self.simid_drone.pop(str(simid), None)
             return 'ACK\n'

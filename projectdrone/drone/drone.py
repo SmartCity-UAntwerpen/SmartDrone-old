@@ -13,7 +13,7 @@ class Drone(object):
 
     # creates a drone
     def __init__(self):
-        self.id = Drone._get_id()
+        self.id = self.get_id()
         self.job_client = mqttclient.Client()
         self.pos_client = mqttclient.Client()
         self.x = 0
@@ -35,8 +35,7 @@ class Drone(object):
             print(e)
 
     # get an id from the server
-    @staticmethod
-    def _get_id():
+    def get_id(self):
         a=requests.get("http://127.0.0.1:8082/advertise").text#Todo, deploy on server, right ip addr + env
         print a
         a=int(a)
@@ -47,8 +46,8 @@ class Drone(object):
     @staticmethod
     def _create_client(_id, marker):
         client = mqttclient.Client("Drone " + str(_id)+str(marker))
-        client.username_pw_set("root", "smartcity")#todo env
-        client.connect("iot.eclipse.org", 1883, 60)#todo env
+        client.username_pw_set(env.mqttusername, env.mqttpassword)
+        client.connect(env.mqttbroker, env.mqttport, 60)
         #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
 

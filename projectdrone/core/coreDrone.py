@@ -9,7 +9,7 @@ from coreInterface import coreInterface
 from coreSimDrone import coreSimDrone
 from projectdrone import navpy
 from projectdrone.env import env
-
+from random import randint
 
 class coreDrone:
     def __init__(self):
@@ -23,7 +23,7 @@ class coreDrone:
         thread.start()
 
         print self.waypoints
-        simcore=coreSimDrone(self.waypoints)
+        simcore=coreSimDrone(self.waypoints, self.id_droneparam)
         simcore.wait_for_instruction()
 
     def haertbeatcheck(self):
@@ -33,26 +33,25 @@ class coreDrone:
             timedead=time.time()-env.haertbeattimedead
 
             for key, value in self.id_droneparam.items():
+                print "check"
                 if value.timestamp<=timeout and value.available==1:
                     value.available=0
-                    print "I shot the sheriff: "+ key
-                    #TODO send to maaskantje
-                elif value.timestamp<=timedead and value.timestamp!=0:
-                    self.id_droneparam.get(key).kill()
-                    self.id_droneparam.pop(key, None)
-
-                    print "I shot the sheriff twice: "+ key
-                    # TODO send to Quentin
+                    print "Unavailable: "+ key
+                elif value.timestamp<=timedead and value.timestamp!=0 and not value.simdrone:
+                        self.id_droneparam.get(key).kill()
+                        self.id_droneparam.pop(key, None)
+                        print "Kill: "+ key
+                        # TODO send to Quentin
 
 
     # register to the pos receiving channel
     def _reg_pos(self):
         self.mqtt_client = mqttclient.Client()
-        self.mqtt_client = self._create_client("Dronecore")
+        self.mqtt_client = self._create_client("Dronecore"+str(randint(0, 99)))
         self.mqtt_client.subscribe("pos/#")
         self.mqtt_client.on_message = self._pos_update  # register position execution function
         self.mqtt_client.loop_start()
-        print "MQTT subscibe"
+        print "MQTT pos subscibe"
 
     # register to the jobdone receiving channel
     def _reg_jobdone(self):

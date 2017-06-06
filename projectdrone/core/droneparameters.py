@@ -12,5 +12,6 @@ class DroneParameters:
         self.idJob=0
         self.timestamp=0
         self.available=1
+        self.simdrone=0
     def kill(self):
         del self
