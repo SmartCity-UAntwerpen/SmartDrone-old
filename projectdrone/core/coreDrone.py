@@ -24,7 +24,7 @@ class coreDrone:
 
         print (self.waypoints)
         simcore=coreSimDrone(self.waypoints, self.id_droneparam)
-        simcore.runtest()
+        #simcore.runtest()
         simcore.wait_for_instruction()
 
     def haertbeatcheck(self):

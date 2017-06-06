@@ -16,8 +16,8 @@ class env:
 
     addrjobdone=""
 
-    #mqttbroker="143.129.39.151"
-    mqttbroker="iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
+    mqttbroker="143.129.39.151"
+    #mqttbroker="iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
     mqttusername="root"
     mqttpassword="smartcity"
     mqttport=1883
@@ -30,7 +30,7 @@ class env:
     restport=8082
 
     haertbeattime = 10
-    haertbeattimedead = 20#60*60*24
+    haertbeattimedead = 60*60*24
 
     homelat = 51.1785531
     homelon = 4.4183511
