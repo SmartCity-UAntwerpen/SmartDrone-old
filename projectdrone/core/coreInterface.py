@@ -92,7 +92,7 @@ class restserver:
         coorda = self.waypoints.get(str(idStart))
         #todo check drone at startpoint
         coordb = self.waypoints.get(str(idEnd))
-        self.mqtt_client.publish("job/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))
+        self.mqtt_client.publish(env.mqttTopicJob+"/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))
         return "ACK"
 
 

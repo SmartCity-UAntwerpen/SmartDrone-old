@@ -147,7 +147,7 @@ class SimDrone(Drone):
         self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
         self.job = False
-        self.job_client.publish("jobdone/"+str(self.id), "done")
+        self.job_client.publish(env.mqttTopicJobdone+"/"+str(self.id), "done")
 
     def _updateNEDloc(self):
         self.locationNED = navpy.lla2ned(self.x, self.y, self.z, env.homelat, env.homelon,
@@ -163,7 +163,7 @@ class SimDrone(Drone):
         return math.sqrt(a+b)
 
     def get_id(self):
-        a=requests.get("http://127.0.0.1:8082/advertise?simdrone=1").text#Todo, deploy on server, right ip addr + env
+        a=requests.get(env.addradvertise+"?simdrone=1").text
         print a
         a=int(a)
         return a

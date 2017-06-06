@@ -7,6 +7,7 @@ class env:
 
     addrwaypoints="http://127.0.0.1:8082/fakewaypoints"#"http://146.175.140.44:1994/map/stringmapjson/drone"
     addrnewid= "http://146.175.140.44:1994/bot/newBot/drone"
+    addradvertise="http://127.0.0.1:8082/advertise"
     bedugaddrnewid = True
 
     addrjobdone=""
@@ -16,8 +17,13 @@ class env:
     mqttpassword="smartcity"
     mqttport=1883
 
+    mqttTopicJob="drone/job"
+    mqttTopicJobdone="drone/jobdone"
+    mqttTopicPos="drone/pos"
+
     tcpport=8888
     restport=8082
+
     haertbeattime = 10
     haertbeattimedead = 20#60*60*24
 

@@ -33,7 +33,6 @@ class coreDrone:
             timedead=time.time()-env.haertbeattimedead
 
             for key, value in self.id_droneparam.items():
-                print "check"
                 if value.timestamp<=timeout and value.available==1:
                     value.available=0
                     print "Unavailable: "+ key
@@ -43,12 +42,11 @@ class coreDrone:
                         print "Kill: "+ key
                         # TODO send to Quentin
 
-
     # register to the pos receiving channel
     def _reg_pos(self):
         self.mqtt_client = mqttclient.Client()
-        self.mqtt_client = self._create_client("Dronecore"+str(randint(0, 99)))
-        self.mqtt_client.subscribe("pos/#")
+        self.mqtt_client = self._create_client("Dronecore" + str(randint(0, 99)))
+        self.mqtt_client.subscribe(env.mqttTopicPos+"/#")
         self.mqtt_client.on_message = self._pos_update  # register position execution function
         self.mqtt_client.loop_start()
         print "MQTT pos subscibe"
@@ -56,8 +54,8 @@ class coreDrone:
     # register to the jobdone receiving channel
     def _reg_jobdone(self):
         self.mqtt_client = mqttclient.Client()
-        self.mqtt_client = self._create_client("Dronecore_jobdone")
-        self.mqtt_client.subscribe("jobdone/#")
+        self.mqtt_client = self._create_client("Dronecorejobdone" + str(randint(0, 99)))
+        self.mqtt_client.subscribe(env.mqttTopicJobdone+"/#")
         self.mqtt_client.on_message = self._job_done  # register position execution function
         self.mqtt_client.loop_start()
         print "MQTT jobdone subscibe"

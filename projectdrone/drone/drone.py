@@ -36,37 +36,35 @@ class Drone(object):
 
     # get an id from the server
     def get_id(self):
-        a=requests.get("http://127.0.0.1:8082/advertise").text#Todo, deploy on server, right ip addr + env
+        a=requests.get(env.addradvertise).text
         print a
         a=int(a)
         return a
 
     # helper function for creating drone mqtt clients - note IDs must be unique -> marker
     # set internal to avoid confusion
-    @staticmethod
-    def _create_client(_id, marker):
+    def _create_client(self, _id, marker):
         client = mqttclient.Client("Drone " + str(_id)+str(marker))
         client.username_pw_set(env.mqttusername, env.mqttpassword)
         client.connect(env.mqttbroker, env.mqttport, 60)
-        #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
 
     # loop for position update heartbeat
     def _pos_loop(self, _id):
         while self.running:
-            self.pos_client.publish("pos/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))#todo change topics + env
+            self.pos_client.publish(env.mqttTopicPos+"/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))
             time.sleep(1)  # heartbeat frequency 1 sec
 
     # register to the job receiving channel
     def _reg_jobs(self):
-        self.job_client = self._create_client(self.id, "job")#todo env + change topic
-        self.job_client.subscribe("job/"+str(self.id))#todo env + change topic
+        self.job_client = self._create_client(self.id, env.mqttTopicJob)
+        self.job_client.subscribe(env.mqttTopicJob+"/"+str(self.id))
         self.job_client.on_message = self._job  # register job execution function
         self.job_client.loop_start()
 
     # register to the position publishing channel
     def _reg_pos(self):
-        self.pos_client = self._create_client(self.id, "pos")#todo env + change topic
+        self.pos_client = self._create_client(self.id, env.mqttTopicPos)
 
     # unregister position channel
     def _unregister_pos(self):
@@ -89,7 +87,6 @@ class Drone(object):
 
     # fly to coord
     def _fly(self, coord):
-        pass  # todo implement
         self.job = False
         # load pathactions & waypoints to drone
         pathactions = [Pathaction(0x00, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
@@ -116,4 +113,4 @@ class Drone(object):
             self.y = pos[1]
             self.z = pos[2]
             time.sleep(1)
-        self.job_client.publish("jobdone/"+str(self.id), "done")#todo env + change topic
+        self.job_client.publish(env.mqttTopicJobdone+"/"+str(self.id), "done")
