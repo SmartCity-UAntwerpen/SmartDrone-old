@@ -37,7 +37,7 @@ class Drone(object):
     # get an id from the server
     @staticmethod
     def _get_id():
-        a=requests.get("http://127.0.0.1:8082/advertise").text#Todo, deploy on server, right ip addr
+        a=requests.get("http://127.0.0.1:8082/advertise").text#Todo, deploy on server, right ip addr + env
         print a
         a=int(a)
         return a
@@ -47,27 +47,27 @@ class Drone(object):
     @staticmethod
     def _create_client(_id, marker):
         client = mqttclient.Client("Drone " + str(_id)+str(marker))
-        client.username_pw_set("root", "smartcity")
-        client.connect("iot.eclipse.org", 1883, 60)
+        client.username_pw_set("root", "smartcity")#todo env
+        client.connect("iot.eclipse.org", 1883, 60)#todo env
         #client.connect("smartcity-ua.ddns.net", 1883, 60)
         return client
 
     # loop for position update heartbeat
     def _pos_loop(self, _id):
         while self.running:
-            self.pos_client.publish("pos/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))
+            self.pos_client.publish("pos/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))#todo change topics + env
             time.sleep(1)  # heartbeat frequency 1 sec
 
     # register to the job receiving channel
     def _reg_jobs(self):
-        self.job_client = self._create_client(self.id, "job")
-        self.job_client.subscribe("job/"+str(self.id))
+        self.job_client = self._create_client(self.id, "job")#todo env + change topic
+        self.job_client.subscribe("job/"+str(self.id))#todo env + change topic
         self.job_client.on_message = self._job  # register job execution function
         self.job_client.loop_start()
 
     # register to the position publishing channel
     def _reg_pos(self):
-        self.pos_client = self._create_client(self.id, "pos")
+        self.pos_client = self._create_client(self.id, "pos")#todo env + change topic
 
     # unregister position channel
     def _unregister_pos(self):
@@ -117,4 +117,4 @@ class Drone(object):
             self.y = pos[1]
             self.z = pos[2]
             time.sleep(1)
-        self.job_client.publish("jobdone/"+str(self.id), "done")
+        self.job_client.publish("jobdone/"+str(self.id), "done")#todo env + change topic
