@@ -121,7 +121,7 @@ class restserver:
         coordb = self.waypoints.get(str(idEnd))
 
         if coorda==None or coordb== None:
-            return "Wrong waypoint ID"
+            raise cherrypy.HTTPError(404, "Wrong start or end ID")
         jsonstring = []
         for key, value in self.id_droneparam.items():
             # time to finish job

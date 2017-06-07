@@ -18,7 +18,7 @@ class coreDrone:
         self._reg_pos()
         self._reg_jobdone()
 
-        coreint =coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
+        coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
         thread = threading.Thread(target=self.haertbeatcheck)
         thread.start()
 
@@ -117,8 +117,6 @@ class coreDrone:
                     droneparam.idStart = int(coreCalculator.calc_waypoint(self.waypoints, droneparam))
                     droneparam.idEnd=droneparam.idStart
                     droneparam.init=1
-        else:
-            print ("New pos, Wrong ID: "+str(msgtopic[2]))
 
     def generatedNEDwaypoints(self):
         print (navpy.lla2ned(51.1785531, 4.4183511, 0, env.homelat, env.homelon, env.homealt))

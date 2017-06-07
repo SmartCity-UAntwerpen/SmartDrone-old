@@ -66,21 +66,21 @@ class coreSimDrone:
         if not drone is None:
             return drone.run()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def stop_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             return drone.stop()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def restart_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             return drone.restart()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def set_drone_startpoint(self, simid, point):
         drone = self.find_drone_by_simid(simid)
@@ -92,8 +92,7 @@ class coreSimDrone:
                 y = waypoint.y
                 z = waypoint.z
                 return drone.setstartpoint(x, y, z)
-            return 'Wrong startpoint\n'
-        return "Wrong ID\n"
+        return "NACK\n"
 
     def set_drone_speed(self, simid, speed):
         drone= self.find_drone_by_simid(simid)
@@ -101,12 +100,12 @@ class coreSimDrone:
             self.id_droneparam.get(str(drone.id)).speedfactor=float(speed)/float(env.standardspeedSimulation)
             return drone.setspeed(float(speed)/float(env.standardspeedSimulation))
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def kill_drone(self, simid):
         drone = self.simid_drone.get(str(simid))
         if drone is None:
-            return "Wrong ID\n"
+            return "NACK\n"
         else:
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)

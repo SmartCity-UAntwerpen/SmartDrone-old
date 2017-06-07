@@ -96,15 +96,15 @@ class SimDrone(Drone):
             sy = 1
         else:
             sy = -1
-        remainder = distance % speed
+        remainder = distance % (speed*float( self.speedfactor))
         distance -= remainder
         traveled = 0
         while traveled != distance:
             traveled += speed
-            self.locationNED[0] += sx * speed * abs(math.cos(a))
-            self.locationNED[1] += sy * speed * abs(math.sin(a))
+            self.locationNED[0] += sx * speed*float( self.speedfactor) * abs(math.cos(a))
+            self.locationNED[1] += sy * speed*float( self.speedfactor) * abs(math.sin(a))
             self._updateLLAloc()
-            time.sleep(1 / self.speedfactor)
+            time.sleep(1)
 
         self.locationNED[0] += sx * remainder * abs(math.cos(a))
         self.locationNED[1] += sy * remainder * abs(math.sin(a))
@@ -113,7 +113,7 @@ class SimDrone(Drone):
     # takeoff + landing simulation
     def _sim_vertical(self, speed, height):
         dist_z = height - self.locationNED[2]
-        remainder = dist_z % speed
+        remainder = dist_z % (speed*float( self.speedfactor))
         dist_z -= remainder
         if dist_z > 0:
             lift = 1
@@ -121,10 +121,10 @@ class SimDrone(Drone):
             lift = -1
         traveled = 0
         while traveled != dist_z:
-            traveled += lift * speed
-            self.locationNED[2] += lift * speed
+            traveled += lift * speed*float( self.speedfactor)
+            self.locationNED[2] += lift * speed*float( self.speedfactor)
             self._updateLLAloc()
-            time.sleep(1 /float( self.speedfactor))
+            time.sleep(1)
         self.z += lift * remainder
         self._updateLLAloc()
 

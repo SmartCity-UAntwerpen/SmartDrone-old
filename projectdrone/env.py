@@ -5,19 +5,21 @@ class env:
     speed_horizontal=1
     settletime=2
 
-    #addrwaypoints="http://143.129.39.151:10000/map/stringmapjson/drone"
-    addrwaypoints="http://127.0.0.1:8082/fakewaypoints"
+    addrwaypoints="http://146.175.140.44:1994/map/stringmapjson/drone"
+    #addrwaypoints="http://127.0.0.1:8082/fakewaypoints"
 
-    addrnewid= "http://143.129.39.151:10000/bot/newBot/drone"
-    addrkillid="http://143.129.39.151:10000/delete"
+    #addrnewid= "http://143.129.39.151:10000/bot/newBot/drone"
+    addrnewid = "http://146.175.140.44:1994/bot/newBot/drone"
+    #addrkillid="http://143.129.39.151:10000/delete"
+    addrkillid = "http://146.175.140.44:1994/delete"
 
     addradvertise="http://127.0.0.1:8082/advertise"
-    bedugaddrnewid = True
+    bedugaddrnewid = False
 
     addrjobdone=""
 
     mqttbroker="143.129.39.151"
-    #mqttbroker="iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
+    #mqttbroker="iot.eclipse.org"#"smartcity-ua.ddns.net"
     mqttusername="root"
     mqttpassword="smartcity"
     mqttport=1883
