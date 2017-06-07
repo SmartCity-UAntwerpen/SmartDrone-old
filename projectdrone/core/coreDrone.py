@@ -12,20 +12,22 @@ from projectdrone.env import env
 from random import randint
 
 class coreDrone:
+
     def __init__(self):
-        self.id_droneparam={}
-        self.waypoints={}
+        self.id_droneparam = {}
+        self.waypoints = {}
         self._reg_pos()
         self._reg_jobdone()
 
         coreInterface(self.id_droneparam, self.waypoints, self.mqtt_client)
-        thread = threading.Thread(target=self.haertbeatcheck)
-        thread.start()
+        threadHaert = threading.Thread(target=self.haertbeatcheck)
+        threadHaert.start()
 
-        print ("Waypoints: "+str(self.waypoints))
-        simcore=coreSimDrone(self.waypoints, self.id_droneparam)
+        print ("Waypoints: " + str(self.waypoints))
+        self.simcore=coreSimDrone(self.waypoints, self.id_droneparam)
         #simcore.runtest()
-        simcore.wait_for_instruction()
+
+
 
     def haertbeatcheck(self):
         while 1:
@@ -124,4 +126,6 @@ class coreDrone:
         print (navpy.lla2ned(51.1783561, 4.4182861, 0, env.homelat, env.homelon, env.homealt))
         print (navpy.lla2ned(51.1787070, 4.4185652, 0, env.homelat, env.homelon, env.homealt))
         print (navpy.lla2ned(51.1787534, 4.4184587, 0, env.homelat, env.homelon, env.homealt))
-coreDrone()
+
+if __name__ == '__main__':
+    coreDrone()

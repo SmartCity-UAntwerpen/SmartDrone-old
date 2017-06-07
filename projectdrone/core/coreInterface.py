@@ -54,7 +54,7 @@ class restserver:
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
     def fakewaypoints(self):
-       return [{'id':0,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
+       return [{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
@@ -81,7 +81,7 @@ class restserver:
             raise cherrypy.HTTPError(404, "Drone is buzy")
         if droneparam.available==0:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
-        if not droneparam.idEnd==int(idStart):
+        if not int(droneparam.idEnd)==int(idStart):
             raise cherrypy.HTTPError(404, "Drone is not at the right waypoint")
         droneparam.buzy=1
         droneparam.idStart = idStart

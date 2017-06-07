@@ -1,5 +1,6 @@
 import socket
 import sys
+import threading
 
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
@@ -11,6 +12,8 @@ class coreSimDrone:
         self.id_droneparam=id_droneparam
         self.waypoints=waypoints
         self.init_socket()
+        threadTCP = threading.Thread(target=self.wait_for_instruction())
+        threadTCP.start()
 
     def init_socket(self):
         HOST = '0.0.0.0'# Symbolic name, meaning all available interfaces
@@ -35,8 +38,8 @@ class coreSimDrone:
             print ("Comand: "+data)
             data = data.split(" ")
             if data[0]=="create":
-                self.create_drone(data[1].rstrip())
-                response='ACK\n'
+                response=self.create_drone(data[1].rstrip())
+
             elif data[0]=="run":
                 response = self.run_drone(data[1].rstrip())
             elif data[0]=="stop":
@@ -59,7 +62,10 @@ class coreSimDrone:
         self.s.close()
 
     def create_drone(self, simid):
-        self.simid_drone[str(simid)] = SimDrone()
+        if self.simid_drone.get(simid) is None:
+            self.simid_drone[str(simid)] = SimDrone()
+            return 'ACK\n'
+        return 'NACK\n'
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
@@ -116,9 +122,3 @@ class coreSimDrone:
     def find_drone_by_simid(self, simid):
         drone = self.simid_drone.get(str(simid))
         return drone
-
-    def runtest(self):
-        self.create_drone("1")
-        self.set_drone_speed("1","500")
-        self.set_drone_startpoint("1", "2")
-        self.run_drone("1")
