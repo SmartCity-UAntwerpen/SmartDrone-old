@@ -114,10 +114,10 @@ class coreSimDrone:
             return "NACK\n"
         else:
             try:
-                a = requests.get(env.addrkillid + "/" + drone.id).text
+                a = requests.get(env.addrkillid + "/" + str(drone.id)).text
             except ValueError, Argument:
                 print (Argument)
-            print ("Kill: " + drone.id)
+            print ("Kill: " + str(drone.id))
 
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)

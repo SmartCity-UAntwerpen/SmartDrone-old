@@ -46,7 +46,7 @@ class coreDrone:
                             a = requests.get(env.addrkillid+"/"+key).text
                         except ValueError, Argument:
                             print (Argument)
-                        print ("Kill: "+ key)
+                        print ("Kill: "+ str(key))
 
     # register to the pos receiving channel
     def _reg_pos(self):
@@ -88,7 +88,7 @@ class coreDrone:
             a = requests.get(env.addrjobdone+"/"+ str(id)).text
         except ValueError, Argument:
             print (Argument)
-        print ("jobdone: "+id)
+        print ("jobdone: "+str(id))
 
     def _pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
