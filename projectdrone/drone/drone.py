@@ -117,6 +117,7 @@ class Drone(object):
             action = dc.get_pathaction_active()
             self.state = action + 1
             time.sleep(1)
+        self.state = 0
         self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
 
     def _updatepos(self):

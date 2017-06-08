@@ -154,6 +154,7 @@ class SimDrone(Drone):
         time.sleep(env.settletime / self.speedfactor)
         self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
+        self.state = 0  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self.job = False
         self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
 
@@ -177,3 +178,12 @@ class SimDrone(Drone):
         print (a)
         a = int(a)
         return a
+
+if __name__ == '__main__':
+    sim = SimDrone()
+    sim.setstartpoint(7,7,0)
+    sim.run()
+
+    while 1:
+        pass
+
