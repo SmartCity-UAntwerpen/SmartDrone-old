@@ -2,11 +2,12 @@ import paho.mqtt.client as mqttclient
 import thread
 import time
 import requests
-from Pathaction import Pathaction
-from Waypoint import Waypoint
+
+from projectdrone.UAV.Pathaction import Pathaction
+from projectdrone.UAV.Waypoint import Waypoint
 from projectdrone.env import env
 import dronecomms as dc
-import PathActions as pa
+import projectdrone.UAV.PathActions as pa
 
 
 class Drone(object):
@@ -30,6 +31,7 @@ class Drone(object):
         self.running = True
         try:
             thread.start_new_thread(self._pos_loop, (self.id,))
+            thread.start_new_thread(self._updatepos)
         except thread.error as e:
             print(e)
 
@@ -114,12 +116,16 @@ class Drone(object):
         while dc.get_thrust() >= 1:
             action = dc.get_pathaction_active()
             self.state = action + 1
+            time.sleep(1)
+        self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
+
+    def _updatepos(self):
+        while self.running:
             pos = dc.get_position()
             self.x = pos[0]
             self.y = pos[1]
             self.z = pos[2]
             time.sleep(1)
-        self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
 
 if __name__ == '__main__':
     Drone()
