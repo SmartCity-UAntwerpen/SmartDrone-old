@@ -115,10 +115,10 @@ class coreDrone:
                 print (str(weighttotal) +" "+ str(weight) + " "+str((weighttotal-weight)/weighttotal*100))
                 droneparam.percentage = (weighttotal-weight)/weighttotal*100
             else:
-                if droneparam.init==0:#first time? Set startpoint right!
-                    droneparam.idStart = int(coreCalculator.calc_waypoint(self.waypoints, droneparam))
-                    droneparam.idEnd=droneparam.idStart
-                    droneparam.init=1
+                #if droneparam.init==0:#first time? Set startpoint right!
+                droneparam.idStart = int(coreCalculator.calc_waypoint(self.waypoints, droneparam))
+                droneparam.idEnd=droneparam.idStart
+                droneparam.init=1
 
     def generatedNEDwaypoints(self):
         print (navpy.lla2ned(51.1785531, 4.4183511, 0, env.homelat, env.homelon, env.homealt))
