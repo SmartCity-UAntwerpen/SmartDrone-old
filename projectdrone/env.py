@@ -5,14 +5,22 @@ class env:
     speed_horizontal=1
     settletime=2
 
-    addrwaypoints="http://127.0.0.1:8082/fakewaypoints"#"http://146.175.140.44:1994/map/stringmapjson/drone"
-    addrnewid= "http://146.175.140.44:1994/bot/newBot/drone"
-    addradvertise="http://127.0.0.1:8082/advertise"
-    bedugaddrnewid = True
+    addrwaypoints="http://143.129.39.151:10000/map/stringmapjson/drone"
+    #addrwaypoints="http://127.0.0.1:8082/fakewaypoints"
 
-    addrjobdone=""
+    addrnewid= "http://143.129.39.151:10000/bot/newBot/drone"
+    bedugaddrnewid = False
 
-    mqttbroker="143.129.39.151"#""iot.eclipse.org"#"smartcity-ua.ddns.net"    mqttport=1883
+    #addrkillid="http://143.129.39.151:10000/bot/delete"
+    addrkillid = "http://146.175.140.44:1994/delete"
+
+    addradvertise="http://143.129.39.151:8082/advertise"
+    #addradvertise="http://143.129.39.151:8082/advertise"
+
+    addrjobdone="http://143.129.39.151:8090/completeJob"
+
+    mqttbroker="143.129.39.151"
+    #mqttbroker="iot.eclipse.org"
     mqttusername="root"
     mqttpassword="smartcity"
     mqttport=1883
@@ -25,7 +33,7 @@ class env:
     restport=8082
 
     haertbeattime = 10
-    haertbeattimedead = 20#60*60*24
+    haertbeattimedead = 60*60*24
 
     homelat = 51.1785531
     homelon = 4.4183511
@@ -33,5 +41,8 @@ class env:
 
     printNewPos = False
 
-    port = 'COM4'
+    #port = 'COM4'
+    port = '/dev/ttyS0'
     rate = 57600
+
+    standardspeedSimulation=70

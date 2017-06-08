@@ -1,5 +1,6 @@
 import socket
 import sys
+import threading
 
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
@@ -11,6 +12,8 @@ class coreSimDrone:
         self.id_droneparam=id_droneparam
         self.waypoints=waypoints
         self.init_socket()
+        threadTCP = threading.Thread(target=self.wait_for_instruction())
+        threadTCP.start()
 
     def init_socket(self):
         HOST = '0.0.0.0'# Symbolic name, meaning all available interfaces
@@ -20,23 +23,23 @@ class coreSimDrone:
         try:
             self.s.bind((HOST, PORT))
         except socket.error as msg:
-            print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+            print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
             sys.exit()
 
         #Start listening on socket
         self.s.listen(10)
-        print 'Socket now listening'
+        print ('Socket now listening')
 
     def wait_for_instruction(self):
         while (1):
             #wait to accept a connection - blocking call
             conn, addr = self.s.accept()
             data= conn.recv(1024)
-            print "Comand: "+data
+            print ("Comand: "+data)
             data = data.split(" ")
             if data[0]=="create":
-                self.create_drone(data[1].rstrip())
-                response='ACK\n'
+                response=self.create_drone(data[1].rstrip())
+
             elif data[0]=="run":
                 response = self.run_drone(data[1].rstrip())
             elif data[0]=="stop":
@@ -53,34 +56,37 @@ class coreSimDrone:
                 response = self.kill_drone(data[1].rstrip())
             else:
                 response='NACK\n'
-            print response
+            print (response)
             conn.send(response)
             conn.close()
         self.s.close()
 
     def create_drone(self, simid):
-        self.simid_drone[str(simid)] = SimDrone()
+        if self.simid_drone.get(simid) is None:
+            self.simid_drone[str(simid)] = SimDrone()
+            return 'ACK\n'
+        return 'NACK\n'
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             return drone.run()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def stop_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             return drone.stop()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def restart_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             return drone.restart()
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def set_drone_startpoint(self, simid, point):
         drone = self.find_drone_by_simid(simid)
@@ -92,21 +98,20 @@ class coreSimDrone:
                 y = waypoint.y
                 z = waypoint.z
                 return drone.setstartpoint(x, y, z)
-            return 'Wrong startpoint\n'
-        return "Wrong ID\n"
+        return "NACK\n"
 
     def set_drone_speed(self, simid, speed):
         drone= self.find_drone_by_simid(simid)
         if not drone is None:
-
-            return drone.setspeed(speed)
+            self.id_droneparam.get(str(drone.id)).speedfactor=float(speed)/float(env.standardspeedSimulation)
+            return drone.setspeed(float(speed)/float(env.standardspeedSimulation))
         else:
-            return "Wrong ID\n"
+            return "NACK\n"
 
     def kill_drone(self, simid):
         drone = self.simid_drone.get(str(simid))
         if drone is None:
-            return "Wrong ID\n"
+            return "NACK\n"
         else:
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)

@@ -2,8 +2,9 @@ import math
 
 from drone import *
 from projectdrone import navpy
+from projectdrone.drone.drone import Drone
 from projectdrone.env import env
-
+import requests
 
 class SimDrone(Drone):
 
@@ -11,7 +12,7 @@ class SimDrone(Drone):
         self.init_x = 0
         self.init_y = 0
         self.init_z = 0
-        self.speed = 100
+        self.speedfactor = 1.0
         self.is_set = False
         self.running = False
         super(SimDrone, self).__init__()
@@ -38,7 +39,7 @@ class SimDrone(Drone):
         if self.running:
             return 'NACK'
         else:
-            self.speed = speed
+            self.speedfactor = float(speed)
             return 'ACK'
 
     # reset current location
@@ -95,13 +96,13 @@ class SimDrone(Drone):
             sy = 1
         else:
             sy = -1
-        remainder = distance % speed
+        remainder = distance % (speed*float( self.speedfactor))
         distance -= remainder
         traveled = 0
         while traveled != distance:
             traveled += speed
-            self.locationNED[0] += sx * speed * abs(math.cos(a))
-            self.locationNED[1] += sy * speed * abs(math.sin(a))
+            self.locationNED[0] += sx * speed*float( self.speedfactor) * abs(math.cos(a))
+            self.locationNED[1] += sy * speed*float( self.speedfactor) * abs(math.sin(a))
             self._updateLLAloc()
             time.sleep(1)
 
@@ -112,7 +113,7 @@ class SimDrone(Drone):
     # takeoff + landing simulation
     def _sim_vertical(self, speed, height):
         dist_z = height - self.locationNED[2]
-        remainder = dist_z % speed
+        remainder = dist_z % (speed*float( self.speedfactor))
         dist_z -= remainder
         if dist_z > 0:
             lift = 1
@@ -120,8 +121,8 @@ class SimDrone(Drone):
             lift = -1
         traveled = 0
         while traveled != dist_z:
-            traveled += lift * speed
-            self.locationNED[2] += lift * speed
+            traveled += lift * speed*float( self.speedfactor)
+            self.locationNED[2] += lift * speed*float( self.speedfactor)
             self._updateLLAloc()
             time.sleep(1)
         self.z += lift * remainder
@@ -143,7 +144,7 @@ class SimDrone(Drone):
         self.state = 2  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_fly(env.speed_horizontal, distance, dist_x, dist_y)  # cover distance in x & y direction
         self.state = 3  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
-        #TODO hang stable
+        time.sleep(env.settletime / self.speedfactor)
         self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
         self.job = False
@@ -164,6 +165,6 @@ class SimDrone(Drone):
 
     def get_id(self):
         a=requests.get(env.addradvertise+"?simdrone=1").text
-        print a
+        print (a)
         a=int(a)
         return a

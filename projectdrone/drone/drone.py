@@ -1,16 +1,16 @@
+import paho.mqtt.client as mqttclient
 import thread
 import time
-
-import paho.mqtt.client as mqttclient
 import requests
-import dronecomms as dc
-from projectdrone.UAV.Pathaction import Pathaction
-import projectdrone.UAV.PathActions as pa
-from projectdrone.UAV.Waypoint import Waypoint
+from Pathaction import Pathaction
+from Waypoint import Waypoint
 from projectdrone.env import env
+import dronecomms as dc
+import PathActions as pa
 
 
 class Drone(object):
+
     # creates a drone
     def __init__(self):
         self.id = self.get_id()
@@ -36,15 +36,15 @@ class Drone(object):
 
     # get an id from the server
     def get_id(self):
-        a = requests.get(env.addradvertise).text
-        print a
-        a = int(a)
+        a=requests.get(env.addradvertise).text
+        print (a)
+        a=int(a)
         return a
 
     # helper function for creating drone mqtt clients - note IDs must be unique -> marker
     # set internal to avoid confusion
     def _create_client(self, _id, marker):
-        client = mqttclient.Client("Drone " + str(_id) + str(marker))
+        client = mqttclient.Client("Drone " + str(_id)+str(marker))
         client.username_pw_set(env.mqttusername, env.mqttpassword)
         client.connect(env.mqttbroker, env.mqttport, 60)
         return client
@@ -52,14 +52,13 @@ class Drone(object):
     # loop for position update heartbeat
     def _pos_loop(self, _id):
         while self.running:
-            self.pos_client.publish(env.mqttTopicPos + "/" + str(_id),
-                                    str(self.x) + "," + str(self.y) + "," + str(self.z) + "," + str(self.state))
+            self.pos_client.publish(env.mqttTopicPos+"/" + str(_id), str(self.x) +"," + str(self.y) +"," + str(self.z) +"," + str(self.state))
             time.sleep(1)  # heartbeat frequency 1 sec
 
     # register to the job receiving channel
     def _reg_jobs(self):
         self.job_client = self._create_client(self.id, env.mqttTopicJob)
-        self.job_client.subscribe(env.mqttTopicJob + "/" + str(self.id))
+        self.job_client.subscribe(env.mqttTopicJob+"/"+str(self.id))
         self.job_client.on_message = self._job  # register job execution function
         self.job_client.loop_start()
 
@@ -83,7 +82,7 @@ class Drone(object):
         coord = map(float, coord)
         if not self.job:  # don't handle new job if job ongoing
             self.job = True
-            print coord
+            print (coord)
             thread.start_new_thread(self._fly, (coord,))
 
     # fly to coord
@@ -95,7 +94,7 @@ class Drone(object):
                                   condition_parameters=[env.fly_height, 0.0, 0.0, 0.0]),
                        Pathaction(0x01, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
-                       Pathaction(0x02, pa.PATHACTION_MODE_GOTOENDPOINT, pa.PATHACTION_ENDCONDITION_TIMEOUT,
+                       Pathaction(0x02, pa.PATHACTION_MODE_BRAKE, pa.PATHACTION_ENDCONDITION_TIMEOUT,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
                        Pathaction(0x03, pa.PATHACTION_MODE_LAND, pa.PATHACTION_ENDCONDITION_NONE,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT)]
@@ -107,22 +106,17 @@ class Drone(object):
             dc.set_pathaction(pathaction)
         for waypoint in waypoints:
             dc.set_waypoint(waypoint)
-        dc.set_pathplan(len(waypoints), len(pathactions))
+        dc.set_pathplan(waypoints, pathactions)
         # wait until takeoff initiated
-        while dc.get_thrust() <= 1.0:
+        while dc.get_thrust() == 0:
             time.sleep(1)
         # poll position & state every second
-        while dc.get_thrust() >= 1.0:
+        while dc.get_thrust() != 0:
             action = dc.get_pathaction_active()
-            self.state = action + 1
+            self.state = action+1
             pos = dc.get_position()
             self.x = pos[0]
             self.y = pos[1]
             self.z = pos[2]
             time.sleep(1)
-        self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
-
-if __name__ == '__main__':
-    Drone()
-    while 1:
-        pass
+        self.job_client.publish(env.mqttTopicJobdone+"/"+str(self.id), "done")
