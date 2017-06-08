@@ -4,7 +4,7 @@ import threading
 
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
-
+import requests
 
 class coreSimDrone:
     def __init__(self,waypoints,id_droneparam):
@@ -113,10 +113,17 @@ class coreSimDrone:
         if drone is None:
             return "NACK\n"
         else:
+            try:
+                a = requests.get(env.addrkillid + "/" + drone.id).text
+            except ValueError, Argument:
+                print (Argument)
+            print ("Kill: " + drone.id)
+
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)
             drone.kill()
             self.simid_drone.pop(str(simid), None)
+
             return 'ACK\n'
 
     def find_drone_by_simid(self, simid):

@@ -1,6 +1,5 @@
 import unittest
 from projectdrone.core.coreDrone import coreDrone
-import time
 from threading import Thread
 
 class CoreTest(unittest.TestCase):
