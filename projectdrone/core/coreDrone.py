@@ -85,7 +85,7 @@ class coreDrone:
         droneparam.percentage=100
         id = droneparam.idJob
         try:
-            a = requests.get(env.addrjobdone+"/"+ id).text
+            a = requests.get(env.addrjobdone+"/"+ str(id)).text
         except ValueError, Argument:
             print (Argument)
         print ("jobdone: "+id)
