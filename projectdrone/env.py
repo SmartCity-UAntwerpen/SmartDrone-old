@@ -11,8 +11,8 @@ class env:
     addrnewid= "http://143.129.39.151:10000/bot/newBot/drone"
     bedugaddrnewid = False
 
-    #addrkillid="http://143.129.39.151:10000/bot/delete"
-    addrkillid = "http://146.175.140.44:1994/delete"
+    addrkillid="http://143.129.39.151:10000/bot/delete"
+    #addrkillid = "http://146.175.140.44:1994/delete"
 
     addradvertise="http://143.129.39.151:8082/advertise"
     #addradvertise="http://143.129.39.151:8082/advertise"
@@ -41,8 +41,8 @@ class env:
 
     printNewPos = False
 
-    #port = 'COM4'
-    port = '/dev/ttyS0'
+    port = 'COM3'
+    #port = '/dev/ttyS0'
     rate = 57600
 
     standardspeedSimulation=70
