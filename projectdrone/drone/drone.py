@@ -31,9 +31,9 @@ class Drone(object):
         self.running = True
         try:
             thread.start_new_thread(self._pos_loop, (self.id,))
-            thread.start_new_thread(self._updatepos)
-        except thread.error as e:
-            print(e)
+            thread.start_new_thread(self._updatepos, ())
+        except thread.error:
+            pass
 
     # get an id from the server
     def get_id(self):

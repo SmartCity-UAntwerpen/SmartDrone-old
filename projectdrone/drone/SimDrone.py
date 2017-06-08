@@ -6,12 +6,13 @@ from projectdrone.drone.drone import Drone
 from projectdrone.env import env
 import requests
 
-class SimDrone(Drone):
 
+class SimDrone(Drone):
     def __init__(self):
         self.init_x = 0
         self.init_y = 0
         self.init_z = 0
+        self.locationNED = [0, 0, 0]
         self.speedfactor = 1.0
         self.is_set = False
         self.running = False
@@ -20,22 +21,22 @@ class SimDrone(Drone):
     # set the initial x/y/z coordinates
     def setstartpoint(self, x, y, z):
 
-
         if self.running:
             return "NACK\n"
 
         else:
-            self.locationNED=[x,y,z]
+            self.locationNED = [x, y, z]
             self._updateLLAloc()
-            self.init_x,self.init_y,self.init_z= navpy.ned2lla([x, y, z], env.homelat, env.homelon,
-                                                               env.homealt)  # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            self.init_x, self.init_y, self.init_z = navpy.ned2lla([x, y, z], env.homelat, env.homelon,
+                                                                  env.homealt)  # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
 
             self.init_x = self.x
             self.init_y = self.y
             self.init_z = self.z
             self.is_set = True
             return "ACK\n"
-    def setspeed (self, speed):
+
+    def setspeed(self, speed):
         if self.running:
             return 'NACK'
         else:
@@ -60,7 +61,7 @@ class SimDrone(Drone):
 
     # restart drone
     def restart(self):
-        if  self.is_set:
+        if self.is_set:
             self.stop()
             self._reset()
             self.run()
@@ -73,7 +74,13 @@ class SimDrone(Drone):
         if self.running or not self.is_set:  # don't start another thread if already running
             return "NACK\n"
         else:
-            super(SimDrone, self).run()
+            self._reg_jobs()
+            self._reg_pos()
+            self.running = True
+            try:
+                thread.start_new_thread(self._pos_loop, (self.id,))
+            except thread.error:
+                pass
             self.state = 0  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
             return "ACK\n"
 
@@ -96,13 +103,13 @@ class SimDrone(Drone):
             sy = 1
         else:
             sy = -1
-        remainder = distance % (speed*float( self.speedfactor))
+        remainder = distance % (speed * float(self.speedfactor))
         distance -= remainder
         traveled = 0
         while traveled != distance:
             traveled += speed
-            self.locationNED[0] += sx * speed*float( self.speedfactor) * abs(math.cos(a))
-            self.locationNED[1] += sy * speed*float( self.speedfactor) * abs(math.sin(a))
+            self.locationNED[0] += sx * speed * float(self.speedfactor) * abs(math.cos(a))
+            self.locationNED[1] += sy * speed * float(self.speedfactor) * abs(math.sin(a))
             self._updateLLAloc()
             time.sleep(1)
 
@@ -113,7 +120,7 @@ class SimDrone(Drone):
     # takeoff + landing simulation
     def _sim_vertical(self, speed, height):
         dist_z = height - self.locationNED[2]
-        remainder = dist_z % (speed*float( self.speedfactor))
+        remainder = dist_z % (speed * float(self.speedfactor))
         dist_z -= remainder
         if dist_z > 0:
             lift = 1
@@ -121,8 +128,8 @@ class SimDrone(Drone):
             lift = -1
         traveled = 0
         while traveled != dist_z:
-            traveled += lift * speed*float( self.speedfactor)
-            self.locationNED[2] += lift * speed*float( self.speedfactor)
+            traveled += lift * speed * float(self.speedfactor)
+            self.locationNED[2] += lift * speed * float(self.speedfactor)
             self._updateLLAloc()
             time.sleep(1)
         self.z += lift * remainder
@@ -130,15 +137,15 @@ class SimDrone(Drone):
 
     # fly drone
     def _fly(self, coord):
-        #coord in NED
-        #Transform self.(x',y',z') = self.(x,y,z) to NED
-        #calc fly
-        #transform self.(x',y',z') to lla
+        # coord in NED
+        # Transform self.(x',y',z') = self.(x,y,z) to NED
+        # calc fly
+        # transform self.(x',y',z') to lla
         self._updateNEDloc()
 
-        distance = SimDrone._calc_dist(self.locationNED[0], self.locationNED[1], coord[0], coord[1])#meter
-        dist_x = coord[0]-self.locationNED[0]
-        dist_y = coord[1]-self.locationNED[1]
+        distance = SimDrone._calc_dist(self.locationNED[0], self.locationNED[1], coord[0], coord[1])  # meter
+        dist_x = coord[0] - self.locationNED[0]
+        dist_y = coord[1] - self.locationNED[1]
         self.state = 1  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_takeoff, env.fly_height)  # takeoff to fly height
         self.state = 2  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
@@ -148,23 +155,25 @@ class SimDrone(Drone):
         self.state = 4  # 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
         self._sim_vertical(env.speed_landing, coord[2])  # move to end height
         self.job = False
-        self.job_client.publish(env.mqttTopicJobdone+"/"+str(self.id), "done")
+        self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
 
     def _updateNEDloc(self):
         self.locationNED = navpy.lla2ned(self.x, self.y, self.z, env.homelat, env.homelon,
                                          env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+
     def _updateLLAloc(self):
         self.x, self.y, self.z = navpy.ned2lla(self.locationNED, env.homelat, env.homelon,
                                                env.homealt)  # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+
     # calculate distance between points
     @staticmethod
     def _calc_dist(x1, y1, x2, y2):
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
-        return math.sqrt(a+b)
+        return math.sqrt(a + b)
 
     def get_id(self):
-        a=requests.get(env.addradvertise+"?simdrone=1").text
+        a = requests.get(env.addradvertise + "?simdrone=1").text
         print (a)
-        a=int(a)
+        a = int(a)
         return a
