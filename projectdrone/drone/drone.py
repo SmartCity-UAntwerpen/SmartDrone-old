@@ -112,10 +112,12 @@ class Drone(object):
         # wait until takeoff initiated
         while dc.get_thrust() <= 1:
             time.sleep(1)
+            print "waiting for takeoff"
         # poll position & state every second
         while dc.get_thrust() >= 1:
             action = dc.get_pathaction_active()
             self.state = action + 1
+            print self.state
             time.sleep(1)
         self.state = 0
         self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")

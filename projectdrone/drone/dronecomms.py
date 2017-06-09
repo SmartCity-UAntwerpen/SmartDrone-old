@@ -23,7 +23,6 @@ def set_pathaction(pathaction):
 def set_pathplan(waypointcount, pathactioncount):
     object_id = object_ids.pathplan
     data = Pathplan(waypointcount, pathactioncount).package()
-    print data
     send(object_id, 0x00, data, len(data))
 
 
@@ -37,7 +36,7 @@ def get_thrust():
 # get the position
 def get_position():
     sensordata = GPSPositionSensor.get_instance()
-    return [sensordata.longitude, sensordata.latitude, sensordata.altitude]
+    return [sensordata.latitude, sensordata.longitude, sensordata.altitude]
 
 
 # get the current amount of waypoints

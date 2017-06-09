@@ -24,8 +24,8 @@ class GPSPositionSensor(UAV_Obj):
     @staticmethod
     def get_instance(instance_id=0x00):
         data = get_uav_obj(object_ids.GPSPositionSensor, instance_id)
-        latitude = unpack(data[0:4], 4)
-        longitude = unpack(data[4:8], 4)
+        latitude = unpack(data[0:4], 4)/10000000.0
+        longitude = unpack(data[4:8], 4)/10000000.0
         altitude = unpack_float(data[8:12])
         geoidseparation = unpack_float(data[12:16])
         heading = unpack_float(data[16:20])
