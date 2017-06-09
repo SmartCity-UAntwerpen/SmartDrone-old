@@ -124,7 +124,7 @@ class restserver:
             raise cherrypy.HTTPError(404, "Wrong start or end ID")
         jsonstring = []
         for key, value in self.id_droneparam.items():
-            if not self.waypoints.get(str(value.idEnd)) is None:
+            if not self.waypoints.get(str(value.idEnd)) is None and value.available==1:
                 # time to finish job
                 if value.buzy==0:
                     weightToStart = 0
