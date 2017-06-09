@@ -43,7 +43,7 @@ class coreDrone:
                         self.id_droneparam.get(key).kill()
                         self.id_droneparam.pop(key, None)
                         try:
-                            a = requests.get(env.addrkillid+"/"+key).text
+                            a = requests.get(env.addrkillid+"/"+str(key)).text
                         except ValueError, Argument:
                             print (Argument)
                         print ("Kill: "+ str(key))

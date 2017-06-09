@@ -1,8 +1,8 @@
 class env:
     fly_height = -4.0
-    speed_takeoff = 0.5
-    speed_landing = 0.5
-    speed_horizontal = 1
+    speed_takeoff = 2
+    speed_landing = 2
+    speed_horizontal = 1.5
     settletime = 2
 
     addrwaypoints = "http://143.129.39.151:10000/map/stringmapjson/drone"
@@ -35,8 +35,8 @@ class env:
 
     printNewPos = False
 
-    port = 'COM3'
-    #port = '/dev/ttyS0'
+    #port = 'COM3'
+    port = '/dev/ttyS0'
     rate = 57600
 
     standardspeedSimulation = 70

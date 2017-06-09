@@ -97,7 +97,7 @@ class Drone(object):
                        Pathaction(0x01, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_LEGREMAINING,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
                        Pathaction(0x02, pa.PATHACTION_MODE_GOTOENDPOINT, pa.PATHACTION_ENDCONDITION_TIMEOUT,
-                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT),
+                                  pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT, condition_parameters=[env.settletime, 0.0, 0.0, 0.0]),
                        Pathaction(0x03, pa.PATHACTION_MODE_LAND, pa.PATHACTION_ENDCONDITION_NONE,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT)]
         waypoints = [Waypoint(0x00, 0.0, 0.0, env.fly_height, env.speed_takeoff, 0x00),
