@@ -124,23 +124,24 @@ class restserver:
             raise cherrypy.HTTPError(404, "Wrong start or end ID")
         jsonstring = []
         for key, value in self.id_droneparam.items():
-            # time to finish job
-            if value.buzy==0:
-                weightToStart = 0
-            else:
-                waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob,value.speedfactor)
+            if not self.waypoints.get(str(value.idEnd)) is None and value.available==1:
+                # time to finish job
+                if value.buzy==0:
+                    weightToStart = 0
+                else:
+                    waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
+                    weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob,value.speedfactor)
 
-            #  flytime = time to reach initial point + time to reach end point
-            if str(value.idEnd)==str(idStart):
-                weightToStart=0
-            else:
-                waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
-                weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda,value.speedfactor)
-            # time to fly from a to b
-            weight = coreCalculator.calc_time_between_points(coorda,coordb,value.speedfactor)
-            jsonstring.append(
-                {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
+                #  flytime = time to reach initial point + time to reach end point
+                if str(value.idEnd)==str(idStart):
+                    weightToStart=0
+                else:
+                    waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
+                    weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda,value.speedfactor)
+                # time to fly from a to b
+                weight = coreCalculator.calc_time_between_points(coorda,coordb,value.speedfactor)
+                jsonstring.append(
+                    {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
 
         return jsonstring
 
