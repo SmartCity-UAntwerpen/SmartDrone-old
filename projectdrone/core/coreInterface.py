@@ -1,13 +1,12 @@
 from random import randint
 
 import cherrypy
-import requests
 from coreMQTT import coreMQTT
 from coreCalculator import coreCalculator
 from droneparameters import DroneParameters
 from projectdrone.env import env
 from waypoints import Waypoints
-
+from coreRequest import coreRequest
 
 class coreInterface():
     def __init__(self, id_droneparam, waypoints):
@@ -20,7 +19,7 @@ class coreInterface():
         self.getWaypoints()
 
     def getWaypoints(self):
-        waypoints= requests.get(env.addrwaypoints).json()
+        waypoints= coreRequest.sendRequest(env.addrwaypoints).json()
         for index in waypoints:
             waypoint=Waypoints()
             waypoint.x=index['x']
@@ -29,13 +28,7 @@ class coreInterface():
             self.waypoints[str(index['id'])]=waypoint
         return None
 
-    @staticmethod
-    def sendRequest(path):
-        try:
-            return requests.get(path).text
-        except requests.exceptions.RequestException as e:
-            print (e)
-        return None
+
 
 class restserver:
     def __init__(self, id_droneparam, waypoints):
@@ -107,7 +100,7 @@ class restserver:
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def advertise(self, simdrone=0):
-        id=coreInterface.sendRequest(requests.get(env.addrnewid).text)
+        id=coreRequest.sendRequest(env.addrnewid).text
         if id is None:
             id=randint(0, 99)
             print ("Give drone self an id")

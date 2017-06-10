@@ -1,5 +1,5 @@
 from coreCalculator import coreCalculator
-from coreInterface import coreInterface
+from coreRequest import coreRequest
 import paho.mqtt.client as mqttclient
 from random import randint
 from projectdrone.env import env
@@ -53,7 +53,7 @@ class coreMQTT:
         if droneparam.idNext==-1:
             droneparam.buzy = 0
             droneparam.percentage=100
-            coreInterface.sendRequest(env.addrjobdone+"/"+ str(id))
+            coreRequest.sendRequest(env.addrjobdone+"/"+ str(id))
             print ("jobdone: "+str(id))
         else:
             droneparam.percentage = 0

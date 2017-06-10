@@ -4,6 +4,7 @@ import time
 from coreInterface import coreInterface
 from coreSimDrone import coreSimDrone
 from coreMQTT import coreMQTT
+from coreRequest import coreRequest
 from projectdrone.env import env
 
 class coreDrone:
@@ -32,7 +33,7 @@ class coreDrone:
                 elif value.timestamp<=timedead and value.timestamp!=0 and not value.simdrone:
                         self.id_droneparam.get(key).kill()
                         self.id_droneparam.pop(key, None)
-                        coreInterface.sendRequest(env.addrkillid+"/"+str(key))
+                        coreRequest.sendRequest(env.addrkillid+"/"+str(key))
                         print ("Kill: "+ str(key))
 if __name__ == '__main__':
     coreDrone()

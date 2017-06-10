@@ -4,8 +4,7 @@ import threading
 
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
-import requests
-from coreInterface import coreInterface
+from coreRequest import coreRequest
 
 class coreSimDrone:
     def __init__(self,waypoints,id_droneparam):
@@ -111,7 +110,7 @@ class coreSimDrone:
         if drone is None:
             return "NACK\n"
         else:
-            coreInterface.sendRequest(env.addrkillid + "/" + str(drone.id))
+            coreRequest.sendRequest(env.addrkillid + "/" + str(drone.id))
             print ("Kill: " + str(drone.id))
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)
