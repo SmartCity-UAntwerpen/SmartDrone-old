@@ -3,6 +3,7 @@
 import serial as serial
 import struct
 import time
+import threading
 from projectdrone.env import env
 
 # variables
@@ -30,9 +31,12 @@ try:
 except serial.SerialException as e:
     print e
 
+lock = threading.Lock()
+
 
 # send information about object
 def send(object_id, instance, data, length):
+    lock.acquire()
     # 0x3c sync, 0x22 = send with ack
     p_len = length + 10  # add header portion to data length
     header = [0x3c, 0x22, (p_len >> (8 * 0)) & 0xFF, (p_len >> (8 * 1)) & 0xFF, (object_id >> (8 * 0)) & 0xFF,
@@ -42,10 +46,12 @@ def send(object_id, instance, data, length):
     data.append(crc)
     ser.write(header)
     ser.write(data)
+    lock.release()
 
 
 # request data from flight controller
 def request(object_id, instance=0x0000):
+    lock.acquire()
     # 0x3c sync, 0x21 = request, length = 0x000a
     header = [0x3c, 0x21, 0x0a, 0x00, (object_id >> (8 * 0)) & 0xFF, (object_id >> (8 * 1)) & 0xFF,
               (object_id >> (8 * 2)) & 0xFF, (object_id >> (8 * 3)) & 0xFF, (instance >> (8 * 0)) & 0xFF,
@@ -53,10 +59,12 @@ def request(object_id, instance=0x0000):
     crc = crc1(header)
     header.append((crc >> (8*0)) & 0xFF)
     ser.write(header)
+    lock.release()
 
 
 # receive serial data
 def receive(object_id, ret, instance=None):
+    lock.acquire()
     start = time.time()
     time.clock()
     elapsed = 0
@@ -111,10 +119,13 @@ def receive(object_id, ret, instance=None):
                     for j in range(10, length):
                         ret.append(data[j])  # add data to output buffer
                     if ccrc != crc:
+                        lock.release()
                         return 1  # return 1 if crc doesnt match -> detect corrupted message
+                    lock.release()
                     return 0
         elapsed = time.time() - start
 
+    lock.release()
     return 1
 
 

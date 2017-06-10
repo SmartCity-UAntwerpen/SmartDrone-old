@@ -38,7 +38,6 @@ class Drone(object):
     # get an id from the server
     def get_id(self):
         a = requests.get(env.addradvertise).text
-        print (a)
         a = int(a)
         return a
 
@@ -84,12 +83,10 @@ class Drone(object):
         coord = map(float, coord)
         if not self.job:  # don't handle new job if job ongoing
             self.job = True
-            print (coord)
             thread.start_new_thread(self._fly, (coord,))
 
     # fly to coord
     def _fly(self, coord):
-        self.job = False
         # load pathactions & waypoints to drone
         pathactions = [Pathaction(0x00, pa.PATHACTION_MODE_FOLLOWVECTOR, pa.PATHACTION_ENDCONDITION_ABOVEALTITUDE,
                                   pa.PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT,
@@ -112,15 +109,14 @@ class Drone(object):
         # wait until takeoff initiated
         while dc.get_thrust() <= 1:
             time.sleep(1)
-            print "waiting for takeoff"
         # poll position & state every second
         while dc.get_thrust() >= 1:
             action = dc.get_pathaction_active()
             self.state = action + 1
-            print self.state
             time.sleep(1)
         self.state = 0
         self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
+        self.job = False
 
     def _updatepos(self):
         while self.running:
