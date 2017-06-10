@@ -10,6 +10,7 @@ class DroneParameters:
         self.percentage=100
         self.idStart=0
         self.idEnd=0
+        self.idNext=-1
         self.idJob=0
 
         self.timestamp=0

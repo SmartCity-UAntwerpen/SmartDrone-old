@@ -81,17 +81,21 @@ class restserver:
             raise cherrypy.HTTPError(404, "Drone is buzy")
         if droneparam.available==0:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
+
         if not int(droneparam.idEnd)==int(idStart):
-            raise cherrypy.HTTPError(404, "Drone is not at the right waypoint")
-        droneparam.buzy=1
-        droneparam.idStart = idStart
-        droneparam.idEnd = idEnd
+            droneparam.idStart = droneparam.idEnd
+            droneparam.idEnd=idStart
+            droneparam.idNext = idEnd
+        else:
+            droneparam.idStart = idStart
+            droneparam.idEnd = idEnd
+            droneparam.idNext = -1
         droneparam.idJob=idJob
+        droneparam.buzy=1
         droneparam.percentage=0
 
-        #coorda = self.waypoints.get(str(idStart))
-        coordb = self.waypoints.get(str(idEnd))
-        self.mqtt_client.publish(env.mqttTopicJob+"/"+idVehicle, str(coordb.x)+","+str(coordb.y)+","+str(coordb.z))
+        coord = self.waypoints.get(str(droneparam.idEnd))
+        self.mqtt_client.publish(env.mqttTopicJob+"/"+idVehicle, str(coord.x)+","+str(coord.y)+","+str(coord.z))
         return "ACK"
 
 
