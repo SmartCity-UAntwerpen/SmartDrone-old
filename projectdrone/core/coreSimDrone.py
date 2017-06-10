@@ -5,6 +5,7 @@ import threading
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
 import requests
+from coreInterface import coreInterface
 
 class coreSimDrone:
     def __init__(self,waypoints,id_droneparam):
@@ -25,8 +26,6 @@ class coreSimDrone:
         except socket.error as msg:
             print ('Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
             sys.exit()
-
-        #Start listening on socket
         self.s.listen(10)
         print ('Socket now listening')
 
@@ -91,7 +90,6 @@ class coreSimDrone:
     def set_drone_startpoint(self, simid, point):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
-
             waypoint =self.waypoints.get(point)
             if not waypoint is None:
                 x = waypoint.x
@@ -113,12 +111,8 @@ class coreSimDrone:
         if drone is None:
             return "NACK\n"
         else:
-            try:
-                a = requests.get(env.addrkillid + "/" + str(drone.id)).text
-            except ValueError, Argument:
-                print (Argument)
+            coreInterface.sendRequest(env.addrkillid + "/" + str(drone.id))
             print ("Kill: " + str(drone.id))
-
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)
             drone.kill()

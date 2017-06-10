@@ -2,7 +2,7 @@ from random import randint
 
 import cherrypy
 import requests
-
+from coreMQTT import coreMQTT
 from coreCalculator import coreCalculator
 from droneparameters import DroneParameters
 from projectdrone.env import env
@@ -10,13 +10,12 @@ from waypoints import Waypoints
 
 
 class coreInterface():
-    def __init__(self, id_droneparam, waypoints,  mqtt_client):
+    def __init__(self, id_droneparam, waypoints):
         self.id_droneparam=id_droneparam
-        self.mqtt_client= mqtt_client
         self.waypoints=waypoints
         cherrypy.server.socket_host = '0.0.0.0'
         cherrypy.config.update({'server.socket_port': env.restport})
-        cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints, self.mqtt_client), '/')
+        cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints), '/')
         cherrypy.engine.start()
         self.getWaypoints()
 
@@ -30,11 +29,18 @@ class coreInterface():
             self.waypoints[str(index['id'])]=waypoint
         return None
 
+    @staticmethod
+    def sendRequest(path):
+        try:
+            return requests.get(path).text
+        except requests.exceptions.RequestException as e:
+            print (e)
+        return None
+
 class restserver:
-    def __init__(self, id_droneparam, waypoints, mqttclient):
+    def __init__(self, id_droneparam, waypoints):
         self.id_droneparam=id_droneparam
         self.waypoints=waypoints
-        self.mqtt_client=mqttclient
 
     def _cp_dispatch(self, vpath):
         function = vpath.pop()
@@ -48,7 +54,6 @@ class restserver:
             cherrypy.request.params['idStart'] = vpath.pop()
             cherrypy.request.params['idEnd'] = vpath.pop()
             return self.calcWeight
-
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
@@ -95,27 +100,24 @@ class restserver:
         droneparam.percentage=0
 
         coord = self.waypoints.get(str(droneparam.idEnd))
-        self.mqtt_client.publish(env.mqttTopicJob+"/"+idVehicle, str(coord.x)+","+str(coord.y)+","+str(coord.z))
+        coreMQTT.sendMQTT(env.mqttTopicJob+"/"+idVehicle,str(coord.x)+","+str(coord.y)+","+str(coord.z))
         return "ACK"
 
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def advertise(self, simdrone=0):
-        try:
-            if env.bedugaddrnewid:
-                r = randint(0, 99)
-            else:
-                r= int(requests.get(env.addrnewid).text)
-        except ValueError, Argument:
-            print (Argument)
+        id=coreInterface.sendRequest(requests.get(env.addrnewid).text)
+        if id is None:
+            id=randint(0, 99)
+            print ("Give drone self an id")
 
-        if self.id_droneparam.get(str(r))==None:
+        if self.id_droneparam.get(str(id))==None:
             newdroneparameters = DroneParameters()
             if int(simdrone):#if param simdrone, store in droneparameters
                 newdroneparameters.simdrone=1
-            self.id_droneparam[str(r)] = newdroneparameters
-        return str(r)
+            self.id_droneparam[str(id)] = newdroneparameters
+        return str(id)
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
@@ -137,16 +139,13 @@ class restserver:
                     weightToStart=coreCalculator.calc_time_between_points(value,waypointEndPrevJob,value.speedfactor)
 
                 #  flytime = time to reach initial point + time to reach end point
-                if str(value.idEnd)==str(idStart):
-                    weightToStart=0
-                else:
+                if not str(value.idEnd)==str(idStart):
                     waypointEndPrevJob=self.waypoints.get(str(value.idEnd))
                     weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda,value.speedfactor)
                 # time to fly from a to b
                 weight = coreCalculator.calc_time_between_points(coorda,coordb,value.speedfactor)
                 jsonstring.append(
                     {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
-
         return jsonstring
 
 
