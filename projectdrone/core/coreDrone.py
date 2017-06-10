@@ -1,7 +1,7 @@
 import threading
 import time
 
-from coreInterface import coreInterface
+from coreREST import coreREST
 from coreSimDrone import coreSimDrone
 from coreMQTT import coreMQTT
 from coreRequest import coreRequest
@@ -13,12 +13,12 @@ class coreDrone:
         self.id_droneparam = {}
         self.waypoints = {}
         coreMQTT(self.id_droneparam, self.waypoints )
-        coreInterface(self.id_droneparam, self.waypoints)
+        coreREST(self.id_droneparam, self.waypoints)
         threadHaert = threading.Thread(target=self.haertbeatcheck)
         threadHaert.start()
 
-        self.simcore=coreSimDrone(self.waypoints, self.id_droneparam)
         print ("Waypoints: " + str(self.waypoints))
+        self.simcore=coreSimDrone(self.waypoints, self.id_droneparam)
 
     def haertbeatcheck(self):
         while 1:
@@ -35,5 +35,6 @@ class coreDrone:
                         self.id_droneparam.pop(key, None)
                         coreRequest.sendRequest(env.addrkillid+"/"+str(key))
                         print ("Kill: "+ str(key))
+
 if __name__ == '__main__':
     coreDrone()

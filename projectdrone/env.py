@@ -7,7 +7,6 @@ class env:
     settletime = 2
 
     addrwaypoints = "http://143.129.39.151:10000/map/stringmapjson/drone"
-    #addrwaypoints="http://127.0.0.1:8082/fakewaypoints"
 
     addrnewid = "http://143.129.39.151:10000/bot/newBot/drone"
     addrkillid = "http://143.129.39.151:10000/bot/delete"

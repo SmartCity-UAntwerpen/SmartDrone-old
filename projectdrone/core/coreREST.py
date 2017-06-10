@@ -8,18 +8,22 @@ from projectdrone.env import env
 from waypoints import Waypoints
 from coreRequest import coreRequest
 
-class coreInterface():
+class coreREST():
     def __init__(self, id_droneparam, waypoints):
         self.id_droneparam=id_droneparam
         self.waypoints=waypoints
+        self.getWaypoints()
         cherrypy.server.socket_host = '0.0.0.0'
         cherrypy.config.update({'server.socket_port': env.restport})
         cherrypy.tree.mount(restserver(self.id_droneparam, self.waypoints), '/')
         cherrypy.engine.start()
-        self.getWaypoints()
 
     def getWaypoints(self):
-        waypoints= coreRequest.sendRequest(env.addrwaypoints).json()
+        waypoints= coreRequest.sendRequest(env.addrwaypoints)
+        if waypoints is None:
+            waypoints=[{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
+        else:
+            waypoints = waypoints.json()
         for index in waypoints:
             waypoint=Waypoints()
             waypoint.x=index['x']
@@ -27,8 +31,6 @@ class coreInterface():
             waypoint.z=index['z']
             self.waypoints[str(index['id'])]=waypoint
         return None
-
-
 
 class restserver:
     def __init__(self, id_droneparam, waypoints):
@@ -47,12 +49,6 @@ class restserver:
             cherrypy.request.params['idStart'] = vpath.pop()
             cherrypy.request.params['idEnd'] = vpath.pop()
             return self.calcWeight
-
-    @cherrypy.expose
-    @cherrypy.tools.gzip()
-    @cherrypy.tools.json_out()
-    def fakewaypoints(self):
-       return [{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
