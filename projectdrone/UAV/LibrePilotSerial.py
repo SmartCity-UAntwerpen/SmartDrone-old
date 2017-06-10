@@ -2,6 +2,7 @@
 # note this file should not need editing unless a newer version changes these communication protocols
 import serial as serial
 import struct
+import time
 from projectdrone.env import env
 
 # variables
@@ -26,8 +27,8 @@ CRC_TABLE = [
 
 try:
     ser = serial.Serial(env.port, env.rate)
-except serial.SerialException:
-    pass
+except serial.SerialException as e:
+    print e
 
 
 # send information about object
@@ -56,7 +57,10 @@ def request(object_id, instance=0x0000):
 
 # receive serial data
 def receive(object_id, ret, instance=None):
-    while 1:
+    start = time.time()
+    time.clock()
+    elapsed = 0
+    while elapsed < env.receive_timeout:
         message_ok = 1
         data = []
         temp = struct.unpack('B', ser.read())[0]
@@ -109,6 +113,9 @@ def receive(object_id, ret, instance=None):
                     if ccrc != crc:
                         return 1  # return 1 if crc doesnt match -> detect corrupted message
                     return 0
+        elapsed = time.time() - start
+
+    return 1
 
 
 # calculates crc for requests

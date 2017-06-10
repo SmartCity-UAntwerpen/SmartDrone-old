@@ -3,15 +3,11 @@ from LibrePilotSerial import *
 
 # request & get data for a specific object and instance
 def get_uav_obj(object_id, instance=0x00):
-    request(object_id, instance)
-    data = get_data(object_id, instance)
-    return data
-
-
-# get data about object from UART
-def get_data(object_id, instance=0x00):
-    received = []
-    receive(object_id, received, instance)
+    error = 1
+    while error:
+        request(object_id, instance)
+        received = []
+        error = receive(object_id, received, instance)
     return received
 
 

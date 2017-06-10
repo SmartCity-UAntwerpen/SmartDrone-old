@@ -33,10 +33,12 @@ class env:
     homelon = 4.4183511
     homealt = 0
 
+    receive_timeout = 1.0 # 1 sec receive timeout
+
     printNewPos = False
 
-    #port = 'COM3'
-    port = '/dev/ttyS0'
+    port = 'COM4'
+    #port = '/dev/ttyS0'
     rate = 57600
 
     standardspeedSimulation = 70
