@@ -1,3 +1,4 @@
+import navpy
 class env:
     fly_height = -4.0
     speed_takeoff = 2
@@ -6,10 +7,8 @@ class env:
     settletime = 2
 
     addrwaypoints = "http://143.129.39.151:10000/map/stringmapjson/drone"
-    #addrwaypoints="http://127.0.0.1:8082/fakewaypoints"
 
     addrnewid = "http://143.129.39.151:10000/bot/newBot/drone"
-    bedugaddrnewid = False
     addrkillid = "http://143.129.39.151:10000/bot/delete"
     addradvertise = "http://143.129.39.151:8082/advertise"
     addrjobdone = "http://143.129.39.151:8090/completeJob"
@@ -42,3 +41,10 @@ class env:
     rate = 57600
 
     standardspeedSimulation = 70
+
+    def generatedNEDwaypoints(self):
+        print (navpy.lla2ned(51.1785531, 4.4183511, 0, env.homelat, env.homelon, env.homealt))
+        print (navpy.lla2ned(51.1784002, 4.4180879, 0, env.homelat, env.homelon, env.homealt))
+        print (navpy.lla2ned(51.1783561, 4.4182861, 0, env.homelat, env.homelon, env.homealt))
+        print (navpy.lla2ned(51.1787070, 4.4185652, 0, env.homelat, env.homelon, env.homealt))
+        print (navpy.lla2ned(51.1787534, 4.4184587, 0, env.homelat, env.homelon, env.homealt))
