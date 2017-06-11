@@ -22,6 +22,7 @@ class env:
     mqttTopicJobdone = "drone/jobdone"
     mqttTopicPos = "drone/pos"
 
+    tcpip="143.129.39.151"
     tcpport=8888
     restport=8082
 

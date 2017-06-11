@@ -1,24 +1,61 @@
 import unittest
-from projectdrone.core.coreDrone import coreDrone
-from threading import Thread
+import socket
+from projectdrone.env import env
+import time
 
-class CoreTest(unittest.TestCase):
+class simdronetest(unittest.TestCase):
 
     def setUp(self):
-        print 'In setUp()'
-        Thread(target=coreDrone(), args=()).start()
-
-    def tearDown(self):
-        pass#del self.thread
-
-    def test_MakeSimDrone(self):
-        self.failIf(0)
         pass
-        self.failUnlessEqual("ACK\n", self.core.simcore.create_drone(1))
-        self.failUnlessEqual("NACK\n", self.core.simcore.run_drone(1))
+        print 'In setUp()'
+        HOST = env.tcpip # The remote host
+        PORT = env.tcpport  # The same port as used by the server
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect((HOST, PORT))
 
-        self.failIfEqual("NACK\n", self.core.simcore.set_drone_startpoint(1, 44))
-        self.failIfEqual("ACK\n", self.core.simcore.set_drone_startpoint(2, 44))
+    def test_simdrone(self):
+        print 'In Test()'
+        self.s.send('create 1')
+        data = self.s.recv(1024)
+        string= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'NACK", string)
+
+        self.s.send("run 1")#wrong set first startpoint
+        data = self.s.recv(1024)
+        print str(repr(data))
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'NACK", data)
+
+        self.s.send('set 1 startpoint 1')  # wrong idstartpoint
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'NACK", data)
+
+        self.s.send('set 1 startpoint 44')  # startpoint
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'ACK", data)
+
+        self.s.send('run 1')  # right
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'ACK", data)
+
+        self.s.send('set 1 startpoint 44')  # wrong drone running
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'NACK", data)
+
+        self.s.send('kill 1')  #right
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'ACK", data)
+
+        self.s.send('kill 2')  # wrong id
+        data = self.s.recv(1024)
+        data= str(repr(data)).split('\\', 1)[0]
+        self.failUnlessEqual("'NACK", str(repr(data)))
+        self.s.close()
 
 if __name__ == '__main__':
     unittest.main()
