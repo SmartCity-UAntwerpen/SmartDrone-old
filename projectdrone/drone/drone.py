@@ -1,3 +1,7 @@
+"""drone class - note X-Y-Z actually corresponds to LLA
+mqtt setup & message handeling are done here
+a drone currently only flies from A to B and requires manual take over in between
+note reference materials for suggestions on improvement"""
 import paho.mqtt.client as mqttclient
 import thread
 import time
@@ -109,15 +113,17 @@ class Drone(object):
         # wait until takeoff initiated
         while dc.get_thrust() <= 1:
             time.sleep(1)
-        # poll position & state every second
+        # poll state - used in server
         while dc.get_thrust() >= 1:
             action = dc.get_pathaction_active()
             self.state = action + 1
             time.sleep(1)
         self.state = 0
         self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.id), "done")
+        # release availability
         self.job = False
 
+    # loop for updating position
     def _updatepos(self):
         while self.running:
             pos = dc.get_position()

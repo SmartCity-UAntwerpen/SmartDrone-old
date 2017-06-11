@@ -1,3 +1,6 @@
+"""simdrone class for simulating drones - uses and overrides some methods from the original drone class
+note: while it may be interesting to seperate the simulation drone & real drone harder as the development goes on
+make sure they keep a common bass class, so they are transparent to the higher level functionality (e.g. MaaS)"""
 import math
 
 from drone import *
@@ -27,8 +30,8 @@ class SimDrone(Drone):
         else:
             self.locationNED = [x, y, z]
             self._updateLLAloc()
-            self.init_x, self.init_y, self.init_z = navpy.ned2lla([x, y, z], env.homelat, env.homelon,
-                                                                  env.homealt)  # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            # (ned, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            self.init_x, self.init_y, self.init_z = navpy.ned2lla([x, y, z], env.homelat, env.homelon, env.homealt)
 
             self.init_x = self.x
             self.init_y = self.y
@@ -36,6 +39,7 @@ class SimDrone(Drone):
             self.is_set = True
             return "ACK\n"
 
+    # scale the speed by a factor
     def setspeed(self, speed):
         if self.running:
             return 'NACK'
@@ -103,7 +107,7 @@ class SimDrone(Drone):
             sy = 1
         else:
             sy = -1
-        remainder = distance % (speed * float(self.speedfactor))
+        remainder = distance % (speed * float(self.speedfactor))  # fly in m/s -> catch remainder
         distance -= remainder
         traveled = 0
         while traveled != distance:
@@ -173,6 +177,7 @@ class SimDrone(Drone):
         b = pow(y2 - y1, 2)
         return math.sqrt(a + b)
 
+    # get an id from the server - indicate this drone is a simdrone
     def get_id(self):
         a = requests.get(env.addradvertise + "?simdrone=1").text
         print (a)

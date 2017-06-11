@@ -1,3 +1,5 @@
+"""abstraction layer used to implement communication with the flightcontroller,
+used by drone to load flightplan etc"""
 from projectdrone.UAV.Pathplan import Pathplan
 from projectdrone.UAV.AcuatorDesired import ActuatorDesired
 from projectdrone.UAV.GPSPostitionSensor import GPSPositionSensor
@@ -56,5 +58,6 @@ def get_waypoint_active():
 def get_pathaction_active():
     waypoint_active = WaypointActive.get_instance().waypointActive
     waypoint = Waypoint.get_instance(waypoint_active)  # get the currently active waypoint
-    return waypoint.action
+    return waypoint.action  # return its action - note this is just the index, not the object
+
 

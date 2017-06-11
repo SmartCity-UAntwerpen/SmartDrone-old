@@ -1,5 +1,5 @@
-# python implementation of the librepilotserial libraries
-# note this file should not need editing unless a newer version changes these communication protocols
+"""python implementation of the librepilotserial libraries
+note this file should not need editing unless a newer version changes these communication protocols"""
 import serial as serial
 import struct
 import time
@@ -31,7 +31,7 @@ try:
 except serial.SerialException as e:
     print e
 
-lock = threading.Lock()
+lock = threading.Lock()  # lock used to prevent multiple threads using uart at the same time
 
 
 # send information about object

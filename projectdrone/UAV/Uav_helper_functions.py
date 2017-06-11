@@ -4,7 +4,7 @@ from LibrePilotSerial import *
 # request & get data for a specific object and instance
 def get_uav_obj(object_id, instance=0x00):
     error = 1
-    while error:
+    while error:  # resend request if bad crc or receive timed out
         request(object_id, instance)
         received = []
         error = receive(object_id, received, instance)
@@ -19,7 +19,7 @@ def package(data, length):
     return result
 
 
-# unpack bytes to int number
+# unpack bytes to int number - note do not use for length = 1 (fix?)
 def unpack(data, length):
     result = 0
     for i in range(0, length):
