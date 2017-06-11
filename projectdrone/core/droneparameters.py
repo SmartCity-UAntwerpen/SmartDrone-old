@@ -8,8 +8,8 @@ class DroneParameters:
         self.buzy=0
 
         self.percentage=100
-        self.idStart=0
-        self.idEnd=0
+        self.idStart=-1
+        self.idEnd=-1
         self.idNext=-1
         self.idJob=0
 
@@ -17,6 +17,6 @@ class DroneParameters:
         self.available=1
         self.simdrone=0
         self.speedfactor=1.0
-        self.init=0
+
     def kill(self):
         del self
