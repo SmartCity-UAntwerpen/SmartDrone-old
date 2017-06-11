@@ -12,6 +12,7 @@ class coreSimDrone:
         self.id_droneparam=id_droneparam
         self.waypoints=waypoints
         self.init_socket()
+        #start TCP socket
         threadTCP = threading.Thread(target=self.wait_for_instruction())
         threadTCP.start()
 
@@ -35,6 +36,7 @@ class coreSimDrone:
             data= conn.recv(1024)
             print ("Comand: "+data)
             data = data.split(" ")
+            #command case + fill response
             if data[0]=="create":
                 response=self.create_drone(data[1].rstrip())
 
@@ -55,11 +57,13 @@ class coreSimDrone:
             else:
                 response='NACK\n'
             print (response)
+            #send response
             conn.send(response)
             conn.close()
         self.s.close()
 
     def create_drone(self, simid):
+        #When de simdrone numbre already exists, send NACK
         if self.simid_drone.get(simid) is None:
             self.simid_drone[str(simid)] = SimDrone()
             return 'ACK\n'
@@ -68,7 +72,7 @@ class coreSimDrone:
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
-            return drone.run()
+            return drone.run()#Normaly ACK, NACK when the drone has not been set
         else:
             return "NACK\n"
 
@@ -90,7 +94,7 @@ class coreSimDrone:
         drone = self.find_drone_by_simid(simid)
         if not drone is None:
             waypoint =self.waypoints.get(point)
-            if not waypoint is None:
+            if not waypoint is None:#check if waypoint exists
                 x = waypoint.x
                 y = waypoint.y
                 z = waypoint.z
@@ -100,23 +104,26 @@ class coreSimDrone:
     def set_drone_speed(self, simid, speed):
         drone= self.find_drone_by_simid(simid)
         if not drone is None:
-            self.id_droneparam.get(str(drone.id)).speedfactor=float(speed)/float(env.standardspeedSimulation)
-            return drone.setspeed(float(speed)/float(env.standardspeedSimulation))
-        else:
-            return "NACK\n"
+            if drone.setspeed(float(speed)/float(env.standardspeedSimulation))=="ACK\n":
+                self.id_droneparam.get(str(drone.id)).speedfactor = float(speed) / float(
+                    env.standardspeedSimulation)  # save also in dronedaram for weightcalculations
+                return "ACK\n"
+        return "NACK\n"
 
     def kill_drone(self, simid):
         drone = self.simid_drone.get(str(simid))
         if drone is None:
             return "NACK\n"
         else:
+            #kill immediatly by the backbone, because its a simdrone
             coreRequest.sendRequest(env.addrkillid + "/" + str(drone.id))
             print ("Kill: " + str(drone.id))
+            #delete drone
             self.id_droneparam.get(str(drone.id)).kill()
             self.id_droneparam.pop(str(drone.id), None)
             drone.kill()
+            #remove simdroneid-droneid
             self.simid_drone.pop(str(simid), None)
-
             return 'ACK\n'
 
     def find_drone_by_simid(self, simid):
