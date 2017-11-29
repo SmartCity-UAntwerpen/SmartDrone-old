@@ -5,7 +5,7 @@ from LibrePilotSerial import *
 def get_uav_obj(object_id, instance=0x00):
     error = 1
     while error:  # resend request if bad crc or receive timed out
-        request(object_id, instance)
+        request(object_id, instance)  # request data from flightcontroller
         received = []
         error = receive(object_id, received, instance)
     return received

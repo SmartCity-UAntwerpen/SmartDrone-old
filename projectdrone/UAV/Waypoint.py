@@ -1,3 +1,6 @@
+"""waypoint class: represents a point in 3D space (defined by NED coordination system: North East Down)
+ where the drone has to fly to, contains a function to package all its fields except instance"""
+
 from UAV_Obj import *
 
 
@@ -5,12 +8,12 @@ class Waypoint(UAV_Obj):
     object_id = object_ids.waypoint
 
     def __init__(self, instance, north, east, down, velocity, action=0x00):
-        self.instance = instance
-        self.north = north
+        self.instance = instance  # ID of the waypoint
+        self.north = north  # part of NED coordination system
         self.east = east
         self.down = down
-        self.velocity = velocity
-        self.action = action
+        self.velocity = velocity  # speed to reach the waypoint
+        self.action = action  # todo: ??? always the same as instance
 
     @staticmethod
     def get_instance(instance_id=0x00):

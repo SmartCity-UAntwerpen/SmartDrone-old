@@ -1,8 +1,9 @@
 """abstraction layer used to implement communication with the flightcontroller,
 used by drone to load flightplan etc"""
+
 from projectdrone.UAV.Pathplan import Pathplan
 from projectdrone.UAV.AcuatorDesired import ActuatorDesired
-from projectdrone.UAV.GPSPostitionSensor import GPSPositionSensor
+from projectdrone.UAV.GPSPostitionSensor import GPSPositionSensor #todo: remove gps and replace by camera positioning system
 from projectdrone.UAV.LibrePilotSerial import *
 from projectdrone.UAV.WaypointActive import WaypointActive
 from projectdrone.UAV.Waypoint import Waypoint
