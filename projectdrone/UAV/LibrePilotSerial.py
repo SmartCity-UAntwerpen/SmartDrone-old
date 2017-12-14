@@ -1,6 +1,6 @@
 """python implementation of the librepilotserial libraries
 note this file should not need editing unless a newer version changes these communication protocols"""
-import serial as serial
+import serial
 import struct
 import time
 import threading
