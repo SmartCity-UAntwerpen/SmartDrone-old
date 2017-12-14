@@ -53,7 +53,7 @@ class coreMQTT:
     def job_done(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[2]))
-        # if de drone id exists
+        # if the drone id exists
         if not droneparam is None:
             idJob = droneparam.idJob
             # If the point where the drone is, is the asked endpoint
@@ -78,7 +78,7 @@ class coreMQTT:
                 print "Jobstartpoint:" + str(idJob)
 
     # callback new position
-    # TODO convert
+    # TODO convert?
     def pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[2]))
@@ -91,7 +91,7 @@ class coreMQTT:
             droneparam.x = NED[0]
             droneparam.y = NED[1]
             droneparam.z = NED[2]
-            # set te timestamp to the actual time, for the heartbeatcheck
+            # set the timestamp to the actual time, for the heartbeatcheck
             droneparam.available = 1
             droneparam.timestamp = time.time()
             # if the drone is buzy with a job

@@ -1,5 +1,5 @@
 """drone class - note X-Y-Z actually corresponds to LLA
-mqtt setup & message handeling are done here
+mqtt setup & message handling are done here
 a drone currently only flies from A to B and requires manual take over in between
 note reference materials for suggestions on improvement"""
 import paho.mqtt.client as mqttclient
@@ -125,6 +125,7 @@ class Drone(object):
 
     # loop for updating position
     def _updatepos(self):
+        #TODO update to new positioning system
         while self.running:
             pos = dc.get_position()
             self.x = pos[0]

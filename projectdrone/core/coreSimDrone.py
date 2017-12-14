@@ -31,10 +31,12 @@ class coreSimDrone:
 
     def wait_for_instruction(self):
         while (1):
+            print ('entering while')
             #wait to accept a connection - blocking call
             conn, addr = self.s.accept()
-            data= conn.recv(1024)
-            print ("Comand: "+data)
+            print('connection accepted: ', conn, addr)
+            data = conn.recv(1024)
+            print ("Command: "+data)
             data = data.split(" ")
             #command case + fill response
             if data[0]=="create":
@@ -55,19 +57,19 @@ class coreSimDrone:
             elif data[0]=="kill":
                 response = self.kill_drone(data[1].rstrip())
             else:
-                response='NACK\n'
+                response='NeverACK\n'
             print (response)
             #send response
             conn.send(response)
-            conn.close()
-        self.s.close()
+            #conn.close()
+        #self.s.close()
 
     def create_drone(self, simid):
-        #When de simdrone numbre already exists, send NACK
+        # When de simdrone number already exists, send NACK
         if self.simid_drone.get(simid) is None:
             self.simid_drone[str(simid)] = SimDrone()
-            return 'ACK\n'
-        return 'NACK\n'
+            return 'createDroneACK\n'
+        return 'test2\n'
 
     def run_drone(self, simid):
         drone = self.find_drone_by_simid(simid)

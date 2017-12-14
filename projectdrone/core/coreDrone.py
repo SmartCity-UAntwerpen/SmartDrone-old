@@ -2,7 +2,7 @@ import threading
 import time
 
 from coreREST import coreREST
-#from coreSimDrone import coreSimDrone
+from coreSimDrone import coreSimDrone
 from coreMQTT import coreMQTT
 from coreRequest import coreRequest
 from projectdrone.env import env
@@ -12,8 +12,8 @@ from waypoints import Waypoints
 class coreDrone:
 
     def __init__(self):
-        # TODO does this change too? -> check coreREST.advertise
         # Map of drones: K=id , V=droneparamters object
+        # passed by reference, changes in coreREST.advertise
         self.id_droneparam = {}
         # Map of waypoints. K=str(id), V=waypoint object
         self.waypoints = {}
@@ -25,7 +25,7 @@ class coreDrone:
         threadHaert.start()
 
         print ("Waypoints: " + str(self.waypoints))
-        #self.simcore = coreSimDrone(self.waypoints, self.id_droneparam)
+        self.simcore = coreSimDrone(self.waypoints, self.id_droneparam)
 
     def haertbeatcheck(self):
         while 1:
@@ -52,7 +52,6 @@ class coreDrone:
         # sent REST request to map/stringmapjson/drone
         waypoints = coreRequest.sendRequest(env.addrwaypoints)
         if waypoints is None:
-            # TODO ??
             waypoints=[{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
         else:
             # Returns the json-encoded content of a response, if any.

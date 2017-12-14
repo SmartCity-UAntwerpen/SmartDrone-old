@@ -13,9 +13,10 @@ class simdronetest(unittest.TestCase):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((HOST, PORT))
 
+
     def test_simdrone(self):
         print 'In Test()'
-        self.s.send('create 1')
+        self.s.send('create 37')
         data = self.s.recv(1024)
         string= str(repr(data)).split('\\', 1)[0]
         self.failUnlessEqual("'NACK", string)

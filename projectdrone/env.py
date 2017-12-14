@@ -8,14 +8,14 @@ class env:
     speed_horizontal = 1.5
     settletime = 2
 
-    addrwaypoints = "http://143.129.39.151:10000/map/stringmapjson/drone"
+    addrwaypoints = "http://smartcity.ddns.net:10000/map/stringmapjson/drone"
 
-    addrnewid = "http://143.129.39.151:10000/bot/newBot/drone"
-    addrkillid = "http://143.129.39.151:10000/bot/delete"
-    addradvertise = "http://143.129.39.151:8082/advertise"
-    addrjobdone = "http://143.129.39.151:8090/completeJob"
+    addrnewid = "http://smartcity.ddns.net:10000/bot/newBot/drone"
+    addrkillid = "http://smartcity.ddns.net:10000/bot/delete"
+    addradvertise = "http://smartcity.ddns.net:8082/advertise"
+    addrjobdone = "http://smartcity.ddns.net:8090/completeJob"
 
-    mqttbroker = "143.129.39.151"
+    mqttbroker = "smartcity.ddns.net"
     mqttusername = "root"
     mqttpassword = "smartcity"
     mqttport = 1883
@@ -24,7 +24,7 @@ class env:
     mqttTopicJobdone = "drone/jobdone"
     mqttTopicPos = "drone/pos"
 
-    tcpip="143.129.39.151"
+    tcpip="smartcity.ddns.net"
     tcpport=8888
     restport=8082
 

@@ -3,7 +3,11 @@ note: while it may be interesting to seperate the simulation drone & real drone 
 make sure they keep a common bass class, so they are transparent to the higher level functionality (e.g. MaaS)"""
 import math
 
-from drone import *
+#from drone import *
+import thread
+
+import time
+
 from projectdrone import navpy
 from projectdrone.drone.drone import Drone
 from projectdrone.env import env

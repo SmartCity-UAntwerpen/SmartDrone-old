@@ -95,7 +95,7 @@ class restserver:
         id = coreRequest.sendRequest(env.addrnewid)  # ask for id
         if id is None:  # if the server is unavailable, use randint for debugging
             id = randint(0, 99)
-            print ("ID server unavailable: got random id: " + str(id)) # changed from: print ("I give the drone self an id")
+            print ("ID server unavailable: got random id: " + str(id))
         else:
             id = id.text
 
