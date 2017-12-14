@@ -1,6 +1,7 @@
 """simdrone class for simulating drones - uses and overrides some methods from the original drone class
-note: while it may be interesting to seperate the simulation drone & real drone harder as the development goes on
-make sure they keep a common bass class, so they are transparent to the higher level functionality (e.g. MaaS)"""
+note: while it may be interesting to separate the simulation drone & real drone as the development goes on
+make sure they keep a common base class, so they are transparent to the higher level functionality (e.g. MaaS)"""
+
 import math
 
 from drone import *
@@ -15,7 +16,7 @@ class SimDrone(Drone):
         self.init_x = 0
         self.init_y = 0
         self.init_z = 0
-        self.locationNED = [0, 0, 0]
+        self.locationNED = [0, 0, 0]  # North East Down coordinates
         self.speedfactor = 1.0
         self.is_set = False
         self.running = False

@@ -1,14 +1,17 @@
+"""pathaction class: the action that the drone is currently performing to complete its waypoint
+(see list: PathActions.py), contains a function to package all its fields except instance"""
+
 from UAV_Obj import *
 
-
+#  todo: fields???
 class Pathaction(UAV_Obj):
     object_id = object_ids.pathaction
 
     def __init__(self, instance, mode, end_condition, command, mode_parameters=[0.0, 0.0, 0.0, 0.0],
                  condition_parameters=[0.0, 0.0, 0.0, 0.0], jump_destination=-1, error_destination=-1):
-        self.instance = instance
-        self.mode = mode
-        self.end_condition = end_condition
+        self.instance = instance  # ID of the pathaction
+        self.mode = mode  # what should the drone do
+        self.end_condition = end_condition  # how should the pathaction end
         self.command = command
         self.jump_destination = jump_destination
         self.error_destination = error_destination
