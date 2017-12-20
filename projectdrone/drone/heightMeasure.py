@@ -27,14 +27,7 @@ class HeightMeasurer:
             distance = self.tof.get_distance()
             if 3000 > distance > 0:
                 self.positiondata.Z = distance
-        #        print ("%d mm, %d cm, %d" % (distance, (distance/10), count))
-        #    if (distance < minDistance):
-        #       minDistance = distance
-        #   if (distance > maxDistance and distance < 3000):
-        #       maxDistance = distance
             time.sleep(self.timing/1000000.00)
 
         self.tof.stop_ranging() #unreachable with while true
 
-        # print ('Minimum Distance: ' + str(minDistance))
-        # print ('Maximum Distance: ' + str(maxDistance))

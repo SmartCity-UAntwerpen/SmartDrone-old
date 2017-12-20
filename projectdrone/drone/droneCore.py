@@ -11,15 +11,17 @@ def run():
     backendcommunicator = backendCommunication.BackendCommunicator(droneparameters)
     datafuser = dataFusion.DataFuser(droneparameters)
 
-    backendcommunicator.register_jobs()
+    # backendcommunicator.register_jobs()
 
-    position_receive_thread = threading.Thread(target=datafuser.calculate_position())
+    position_receive_thread = threading.Thread(target=datafuser.calculate_position)
     position_receive_thread.daemon = True
     position_receive_thread.start()
+    print("Datafusion thread started")
+    position_update_thread = threading.Thread(target=backendcommunicator.update_position)
+    position_update_thread.daemon = True
+    position_update_thread.start()
+    print("Position update thread started")
 
-    update_position_thread = threading.Thread(target=backendcommunicator.update_position())
-    update_position_thread.daemon = True
-    update_position_thread.start()
-
-
+    while True:
+        ()
 run()

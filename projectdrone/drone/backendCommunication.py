@@ -1,14 +1,18 @@
 """This class takes care of all communication between drone and backend"""
+import threading
+
 import paho.mqtt.client as mqttclient
 import requests
+import time
+
 from projectdrone.env import env
 
 
-class BackendCommunicator:
+class BackendCommunicator():
 
     def __init__(self, droneparameters):
-        self.job_client = self.create_client(env.mqttTopicJob)
-        self.pos_client = self.create_client(env.mqttTopicPos)
+        # self.job_client = self.create_client(env.mqttTopicJob)
+        # self.pos_client = self.create_client(env.mqttTopicPos)
         self.droneparameters = droneparameters
 
     # creates an MQTT client
@@ -35,9 +39,14 @@ class BackendCommunicator:
 
     # loop for position update heartbeat
     def update_position(self):
-        self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
-                                + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
-                                + "," + str(self.droneparameters.state))
+        while True:
+        # self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
+        #                         + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
+        #                         + "," + str(self.droneparameters.state))
+            print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
+                + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]" + "\n")
+            time.sleep(1)
+
 
     # get an ID from the backbone (via backend) to use for this drone
     def get_id(self):

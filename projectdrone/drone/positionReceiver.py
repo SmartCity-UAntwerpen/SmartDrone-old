@@ -25,9 +25,10 @@ class UDPReceiver:
             # print('received message: ', payload , 'with type: ', type(payload))
             # splits the received string on ';' (format x;$
             splitdata = payload.split(';')
-            if len(splitdata) == 3:
+            if len(splitdata) == 4:
                 self.positiondata.X = splitdata[0]
                 self.positiondata.Y = splitdata[1]
                 self.positiondata.yaw = splitdata[2]
+                # print("RECEIVED DATA: " + str(splitdata[0]) + "," + str(splitdata[1]) + "," + str(splitdata[2]) + "\n")
         # cannot be reached with while 1
         conn.close()

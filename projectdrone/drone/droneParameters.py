@@ -12,3 +12,4 @@ class DroneParameters:
         self.yaw = 0             # the corner at which the drone is turned in the horizontal plane
         self.state = 0           # 0=rest, 1=takeoff, 2=fly, 3=hang in the air, 4=land
         self.ID = 0
+        self.test = 0
