@@ -3,7 +3,7 @@ import math
 from projectdrone.env import env
 
 
-class coreCalculator():
+class Calculator:
     def __init__(self):
         pass
 
@@ -19,7 +19,7 @@ class coreCalculator():
         time = abs(env.fly_height - point1.z) / env.speed_takeoff/speedfactor
         time += abs(env.fly_height -point2.z) / env.speed_landing/speedfactor
         time += env.settletime/speedfactor
-        time += coreCalculator.calc_dist(point1.x, point1.y,point2.x, point2.y) / env.speed_horizontal/speedfactor
+        time += Calculator.calc_dist(point1.x, point1.y, point2.x, point2.y) / env.speed_horizontal / speedfactor
         return time
 
     # Calc the time to land given 2 points and a speedfactor
@@ -33,7 +33,7 @@ class coreCalculator():
     def calc_waypoint(waypoints, droneparam):
         distancetowaypoint = {}
         for key, value in waypoints.items():
-            distancetowaypoint[key] = coreCalculator.calc_dist(droneparam.x, droneparam.y, value.x, value.y)
+            distancetowaypoint[key] = Calculator.calc_dist(droneparam.x, droneparam.y, value.x, value.y)
         mindistance = 65536
         waypoint = -1
         for key, value in distancetowaypoint.items():

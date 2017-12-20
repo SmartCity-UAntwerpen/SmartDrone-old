@@ -4,9 +4,9 @@ import threading
 
 from projectdrone.drone.SimDrone import SimDrone
 from projectdrone.env import env
-from coreRequest import coreRequest
+from backendrequest import BackendRequest
 
-class coreSimDrone:
+class SimDroneBackend:
     def __init__(self,waypoints,id_droneparam):
         self.simid_drone={}
         self.id_droneparam=id_droneparam
@@ -116,7 +116,7 @@ class coreSimDrone:
             return "NACK\n"
         else:
             #kill immediatly by the backbone, because its a simdrone
-            coreRequest.sendRequest(env.addrkillid + "/" + str(drone.id))
+            BackendRequest.sendRequest(env.addrkillid + "/" + str(drone.id))
             print ("Kill: " + str(drone.id))
             #delete drone
             self.id_droneparam.get(str(drone.id)).kill()

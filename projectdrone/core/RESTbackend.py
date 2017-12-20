@@ -1,14 +1,14 @@
 from random import randint
 
 import cherrypy
-from coreMQTT import coreMQTT
-from coreCalculator import coreCalculator
+from MQTTbackend import BackendMQTT
+from calculator import Calculator
 from droneparameters import DroneParameters
 from projectdrone.env import env
-from coreRequest import coreRequest
+from backendrequest import BackendRequest
 
 
-class coreREST():
+class RESTBackend:
     # initialize REST server
     def __init__(self, id_droneparam, waypoints):
         self.id_droneparam = id_droneparam
@@ -85,14 +85,14 @@ class restserver:
         # Get the coordinats of the waypoint
         coord = self.waypoints.get(str(droneparam.idEnd))
         # send them to the drone
-        coreMQTT.sendMQTT(env.mqttTopicJob+"/"+idVehicle,str(coord.x)+","+str(coord.y)+","+str(coord.z))
+        BackendMQTT.sendMQTT(env.mqttTopicJob + "/" + idVehicle, str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
         return "ACK"
 
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def advertise(self, simdrone=0):  # param simdrone, if 1 haertbeat has no effect
-        id = coreRequest.sendRequest(env.addrnewid)  # ask for id
+        id = BackendRequest.sendRequest(env.addrnewid)  # ask for id
         if id is None:  # if the server is unavailable, use randint for debugging
             id = randint(0, 99)
             print ("ID server unavailable: got random id: " + str(id)) # changed from: print ("I give the drone self an id")
@@ -124,14 +124,14 @@ class restserver:
                     weightToStart = 0
                 else:
                     waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                    weightToStart=coreCalculator.calc_time_between_points(value, waypointEndPrevJob, value.speedfactor)
+                    weightToStart=Calculator.calc_time_between_points(value, waypointEndPrevJob, value.speedfactor)
 
                 #  flytime = time to reach initial point + time to reach end point
                 if not str(value.idEnd) == str(idStart):
                     waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                    weightToStart += coreCalculator.calc_time_between_points(waypointEndPrevJob,coorda,value.speedfactor)
+                    weightToStart += Calculator.calc_time_between_points(waypointEndPrevJob, coorda, value.speedfactor)
                 # time to fly from a to b
-                weight = coreCalculator.calc_time_between_points(coorda,coordb,value.speedfactor)
+                weight = Calculator.calc_time_between_points(coorda, coordb, value.speedfactor)
                 jsonstring.append(
                     {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
         return jsonstring

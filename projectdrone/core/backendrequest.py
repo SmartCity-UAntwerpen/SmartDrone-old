@@ -1,7 +1,7 @@
 import requests
 
 
-class coreRequest:
+class BackendRequest:
     # send a get request to a specific address
     @staticmethod
     def sendRequest(path):

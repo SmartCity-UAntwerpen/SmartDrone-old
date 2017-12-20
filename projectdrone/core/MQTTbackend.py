@@ -1,5 +1,5 @@
-from coreCalculator import coreCalculator
-from coreRequest import coreRequest
+from calculator import Calculator
+from backendrequest import BackendRequest
 import paho.mqtt.client as mqttclient
 from random import randint
 from projectdrone.env import env
@@ -7,7 +7,7 @@ from projectdrone import navpy
 import time
 
 
-class coreMQTT:
+class BackendMQTT:
     def __init__(self, id_droneparam, waypoints):
         self.reg_pos()
         self.reg_jobdone()
@@ -25,14 +25,14 @@ class coreMQTT:
     # Send mqtt msg over a specific topic
     @staticmethod
     def sendMQTT(topic, msg):
-        mqtt_client = coreMQTT.create_client("Dronecoresend" + str(randint(0, 99)))
+        mqtt_client = BackendMQTT.create_client("Dronecoresend" + str(randint(0, 99)))
         mqtt_client.publish(topic, msg)
         mqtt_client.disconnect()
 
     # register to the position receiving channel
     def reg_pos(self):
         try:
-            self.mqtt_clientpos = coreMQTT.create_client("Dronecore" + str(randint(0, 99)))
+            self.mqtt_clientpos = BackendMQTT.create_client("Dronecore" + str(randint(0, 99)))
             self.mqtt_clientpos.subscribe(env.mqttTopicPos + "/#")
             self.mqtt_clientpos.on_message = self.pos_update  # register position execution function
             self.mqtt_clientpos.loop_start()
@@ -42,7 +42,7 @@ class coreMQTT:
     # register to the jobdone receiving channel
     def reg_jobdone(self):
         try:
-            self.mqtt_client = coreMQTT.create_client("Dronecorejobdone" + str(randint(0, 99)))
+            self.mqtt_client = BackendMQTT.create_client("Dronecorejobdone" + str(randint(0, 99)))
             self.mqtt_client.subscribe(env.mqttTopicJobdone + "/#")
             self.mqtt_client.on_message = self.job_done  # register position execution function
             self.mqtt_client.loop_start()
@@ -62,7 +62,7 @@ class coreMQTT:
                 droneparam.buzy = 0
                 droneparam.percentage = 100
                 # send request to MaaS
-                coreRequest.sendRequest(env.addrjobdone + "/" + str(idJob))
+                BackendRequest.sendRequest(env.addrjobdone + "/" + str(idJob))
                 print ("jobdone: " + str(idJob))
             else:
                 # Send a new job to the drone
@@ -73,8 +73,8 @@ class coreMQTT:
                 # get the coord in NED from the end waypoint
                 coord = self.waypoints.get(str(droneparam.idEnd))
                 # Send job to the drone over MQTT
-                coreMQTT.sendMQTT(env.mqttTopicJob + "/" + str(msgtopic[2]),
-                                  str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
+                BackendMQTT.sendMQTT(env.mqttTopicJob + "/" + str(msgtopic[2]),
+                                     str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
                 print "Jobstartpoint:" + str(idJob)
 
     # callback new position
@@ -100,25 +100,25 @@ class coreMQTT:
             # if the drone is buzy with a job
             if droneparam.buzy == 1:
                 # calc total jobtime
-                weighttotal = coreCalculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)),
-                                                                      self.waypoints.get(str(droneparam.idEnd)),
-                                                                      droneparam.speedfactor)
+                weighttotal = Calculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)),
+                                                                  self.waypoints.get(str(droneparam.idEnd)),
+                                                                  droneparam.speedfactor)
                 # if the drone is landing
                 if int(msgmsg[3]) == 4:  # State: 0 rest, 1 takeoff, 2 fly, 3 hang in the air, 4 land
                     # calc only the land time
-                    weight = coreCalculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)),
-                                                           droneparam.speedfactor)
+                    weight = Calculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)),
+                                                       droneparam.speedfactor)
                 else:
                     # calc the full path
-                    weight = coreCalculator.calc_time_between_points(droneparam,
-                                                                     self.waypoints.get(str(droneparam.idEnd)),
-                                                                     droneparam.speedfactor)
+                    weight = Calculator.calc_time_between_points(droneparam,
+                                                                 self.waypoints.get(str(droneparam.idEnd)),
+                                                                 droneparam.speedfactor)
                 # calc percentage
                 droneparam.percentage = (weighttotal - weight) / weighttotal * 100
                 print ("ID: " + str(msgtopic[2]) + " %:" + str(droneparam.percentage))
 
             else:  # not buzy, when the drone move by hand, change the waypoint to the right one
 
-                droneparam.idEnd = int(coreCalculator.calc_waypoint(self.waypoints, droneparam))
+                droneparam.idEnd = int(Calculator.calc_waypoint(self.waypoints, droneparam))
                 if droneparam.idStart == -1:  # first time? Set startpoint right!
                     droneparam.idStart = droneparam.idEnd
