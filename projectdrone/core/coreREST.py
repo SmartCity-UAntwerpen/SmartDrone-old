@@ -66,7 +66,7 @@ class restserver:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
         # Check if idVehicle is buzy
         if droneparam.buzy==1:
-            raise cherrypy.HTTPError(404, "Drone is buzy")
+            raise cherrypy.HTTPError(404, "Drone is busy")
 
         # If the drone is not at the right waypoint, firstly send a job to go to the startwaypoint else start flying to the endpoint
         if not int(droneparam.idEnd) == int(idStart):

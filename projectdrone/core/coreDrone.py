@@ -12,7 +12,7 @@ from waypoints import Waypoints
 class coreDrone:
 
     def __init__(self):
-        # TODO does this change too? -> check coreREST.advertise
+        # map changes in coreREST.advertise
         # Map of drones: K=id , V=droneparamters object
         self.id_droneparam = {}
         # Map of waypoints. K=str(id), V=waypoint object
@@ -52,7 +52,6 @@ class coreDrone:
         # sent REST request to map/stringmapjson/drone
         waypoints = coreRequest.sendRequest(env.addrwaypoints)
         if waypoints is None:
-            # TODO ??
             waypoints=[{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
         else:
             # Returns the json-encoded content of a response, if any.

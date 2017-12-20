@@ -35,6 +35,9 @@ class env:
     homelon = 4.4183511
     homealt = 0
 
+
+
+
     receive_timeout = 1.0 # 1 sec receive timeout
 
     printNewPos = False

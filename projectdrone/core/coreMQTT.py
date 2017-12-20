@@ -78,20 +78,23 @@ class coreMQTT:
                 print "Jobstartpoint:" + str(idJob)
 
     # callback new position
-    # TODO convert
+    # FIXME (no fix required, just needed a shiny line to draw attention) changed!
     def pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[2]))
         if not droneparam is None:
-            msgmsg = msg.payload.split(",")  # lat-lon-alt
+            msgmsg = msg.payload.split(",")  # was LLA , now NED
             # convert latitude, longitude, altitude to north, east down
-            NED = navpy.lla2ned(float(msgmsg[0]), float(msgmsg[1]), float(msgmsg[2]), env.homelat, env.homelon,
-                                env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            # NED = navpy.lla2ned(float(msgmsg[0]), float(msgmsg[1]), float(msgmsg[2]), env.homelat, env.homelon,
+            #                     env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
 
-            droneparam.x = NED[0]
-            droneparam.y = NED[1]
-            droneparam.z = NED[2]
-            # set te timestamp to the actual time, for the heartbeatcheck
+            # droneparam.x = NED[0]
+            # droneparam.y = NED[1]
+            # droneparam.z = NED[2]
+            droneparam.x = msgmsg[0]
+            droneparam.y = msgmsg[1]
+            droneparam.z = msgmsg[2]
+            # set the timestamp to the actual time, for the heartbeatcheck
             droneparam.available = 1
             droneparam.timestamp = time.time()
             # if the drone is buzy with a job
