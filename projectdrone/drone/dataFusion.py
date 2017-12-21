@@ -5,8 +5,8 @@ import time
 import positiondata
 import math
 import positionReceiver
-#import heightMeasure
 import droneParameters
+#import heightMeasure
 
 
 class DataFuser():
@@ -32,11 +32,31 @@ class DataFuser():
     def calculate_position(self):
         while True:
             self.data_fuse()
-            time.sleep(1)  # 30 Hz
+            diffTimestamp = self.time_diff(self.posdata.time1, self.posdata.time2)
+            diffLastPacket = self.time_diff(int(time.time() * 1000), self.posdata.time2)
+
+            if diffLastPacket > 5000:
+                self.posdata.commState = 3  # lost connection (initiate landing seq)
+            elif diffLastPacket > 100:
+                self.posdata.commState = 2  # poor connection, >0.1sec delay
+            else:
+                if diffTimestamp < 50:
+                    self.posdata.commState = 0  # good status
+                else:
+                    self.posdata.commState = 1  # 1 packet delay
+            time.sleep(0.050)  # 30 Hz
+
+    def height_correction(self, height, pitch, roll):
+        return math.floor(float(height) / math.sqrt(math.pow(math.tan(math.radians(float(pitch))), 2)
+                                                    + math.pow(math.tan(math.radians(float(roll))), 2) + 1))
 
     def data_fuse(self):
-        print("DataFusion: new position calculated: [" + str(self.droneparameters.X) + ","
-              + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "] \n")
-        self.droneparameters.X = math.floor((float(self.posdata.X) * 5700 / 640 - 2850) * (2400 - float(self.posdata.Z)) / 2400)
-        self.droneparameters.Y = math.floor((-(float(self.posdata.Y) * 5700 / 480 - 2850)) * (2400 - float(self.posdata.Z)) / 2400)
-        self.droneparameters.Z = math.floor(float(self.posdata.Z))
+        # print("DataFusion: new position calculated: [" + str(self.droneparameters.X) + ","
+        #       + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "] \n")
+        height = self.height_correction(self.posdata.Z, self.posdata.pitch, self.posdata.roll)
+        self.droneparameters.X = math.floor((float(self.posdata.X) * 5700 / 640 - 2850) * (2400 - float(height)) / 2400)
+        self.droneparameters.Y = math.floor((-(float(self.posdata.Y) * 5700 / 480 - 2850)) * (2400 - float(height)) / 2400)
+        self.droneparameters.Z = math.floor(float(height))
+
+    def time_diff(self, time1, time2):
+        return math.floor(math.fabs(time2 - time1))

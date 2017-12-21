@@ -5,6 +5,8 @@ import paho.mqtt.client as mqttclient
 import requests
 import time
 
+
+from projectdrone.drone import pathplanner, waypoint
 from projectdrone.env import env
 
 
@@ -45,7 +47,7 @@ class BackendCommunicator():
         #                         + "," + str(self.droneparameters.state))
             print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
                 + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]" + "\n")
-            time.sleep(1)
+            time.sleep(5)
 
 
     # get an ID from the backbone (via backend) to use for this drone
@@ -55,10 +57,11 @@ class BackendCommunicator():
 
     # execute the job from mqtt channel
     def process_job(self, msg):
-        print("executes a job")
-        # coord = str(msg.payload).split(",")
-        # coord = map(float, coord)  # convert array of strings to floats
-        # if not self.job:  # don't handle new job if job ongoing
-        #     self.job = True
-        #     thread.start_new_thread(self._fly, (coord,))  # new job -> fly
-        # this is called when a job is published on the channel, job should be interpreted by the pathplanner module
+        # msg is of format: str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
+        if not self.droneparameters.onJob:
+            print("Got job through MQTT, processing")
+            coord = str(msg.payload).split(",")
+            destinationWP = waypoint.Waypoint(coord[0], coord[1], coord[2])
+            pathplanner.plan_path(self.droneparameters, destinationWP)
+        else:
+            print("Already on a job")

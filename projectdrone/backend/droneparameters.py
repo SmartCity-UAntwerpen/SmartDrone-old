@@ -4,7 +4,7 @@ class DroneParameters:
         self.y=0
         self.z=0
 
-        self.buzy=0
+        self.busy=0
 
         self.percentage=100
         self.idStart=-1

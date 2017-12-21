@@ -4,14 +4,16 @@ import threading
 import droneParameters
 import backendCommunication
 import dataFusion
+import pathFollower
 
 
 def run():
     droneparameters = droneParameters.DroneParameters()
     backendcommunicator = backendCommunication.BackendCommunicator(droneparameters)
     datafuser = dataFusion.DataFuser(droneparameters)
-
+    pathfollower = pathFollower.Pathfollower()
     # backendcommunicator.register_jobs()
+    # backendcommunicator.get_id()
 
     position_receive_thread = threading.Thread(target=datafuser.calculate_position)
     position_receive_thread.daemon = True
@@ -23,5 +25,8 @@ def run():
     print("Position update thread started")
 
     while True:
-        ()
+        while droneparameters.onJob:
+            pathfollower.check_position()
+
+
 run()

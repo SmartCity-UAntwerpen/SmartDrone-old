@@ -59,7 +59,7 @@ class BackendMQTT:
             # If the point where the drone is, is the asked endpoint
             if droneparam.idNext == -1:
                 # Set droneparam
-                droneparam.buzy = 0
+                droneparam.busy = 0
                 droneparam.percentage = 100
                 # send request to MaaS
                 BackendRequest.sendRequest(env.addrjobdone + "/" + str(idJob))
@@ -97,8 +97,8 @@ class BackendMQTT:
             # set the timestamp to the actual time, for the heartbeatcheck
             droneparam.available = 1
             droneparam.timestamp = time.time()
-            # if the drone is buzy with a job
-            if droneparam.buzy == 1:
+            # if the drone is busy with a job
+            if droneparam.busy == 1:
                 # calc total jobtime
                 weighttotal = Calculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)),
                                                                   self.waypoints.get(str(droneparam.idEnd)),
@@ -117,7 +117,7 @@ class BackendMQTT:
                 droneparam.percentage = (weighttotal - weight) / weighttotal * 100
                 print ("ID: " + str(msgtopic[2]) + " %:" + str(droneparam.percentage))
 
-            else:  # not buzy, when the drone move by hand, change the waypoint to the right one
+            else:  # not busy, when the drone move by hand, change the waypoint to the right one
 
                 droneparam.idEnd = int(Calculator.calc_waypoint(self.waypoints, droneparam))
                 if droneparam.idStart == -1:  # first time? Set startpoint right!

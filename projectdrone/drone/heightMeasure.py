@@ -25,7 +25,7 @@ class HeightMeasurer:
     def measure_height(self):
         while True:
             distance = self.tof.get_distance()
-            if 3000 > distance > 0:
+            if 3000 > distance > 20: #TODO 50 instellen op treshhold waarde = waarde dat gemeten wordt wanneer drone op grond staat.
                 self.positiondata.Z = distance
             time.sleep(self.timing/1000000.00)
 

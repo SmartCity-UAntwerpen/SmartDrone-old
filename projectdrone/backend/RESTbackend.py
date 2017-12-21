@@ -53,7 +53,7 @@ class restserver:
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
-    def executeJob(self, idJob,idVehicle, idStart,idEnd):
+    def executeJob(self, idJob, idVehicle, idStart, idEnd):
         # Check if idStart en idEnd are correct
         if self.waypoints.get(str(idStart)) is None or self.waypoints.get(str(idEnd)) is None:
             raise cherrypy.HTTPError(404,"Wrong start or end ID")
@@ -64,8 +64,8 @@ class restserver:
         # Check if Vehicle is available
         if droneparam.available==0:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
-        # Check if idVehicle is buzy
-        if droneparam.buzy==1:
+        # Check if idVehicle is busy
+        if droneparam.busy==1:
             raise cherrypy.HTTPError(404, "Drone is busy")
 
         # If the drone is not at the right waypoint, firstly send a job to go to the startwaypoint else start flying to the endpoint
@@ -77,12 +77,12 @@ class restserver:
             droneparam.idStart = idStart
             droneparam.idEnd = idEnd
             droneparam.idNext = -1  # buffer -1 == no next waypoint
-        # save idJob and set buzy and percentage
+        # save idJob and set busy and percentage
         droneparam.idJob = idJob
-        droneparam.buzy = 1
+        droneparam.busy = 1
         droneparam.percentage = 0
 
-        # Get the coordinats of the waypoint
+        # Get the coordinates of the waypoint
         coord = self.waypoints.get(str(droneparam.idEnd))
         # send them to the drone
         BackendMQTT.sendMQTT(env.mqttTopicJob + "/" + idVehicle, str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
@@ -120,7 +120,7 @@ class restserver:
             # calc weight
             if not self.waypoints.get(str(value.idEnd)) is None and value.available == 1:
                 # time to finish job
-                if value.buzy == 0:
+                if value.busy == 0:
                     weightToStart = 0
                 else:
                     waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
@@ -133,5 +133,5 @@ class restserver:
                 # time to fly from a to b
                 weight = Calculator.calc_time_between_points(coorda, coordb, value.speedfactor)
                 jsonstring.append(
-                    {'status': value.buzy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
+                    {'status': value.busy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
         return jsonstring
