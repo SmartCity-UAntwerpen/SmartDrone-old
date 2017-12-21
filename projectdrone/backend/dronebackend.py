@@ -6,7 +6,7 @@ from simdronebackend import SimDroneBackend
 from MQTTbackend import BackendMQTT
 from backendrequest import BackendRequest
 from projectdrone.env import env
-from waypoints import Waypoints
+from waypoint import Waypoint
 
 
 class DroneBackend:
@@ -21,13 +21,13 @@ class DroneBackend:
         # start MQTT, RESTSERVER, heartbeat and simcore
         BackendMQTT(self.id_droneparam, self.waypoints)
         RESTBackend(self.id_droneparam, self.waypoints)
-        threadHaert = threading.Thread(target=self.haertbeatcheck)
+        threadHaert = threading.Thread(target=self.heartbeatcheck)
         threadHaert.start()
 
         print ("Waypoints: " + str(self.waypoints))
         self.simbackend = SimDroneBackend(self.waypoints, self.id_droneparam)
 
-    def haertbeatcheck(self):
+    def heartbeatcheck(self):
         while 1:
             # Check every second
             time.sleep(1.0)
@@ -58,7 +58,7 @@ class DroneBackend:
             waypoints = waypoints.json()
         # make 'waypoints' objects and add them to the self.waypoints map. K= str(id), V=waypoint object
         for index in waypoints:
-            waypoint=Waypoints()
+            waypoint=Waypoint()
             waypoint.x=index['x']
             waypoint.y=index['y']
             waypoint.z=index['z']
