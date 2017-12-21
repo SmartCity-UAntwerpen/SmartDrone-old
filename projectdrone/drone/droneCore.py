@@ -11,7 +11,7 @@ def run():
     droneparameters = droneParameters.DroneParameters()
     backendcommunicator = backendCommunication.BackendCommunicator(droneparameters)
     datafuser = dataFusion.DataFuser(droneparameters)
-    pathfollower = pathFollower.Pathfollower()
+    pathfollower = pathFollower.Pathfollower(droneparameters)
     # backendcommunicator.register_jobs()
     # backendcommunicator.get_id()
 

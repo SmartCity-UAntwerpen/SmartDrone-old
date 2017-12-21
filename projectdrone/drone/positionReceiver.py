@@ -23,9 +23,11 @@ class UDPReceiver:
             # splits the received string on ';' (format x;$
             splitdata = payload.split(';')
             if len(splitdata) == 4:
-                self.positiondata.X = splitdata[0]
-                self.positiondata.Y = splitdata[1]
-                self.positiondata.yaw = splitdata[2]
+                if splitdata[0] != -1 and splitdata[1] != -1:
+                    self.positiondata.X = splitdata[0]
+                    self.positiondata.Y = splitdata[1]
+                if splitdata[2] != -1:
+                    self.positiondata.yaw = splitdata[2]
                 self.positiondata.time1 = int(splitdata[3])
                 self.positiondata.time2 = int(time.time() * 1000)
         # cannot be reached with while 1

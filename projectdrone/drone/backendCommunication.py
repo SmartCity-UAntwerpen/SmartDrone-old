@@ -1,13 +1,11 @@
 """This class takes care of all communication between drone and backend"""
-import threading
 
 import paho.mqtt.client as mqttclient
 import requests
 import time
-
-
-from projectdrone.drone import pathplanner, waypoint
-from projectdrone.env import env
+import pathplanner
+import waypoint
+import env
 
 
 class BackendCommunicator():
@@ -46,7 +44,7 @@ class BackendCommunicator():
         #                         + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
         #                         + "," + str(self.droneparameters.state))
             print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
-                + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]" + "\n")
+                + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
             time.sleep(5)
 
 

@@ -1,6 +1,6 @@
 """The plathplanner takes the job from the backend en translates it to a path (=a list of waypoints) that the drone should fly to
 in order to reach the destination."""
-from projectdrone.drone import waypoint
+import waypoint
 
 
 def plan_path(droneparameters, destinationWP):

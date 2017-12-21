@@ -6,7 +6,6 @@ import time
 import VL53L0X
 import positiondata
 
-
 class HeightMeasurer:
 
     def __init__(self, posdata):
