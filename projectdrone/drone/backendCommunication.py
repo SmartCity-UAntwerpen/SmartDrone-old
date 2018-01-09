@@ -45,7 +45,7 @@ class BackendCommunicator():
         #                         + "," + str(self.droneparameters.state))
             print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
                 + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
-            time.sleep(5)
+            time.sleep(1)
 
 
     # get an ID from the backbone (via backend) to use for this drone

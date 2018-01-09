@@ -30,5 +30,7 @@ class UDPReceiver:
                     self.positiondata.yaw = splitdata[2]
                 self.positiondata.time1 = int(splitdata[3])
                 self.positiondata.time2 = int(time.time() * 1000)
+            print("received from camera: [" + str(splitdata[0]) + "," + str(splitdata[1]) + ",] and yaw: " + str(splitdata[2]))
+            time.sleep(1)
         # cannot be reached with while 1
         conn.close()

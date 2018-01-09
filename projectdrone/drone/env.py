@@ -32,11 +32,19 @@ homelat = 51.1785531
 homelon = 4.4183511
 homealt = 0
 
-view_length = 3250 # view of camera in mm
-view_width = 1700 # view of camera in mm
-pixel_view_length = 640
-pixel_view_width = 480
-camera_height = 2400 #height of camera in mm
+D_x = 4900 # distance of view of camera in mm
+D_y = 3170 # distance of view of camera in mm
+PS_x = 0 #Pixel Start x
+PS_y = 0 # Pixel start y
+PE_x = 640 # Pixel End on x-as (highest x pixel)
+PE_y = 480 # Pixel End
+dx = PE_x - PS_x # x pixel distance
+dy = PE_y - PS_y # y pixel distance
+Rx = D_x / dx # x Ratio: mm/pixel
+Ry = D_y / dy # y Ratio: mm/pixel
+
+pixel_view_width = 225
+camera_height = 2450 #height of camera in mm
 
 
 

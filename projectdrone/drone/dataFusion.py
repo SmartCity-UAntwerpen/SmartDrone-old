@@ -53,12 +53,15 @@ class DataFuser():
     def data_fuse(self):
         # print("DataFusion: new position calculated: [" + str(self.droneparameters.X) + ","
         #       + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "] \n")
-        height = self.height_correction(self.posdata.Z, self.posdata.pitch, self.posdata.roll)
-        self.droneparameters.X = math.floor((float(self.posdata.X) * env.view_width / env.pixel_view_length - env.view_width/2) *
-                                            (env.camera_height - float(height)) / env.camera_height)
-        self.droneparameters.Y = math.floor((-(float(self.posdata.Y) * env.view_length / env.pixel_view_width - env.view_length/2)) *
-                                            (env.camera_height - float(height)) / env.camera_height)
-        self.droneparameters.Z = math.floor(float(height))
+        # height = self.height_correction(self.posdata.Z, self.posdata.pitch, self.posdata.roll)
+        # self.droneparameters.X = math.floor((float(self.posdata.X) * env.view_width / env.pixel_view_length - env.view_width/2) *
+        #                                     (env.camera_height - float(height)) / env.camera_height)
+        # self.droneparameters.Y = math.floor((-(float(self.posdata.Y) * env.view_length / env.pixel_view_width - env.view_length/2)) *
+        #                                     (env.camera_height - float(height)) / env.camera_height)
+        # self.droneparameters.Z = math.floor(float(height))
+        self.droneparameters.X = (self.posdata.X - env.PS_x) * env.Rx
+        self.droneparameters.Y = (self.posdata.Y - env.PS_y) * env.Ry
+        self.droneparameters.Z = self.posdata.Z
 
     def time_diff(self, time1, time2):
         return math.floor(math.fabs(time2 - time1))
