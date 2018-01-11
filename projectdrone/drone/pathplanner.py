@@ -4,9 +4,9 @@ import waypoint
 
 
 def plan_path(droneparameters, destinationWP):
-    above_takeoffWP = waypoint.Waypoint(droneparameters.X, droneparameters.Y, 1000) #height of 1000mm, change desired flight height here
-    above_destinationWP = waypoint.Waypoint(destinationWP.X, destinationWP.Y, 1000)
+    above_takeoffWP = waypoint.Waypoint(droneparameters.X, droneparameters.Y, 200) # height of 20cm, change desired flight height here
+    above_destinationWP = waypoint.Waypoint(destinationWP.X, destinationWP.Y, 200) # height of 20cm, change desired flight height here
     destinationWP = waypoint.Waypoint(destinationWP.X, destinationWP.Y, destinationWP.Z)
     droneparameters.path = {above_takeoffWP, above_destinationWP, destinationWP} # creates the whole path of waypoints
-    droneparameters.targetWP = droneparameters.path[0] #sets the target waypoint to the first waypoint of the path
+    droneparameters.targetWP = droneparameters.path[0] # sets the target waypoint to the first waypoint of the path
     droneparameters.onJob = True

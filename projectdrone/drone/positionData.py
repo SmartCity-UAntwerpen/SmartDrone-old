@@ -12,7 +12,4 @@ class PositionData:
         self.roll = 0
         self.time1 = 0
         self.time2 = 0
-        self.commState = 0  # 0 = Good
-                            # 1 = Okay, greater than 50 ms timestamp delay
-                            # 2 = Bad, no new package for 0.1-5 s
-                            # 3 = Dangerous, no new package for more than 5 s
+        self.isVisible = False  # states if the drone is visible on the camera

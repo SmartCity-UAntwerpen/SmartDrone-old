@@ -10,10 +10,11 @@ import env
 
 class BackendCommunicator():
 
-    def __init__(self, droneparameters):
+    def __init__(self, droneparameters, positiondata):
         # self.job_client = self.create_client(env.mqttTopicJob)
         # self.pos_client = self.create_client(env.mqttTopicPos)
         self.droneparameters = droneparameters
+        self.posdata = positiondata
 
     # creates an MQTT client
     def create_client(self, marker):
@@ -43,9 +44,11 @@ class BackendCommunicator():
         # self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
         #                         + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
         #                         + "," + str(self.droneparameters.state))
-            print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
-                + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
-            time.sleep(1)
+
+            if self.posdata.isVisible and self.droneparameters.commState <= 2:
+                 print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
+                     + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
+                 time.sleep(1.5)
 
 
     # get an ID from the backbone (via backend) to use for this drone

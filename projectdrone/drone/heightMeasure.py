@@ -4,7 +4,7 @@ It uses a python library called 'VL53L0X'."""
 import threading
 import time
 import VL53L0X
-import positiondata
+import positionData
 
 class HeightMeasurer:
 

@@ -78,7 +78,6 @@ class BackendMQTT:
                 print "Jobstartpoint:" + str(idJob)
 
     # callback new position
-    # FIXME (no fix required, just needed a shiny line to draw attention) changed!
     def pos_update(self, client, userdata, msg):
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[2]))
@@ -91,9 +90,10 @@ class BackendMQTT:
             # droneparam.x = NED[0]
             # droneparam.y = NED[1]
             # droneparam.z = NED[2]
-            droneparam.x = msgmsg[0]
-            droneparam.y = msgmsg[1]
-            droneparam.z = msgmsg[2]
+            droneparam.x = int(msgmsg[0])
+            droneparam.y = int(msgmsg[1])
+            droneparam.z = int(msgmsg[2])
+
             # set the timestamp to the actual time, for the heartbeatcheck
             droneparam.available = 1
             droneparam.timestamp = time.time()

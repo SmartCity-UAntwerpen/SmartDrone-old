@@ -22,15 +22,17 @@ class UDPReceiver:
             payload, adrr = self.s.recvfrom(1024)
             # splits the received string on ';' (format x;$
             splitdata = payload.split(';')
-            if len(splitdata) == 4:
-                if splitdata[0] != -1 and splitdata[1] != -1:
+            if len(splitdata) == 4: # drone should receive 4 variables from camera: pixelX,pixelY,yaw,timestamp
+                if float((splitdata[0])) != -1 and float(splitdata[1]) != -1: # if camera can't see drone, values are -1
                     self.positiondata.X = splitdata[0]
                     self.positiondata.Y = splitdata[1]
-                if splitdata[2] != -1:
+                    self.positiondata.isVisible = True
+                else:
+                    self.positiondata.isVisible = False
+                if float(splitdata[2]) != -1: # if camera doesn't see enough blobs to calculate angle, it sends -1
                     self.positiondata.yaw = splitdata[2]
-                self.positiondata.time1 = int(splitdata[3])
-                self.positiondata.time2 = int(time.time() * 1000)
-            print("received from camera: [" + str(splitdata[0]) + "," + str(splitdata[1]) + ",] and yaw: " + str(splitdata[2]))
-            time.sleep(1)
+                self.positiondata.time1 = int(splitdata[3]) # timestamp: cameratime on send
+                self.positiondata.time2 = int(time.time() * 1000) # current time on drone in ms
+            #print("received from camera: [" + str(splitdata[0]) + "," + str(splitdata[1]) + ",] and yaw: " + str(splitdata[2]))
         # cannot be reached with while 1
         conn.close()
