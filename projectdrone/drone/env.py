@@ -54,17 +54,17 @@ homealt = 0
 # calculations for pitch and roll of camera when not enough space is available to measure the entire camera view
 # explanation of calculation can be found in documentation
 # V.313 corridor setup (battery facing the door) - 15/01/2018
-CAM_height = 2470
+CAM_height = 2450
 dx = 640  # x pixel distance = camera resolution
 dy = 480  # y pixel distance
 x_SDW = 800  # short distance from point under camera to wall
 x_H = 1720  # height on wall from ground to end of camera view on the side where X_SDW was measured
-x_beta1 = math.atan2(x_SDW, CAM_height)
+x_beta1 = math.atan2(x_SDW, CAM_height)  # tangent definition
 x_alpha1 = x_beta1
-x_S = math.sqrt( math.pow(CAM_height,2) + math.pow(x_SDW,2 ) )
-x_L = math.sqrt( math.pow(x_S,2) + math.pow(x_H,2) - 2 * x_S * x_H * math.cos(x_beta1) )
-x_alpha2 = math.acos( (math.pow(x_H,2) - math.pow(x_L, 2) - math.pow(x_S,2)) / (-2 * x_L * x_S) )
-x_beta2 = math.radians(100) - x_alpha1 - x_beta1 - x_alpha2
+x_S = math.sqrt( math.pow(CAM_height,2) + math.pow(x_SDW,2 ) )  # pythagoras
+x_L = math.sqrt( math.pow(x_S,2) + math.pow(x_H,2) - 2 * x_S * x_H * math.cos(x_beta1) )  # law of cosines
+x_beta2 = math.acos( (math.pow(x_H,2) - math.pow(x_L, 2) - math.pow(x_S,2)) / (-2 * x_L * x_S) )
+x_alpha2 = math.radians(100) - x_alpha1 - x_beta1 - x_beta2
 
 y_SDW = 1830  # short distance from point under camera to wall
 y_H = 0  # height on wall from ground to end of camera view on the side where Y_SDW was measured
@@ -72,8 +72,8 @@ y_beta1 = math.atan2(y_SDW, CAM_height)
 y_alpha1 = y_beta1
 y_S = math.sqrt( math.pow(CAM_height,2) + math.pow(y_SDW,2 ) )
 y_L = math.sqrt( math.pow(y_S,2) + math.pow(y_H,2) - 2 * y_S * y_H * math.cos(y_beta1) )
-y_alpha2 = math.acos( (math.pow(y_H,2) - math.pow(y_L, 2) - math.pow(y_S,2)) / (-2 * y_L * y_S) )
-y_beta2 = math.radians(75) - y_alpha1 - y_beta1 - y_alpha2
+y_beta2 = math.acos( (math.pow(y_H,2) - math.pow(y_L, 2) - math.pow(y_S,2)) / (-2 * y_L * y_S) )
+y_alpha2 = math.radians(75) - y_alpha1 - y_beta1 - y_beta2
 
 x_alpha = x_alpha1 + x_alpha2
 x_beta = x_beta1 + x_beta2
