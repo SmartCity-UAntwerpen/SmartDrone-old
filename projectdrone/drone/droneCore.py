@@ -15,8 +15,8 @@ def run():
     backendcommunicator = backendCommunication.BackendCommunicator(droneparameters, positiondata)
     datafuser = dataFusion.DataFuser(droneparameters, positiondata)
     pathfollower = pathFollower.Pathfollower(droneparameters)
-    # backendcommunicator.register_jobs()
-    # backendcommunicator.get_id()
+    backendcommunicator.register_jobs()
+    backendcommunicator.get_id()
 
     position_receive_thread = threading.Thread(target=datafuser.calculate_position)
     position_receive_thread.daemon = True

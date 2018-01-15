@@ -3,7 +3,7 @@ import sys
 import threading
 
 from projectdrone.drone.SimDrone import SimDrone
-from projectdrone.env import env
+from projectdrone.drone import env
 from backendrequest import BackendRequest
 
 class SimDroneBackend:

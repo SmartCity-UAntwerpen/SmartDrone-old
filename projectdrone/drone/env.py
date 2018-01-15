@@ -6,14 +6,14 @@ speed_landing = 2
 speed_horizontal = 1.5
 settletime = 2
 
-addrwaypoints = "http://143.129.39.151:10000/map/stringmapjson/drone"
+addrwaypoints = "http://smartcity.ddns.net:10000/map/stringmapjson/drone"
 
-addrnewid = "http://143.129.39.151:10000/bot/newBot/drone"
-addrkillid = "http://143.129.39.151:10000/bot/delete"
-addradvertise = "http://143.129.39.151:8082/advertise"
-addrjobdone = "http://143.129.39.151:8090/completeJob"
+addrnewid = "http://smartcity.ddns.net:10000/bot/newBot/drone"
+addrkillid = "http://smartcity.ddns.net:10000/bot/delete"
+addradvertise = "http://172.16.0.12:8082/advertise"
+addrjobdone = "http://smartcity.ddns.net:8090/completeJob"
 
-mqttbroker = "143.129.39.151"
+mqttbroker = "smartcity.ddns.net"
 mqttusername = "root"
 mqttpassword = "smartcity"
 mqttport = 1883
@@ -22,8 +22,10 @@ mqttTopicJob = "drone/job"
 mqttTopicJobdone = "drone/jobdone"
 mqttTopicPos = "drone/pos"
 
-tcpip="143.129.39.151"
+# for simulation
+tcpip="smartcity.ddns.net"
 tcpport=8888
+
 restport=8082
 
 haertbeattime = 10
@@ -50,12 +52,13 @@ homealt = 0
 # y_beta = math.radians(75) - y_alpha # total angle over y-axis is 75 degrees: proven by experiment
 
 # calculations for pitch and roll of camera when not enough space is available to measure the entire camera view
-# explenation of calculation can be found in documentation
-CAM_height = 2060
-dx = 640 # x pixel distance = camera resolution
-dy = 480 # y pixel distance
-x_SDW = 2200 # short distance from point under camera to wall
-x_H = 0 # height on wall from ground to end of camera view where Xpixel is 640
+# explanation of calculation can be found in documentation
+# V.313 corridor setup (battery facing the door) - 15/01/2018
+CAM_height = 2470
+dx = 640  # x pixel distance = camera resolution
+dy = 480  # y pixel distance
+x_SDW = 800  # short distance from point under camera to wall
+x_H = 1720  # height on wall from ground to end of camera view on the side where X_SDW was measured
 x_beta1 = math.atan2(x_SDW, CAM_height)
 x_alpha1 = x_beta1
 x_S = math.sqrt( math.pow(CAM_height,2) + math.pow(x_SDW,2 ) )
@@ -63,8 +66,8 @@ x_L = math.sqrt( math.pow(x_S,2) + math.pow(x_H,2) - 2 * x_S * x_H * math.cos(x_
 x_alpha2 = math.acos( (math.pow(x_H,2) - math.pow(x_L, 2) - math.pow(x_S,2)) / (-2 * x_L * x_S) )
 x_beta2 = math.radians(100) - x_alpha1 - x_beta1 - x_alpha2
 
-y_SDW = 1440 # short distance from point under camera to wall
-y_H = 0 # height on wall from ground to end of camera view where Xpixel is 640
+y_SDW = 1830  # short distance from point under camera to wall
+y_H = 0  # height on wall from ground to end of camera view on the side where Y_SDW was measured
 y_beta1 = math.atan2(y_SDW, CAM_height)
 y_alpha1 = y_beta1
 y_S = math.sqrt( math.pow(CAM_height,2) + math.pow(y_SDW,2 ) )

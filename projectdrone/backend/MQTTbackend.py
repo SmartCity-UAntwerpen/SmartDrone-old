@@ -2,7 +2,7 @@ from calculator import Calculator
 from backendrequest import BackendRequest
 import paho.mqtt.client as mqttclient
 from random import randint
-from projectdrone.env import env
+from projectdrone.drone import env
 from projectdrone import navpy
 import time
 

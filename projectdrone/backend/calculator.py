@@ -1,6 +1,6 @@
 import math
 
-from projectdrone.env import env
+from projectdrone.drone import env
 
 
 class Calculator:

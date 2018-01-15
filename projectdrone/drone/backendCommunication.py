@@ -8,13 +8,13 @@ import waypoint
 import env
 
 
-class BackendCommunicator():
+class BackendCommunicator:
 
     def __init__(self, droneparameters, positiondata):
-        # self.job_client = self.create_client(env.mqttTopicJob)
-        # self.pos_client = self.create_client(env.mqttTopicPos)
         self.droneparameters = droneparameters
         self.posdata = positiondata
+        self.job_client = self.create_client(env.mqttTopicJob)
+        self.pos_client = self.create_client(env.mqttTopicPos)
 
     # creates an MQTT client
     def create_client(self, marker):
@@ -41,9 +41,9 @@ class BackendCommunicator():
     # loop for position update heartbeat
     def update_position(self):
         while True:
-        # self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
-        #                         + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
-        #                         + "," + str(self.droneparameters.state))
+            self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
+                                 + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
+                                 + "," + str(self.droneparameters.state))
 
             if self.posdata.isVisible and self.droneparameters.commState <= 2:
                  print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
@@ -55,6 +55,7 @@ class BackendCommunicator():
     def get_id(self):
         _id = requests.get(env.addradvertise).text
         self.droneparameters.ID = int(_id)
+        print("Received an ID: " + str(self.droneparameters.ID))
 
     # execute the job from mqtt channel
     def process_job(self, msg):

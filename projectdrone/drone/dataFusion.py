@@ -52,7 +52,7 @@ class DataFuser:
 
     def data_fuse(self):
 
-        height = self.height_correction(self.posdata.Z)
+        height = self.height_correction(self.posdata.Z + 100) # On drone, LEDs are 100 mm higher than the height sensor
 
         x_ratio = ((env.CAM_height - height) * (math.tan(env.x_alpha) + math.tan(env.x_beta))) / env.dx
         y_ratio = ((env.CAM_height - height) * (math.tan(env.y_alpha) + math.tan(env.y_beta))) / env.dy

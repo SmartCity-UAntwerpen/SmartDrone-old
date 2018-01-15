@@ -4,7 +4,7 @@ import cherrypy
 from MQTTbackend import BackendMQTT
 from calculator import Calculator
 from droneparameters import DroneParameters
-from projectdrone.env import env
+from projectdrone.drone import env
 from backendrequest import BackendRequest
 
 
@@ -98,6 +98,7 @@ class restserver:
             print ("ID server unavailable: got random id: " + str(id)) # changed from: print ("I give the drone self an id")
         else:
             id = id.text
+            print ("Received ID from backbone: " + str(id))
 
         # make new droneparameters
         if self.id_droneparam.get(str(id)) is None:
