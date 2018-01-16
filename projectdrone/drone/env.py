@@ -62,9 +62,18 @@ x_H = 1720  # height on wall from ground to end of camera view on the side where
 x_beta1 = math.atan2(x_SDW, CAM_height)  # tangent definition
 x_alpha1 = x_beta1
 x_S = math.sqrt( math.pow(CAM_height,2) + math.pow(x_SDW,2 ) )  # pythagoras
-x_L = math.sqrt( math.pow(x_S,2) + math.pow(x_H,2) - 2 * x_S * x_H * math.cos(x_beta1) )  # law of cosines
-x_beta2 = math.acos( (math.pow(x_H,2) - math.pow(x_L, 2) - math.pow(x_S,2)) / (-2 * x_L * x_S) )
-x_alpha2 = math.radians(100) - x_alpha1 - x_beta1 - x_beta2
+x_L1 = math.sqrt(math.pow(x_S, 2) + math.pow(x_H, 2) - 2 * x_S * x_H * math.cos(x_beta1))  # law of cosines
+x_beta2 = math.acos((math.pow(x_H,2) - math.pow(x_L1, 2) - math.pow(x_S, 2)) / (-2 * x_L1 * x_S))
+
+x_H2 = 1680 # height on wall from ground to end of camera view on other side
+x_LDW = 930 - x_SDW
+x_alpha3 = math.atan(x_H2/x_LDW)
+x_alpha4 = math.acos(x_SDW/x_S)
+x_alpha5 = math.radians(180) - x_alpha3 - x_alpha4
+x_A = math.sqrt(math.pow(x_H2,2) + math.pow(x_LDW,2))
+x_L2 = math.sqrt( math.pow(x_A,2) + math.pow(x_S,2) - 2 * x_A * x_S * math.cos(x_alpha5))
+x_alpha2 = math.acos((math.pow(x_A,2) - math.pow(x_L2,2) - math.pow(x_S,2)) / (-2 * x_L2 * x_S) )
+# x_alpha2 = math.radians(100) - x_alpha1 - x_beta1 - x_beta2
 
 y_SDW = 1830  # short distance from point under camera to wall
 y_H = 0  # height on wall from ground to end of camera view on the side where Y_SDW was measured
@@ -75,10 +84,15 @@ y_L = math.sqrt( math.pow(y_S,2) + math.pow(y_H,2) - 2 * y_S * y_H * math.cos(y_
 y_beta2 = math.acos( (math.pow(y_H,2) - math.pow(y_L, 2) - math.pow(y_S,2)) / (-2 * y_L * y_S) )
 y_alpha2 = math.radians(75) - y_alpha1 - y_beta1 - y_beta2
 
+
 x_alpha = x_alpha1 + x_alpha2
 x_beta = x_beta1 + x_beta2
 y_alpha = y_alpha1 + y_alpha2
 y_beta = y_beta1 + y_beta2
+
+x_deg = math.radians(100) / 640 # amount of degrees per pixel
+y_deg = math.radians(75) / 480 # amount of degrees per pixel
+
 
 print("xalpha, xbeta, yalpha, ybeta: " + str(math.degrees(x_alpha)) + ", " + str(math.degrees(x_beta)) + ", " + str(math.degrees(y_alpha)) + ", " + str(math.degrees(y_beta)))
 

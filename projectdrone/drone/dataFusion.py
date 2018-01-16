@@ -8,6 +8,7 @@ import heightMeasure
 import env
 
 
+
 class DataFuser:
 
     def __init__(self, droneparameters, positiondata):
@@ -54,12 +55,32 @@ class DataFuser:
 
         height = self.height_correction(self.posdata.Z + 100) # On drone, LEDs are 100 mm higher than the height sensor
 
+        # method with mm/pixel ratio
         x_ratio = ((env.CAM_height - height) * (math.tan(env.x_alpha) + math.tan(env.x_beta))) / env.dx
         y_ratio = ((env.CAM_height - height) * (math.tan(env.y_alpha) + math.tan(env.y_beta))) / env.dy
-        #print(" x pos: " + str(int(float(height) * x_ratio + math.tan(env.x_alpha) * height)) + ", ypos: " + str(int(float(height) * y_ratio + math.tan(env.y_alpha) * height)))
         self.droneparameters.X = int(float(self.posdata.X) * x_ratio + math.tan(env.x_alpha) * height)
         self.droneparameters.Y = int(float(self.posdata.Y) * y_ratio + math.tan(env.y_alpha) * height)
         self.droneparameters.Z = int(float(height))
+
+        # method with degrees/pixel ratio
+        # d_x_alpha = float(self.posdata.X) * env.x_deg # angle of drone on x-axis
+        # x_S2 = (env.CAM_height - height) * math.tan(env.x_alpha)
+        # x_L2 = math.sqrt((math.pow(env.CAM_height - height,2)) + math.pow(x_S2,2))
+        # x_pos_no_offset = (x_L2 * math.sin(d_x_alpha)) / math.sin(math.radians(90)+env.x_alpha-d_x_alpha)
+        # x_offset = math.tan(env.x_alpha) * height
+        #
+        # d_y_alpha = float(self.posdata.Y) * env.y_deg # angle of drone on y axis
+        # y_S2 = (env.CAM_height - height) / math.tan(env.y_alpha)
+        # y_L2 = math.sqrt((math.pow(env.CAM_height - height, 2)) + math.pow(y_S2, 2))
+        # y_pos_no_offset = (y_L2 * math.sin(d_y_alpha)) / math.sin(math.radians(90) + env.y_alpha - d_y_alpha)
+        # y_offset = math.tan(env.y_alpha) * height
+        #
+        # self.droneparameters.X = int(x_pos_no_offset + x_offset)
+        # self.droneparameters.Y = int(y_pos_no_offset + y_offset)
+        # self.droneparameters.Z = int(height)
+
+
+
 
     def time_diff(self, time1, time2):
         return math.floor(math.fabs(time2 - time1))
