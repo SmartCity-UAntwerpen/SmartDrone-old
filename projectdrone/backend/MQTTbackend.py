@@ -25,14 +25,14 @@ class BackendMQTT:
     # Send mqtt msg over a specific topic
     @staticmethod
     def sendMQTT(topic, msg):
-        mqtt_client = BackendMQTT.create_client("Dronecoresend" + str(randint(0, 99)))
+        mqtt_client = BackendMQTT.create_client("Dronebackendsend" + str(randint(0, 99)))
         mqtt_client.publish(topic, msg)
         mqtt_client.disconnect()
 
     # register to the position receiving channel
     def reg_pos(self):
         try:
-            self.mqtt_clientpos = BackendMQTT.create_client("Dronecore" + str(randint(0, 99)))
+            self.mqtt_clientpos = BackendMQTT.create_client("Dronebackend" + str(randint(0, 99)))
             self.mqtt_clientpos.subscribe(env.mqttTopicPos + "/#")
             self.mqtt_clientpos.on_message = self.pos_update  # register position execution function
             self.mqtt_clientpos.loop_start()
@@ -42,7 +42,7 @@ class BackendMQTT:
     # register to the jobdone receiving channel
     def reg_jobdone(self):
         try:
-            self.mqtt_client = BackendMQTT.create_client("Dronecorejobdone" + str(randint(0, 99)))
+            self.mqtt_client = BackendMQTT.create_client("Dronebackendjobdone" + str(randint(0, 99)))
             self.mqtt_client.subscribe(env.mqttTopicJobdone + "/#")
             self.mqtt_client.on_message = self.job_done  # register position execution function
             self.mqtt_client.loop_start()
@@ -109,13 +109,14 @@ class BackendMQTT:
                     weight = Calculator.calc_time_land(droneparam, self.waypoints.get(str(droneparam.idEnd)),
                                                        droneparam.speedfactor)
                 else:
-                    # calc the full path
+                    # calc the path
                     weight = Calculator.calc_time_between_points(droneparam,
                                                                  self.waypoints.get(str(droneparam.idEnd)),
                                                                  droneparam.speedfactor)
                 # calc percentage
                 droneparam.percentage = (weighttotal - weight) / weighttotal * 100
-                print ("ID: " + str(msgtopic[2]) + " %:" + str(droneparam.percentage))
+                #print("Weight total: " + str(weighttotal) + " ; Weight: " + str(weight))
+                #print ("ID: " + str(msgtopic[2]) + " - " + str(droneparam.percentage) + " %")
 
             else:  # not busy, when the drone move by hand, change the waypoint to the right one
 

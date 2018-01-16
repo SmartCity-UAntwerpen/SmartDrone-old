@@ -1,9 +1,9 @@
 import math
 
-fly_height = -4.0
-speed_takeoff = 2
-speed_landing = 2
-speed_horizontal = 1.5
+fly_height = 500
+speed_takeoff = 2000
+speed_landing = 2000
+speed_horizontal = 1500
 settletime = 2
 
 addrwaypoints = "http://smartcity.ddns.net:10000/map/stringmapjson/drone"

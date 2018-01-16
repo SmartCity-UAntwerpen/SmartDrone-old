@@ -48,12 +48,17 @@ class DroneBackend:
                         # Send msg the backbone
                         BackendRequest.sendRequest(env.addrkillid + "/" + str(key))
                         print ("Killed: " + str(key))
+            time.sleep(0.5)
 
     def getWaypoints(self):
         # sent REST request to map/stringmapjson/drone
         waypoints = BackendRequest.sendRequest(env.addrwaypoints)
         if waypoints is None:
-            waypoints=[{'id':44,'x':0,'y':0,'z':0},{'id':1,'x':5,'y':5,'z':0},{'id':2,'x':-10,'y':-10,'z':-1}]
+            waypoints = [{'id': 41, 'x': 2850, 'y': 1800, 'z': 125},
+                        {'id': 42, 'x': 2350, 'y': 1300, 'z': 125},
+                        {'id': 43, 'x': 3350, 'y': 1300, 'z': 125},
+                        {'id': 44, 'x': 3350, 'y': 2300, 'z': 125},
+                        {'id': 45, 'x': 2350, 'y': 2300, 'z': 125}]
         else:
             # Returns the json-encoded content of a response, if any.
             waypoints = waypoints.json()

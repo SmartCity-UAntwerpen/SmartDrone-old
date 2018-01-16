@@ -69,6 +69,7 @@ class restserver:
             raise cherrypy.HTTPError(404, "Drone is busy")
 
         # If the drone is not at the right waypoint, firstly send a job to go to the startwaypoint else start flying to the endpoint
+        print(str(droneparam.idStart) + " - " + str(droneparam.idEnd)+ " - " + str(idStart)+ " - " + str(idEnd))
         if not int(droneparam.idEnd) == int(idStart):
             droneparam.idStart = droneparam.idEnd
             droneparam.idEnd = idStart
@@ -113,6 +114,7 @@ class restserver:
     def calcWeight(self, idStart, idEnd):
         coorda = self.waypoints.get(str(idStart))
         coordb = self.waypoints.get(str(idEnd))
+
         # check waypoints
         if coorda is None or coordb is None:
             raise cherrypy.HTTPError(404, "Wrong start or end ID")

@@ -7,8 +7,8 @@ class DroneParameters:
         self.busy=0
 
         self.percentage=100
-        self.idStart=-1
-        self.idEnd=-1
+        self.idStart=41
+        self.idEnd=41
         self.idNext=-1
         self.idJob=0
 
