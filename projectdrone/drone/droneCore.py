@@ -1,22 +1,25 @@
 """This class is the droneCore, it is the top module on the drone"""
 
 import threading
+
+import time
+
 import droneParameters
 import backendCommunication
 import dataFusion
 import pathFollower
-import waypoint
 import positionData
 
 
 def run():
     droneparameters = droneParameters.DroneParameters()
     positiondata = positionData.PositionData()
-    backendcommunicator = backendCommunication.BackendCommunicator(droneparameters, positiondata)
-    datafuser = dataFusion.DataFuser(droneparameters, positiondata)
     pathfollower = pathFollower.Pathfollower(droneparameters)
-    backendcommunicator.register_jobs()
+    backendcommunicator = backendCommunication.BackendCommunicator(droneparameters, positiondata, pathfollower)
+    datafuser = dataFusion.DataFuser(droneparameters, positiondata)
+
     backendcommunicator.get_id()
+    backendcommunicator.register_jobs()
 
     position_receive_thread = threading.Thread(target=datafuser.calculate_position)
     position_receive_thread.daemon = True
@@ -27,13 +30,16 @@ def run():
     position_update_thread.start()
     print("Position update thread started")
 
-    droneparameters.onJob = True
-    droneparameters.path.append(waypoint.Waypoint(3500,515,25))
-    droneparameters.targetWP = droneparameters.path[0]
-
     while True:
-        while droneparameters.onJob:
-            pathfollower.check_position()
+        time.sleep(1)
+
+    #droneparameters.onJob = True
+    #droneparameters.path.append(waypoint.Waypoint(3500,515,25))
+    #droneparameters.targetWP = droneparameters.path[0]
+
+    #while True:
+        #while droneparameters.onJob:
+            #pathfollower.check_position()
 
 
 run()
