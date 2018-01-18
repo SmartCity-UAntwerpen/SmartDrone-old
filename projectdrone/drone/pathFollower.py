@@ -35,7 +35,7 @@ class Pathfollower:
         #print("Waypoint XYZ: " + str(waypoint.X) + " - " + str(waypoint.Y) + " - " + str(waypoint.Z))
         if waypoint.X - 200 <= self.droneparameters.X <= waypoint.X + 200 \
                 and waypoint.Y - 200 <= self.droneparameters.Y <= waypoint.Y + 200 \
-                and waypoint.Z - 200 <= self.droneparameters.Z <= waypoint.Z + 200:
+                and waypoint.Z - 50 <= self.droneparameters.Z <= waypoint.Z + 50:
             return True
         else:
             return False
