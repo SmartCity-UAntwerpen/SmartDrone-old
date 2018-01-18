@@ -10,15 +10,16 @@ from waypoint import Waypoints
 
 class DroneBackend:
     def __init__(self):
-        # map changes in coreREST.advertise
-        # Map of drones: K=id , V=droneparamters object
+        # Map of drones: K=id , V=droneparamters object. Drones are added in advertise REST call (in RESTbackend class)
         self.id_droneparam = {}
         # Map of waypoints. K=str(id), V=waypoint object
         self.waypoints = {}
+        # Fetch waypoints from backbone
         self.getWaypoints()
         # start MQTT, RESTSERVER, heartbeat
         BackendMQTT(self.id_droneparam, self.waypoints)
         RESTBackend(self.id_droneparam, self.waypoints)
+        #fixme: fix typo: should be Heartbeat
         threadHaert = threading.Thread(target=self.heartbeatcheck)
         threadHaert.daemon = True
         threadHaert.start()
@@ -32,7 +33,7 @@ class DroneBackend:
             timedead = time.time() - env.haertbeattimedead
             # for each drone
             for key, value in self.id_droneparam.items():
-                # drone hasn't posted MQTT msg for env.haertbeattime
+                # drone hasn't posted MQTT msg for env.haertbeattime (current 30seconds)
                 if value.timestamp <= timeout and value.available == 1:
                     value.available = 0
                     print ("Unavailable: " + key)
@@ -41,15 +42,15 @@ class DroneBackend:
                     # Delete drone from map
                     self.id_droneparam.get(key).kill()
                     self.id_droneparam.pop(key, None)
-                    # Send msg the backbone
+                    # REST call to backbone to delete the drone
                     BackendRequest.sendRequest(env.addrkillid + "/" + str(key))
                     print ("Killed: " + str(key))
             time.sleep(0.5)
 
     def getWaypoints(self):
-        # sent REST request to map/stringmapjson/drone
+        # sent REST request to map/stringmapjson/drone on backbone
         waypoints = BackendRequest.sendRequest(env.addrwaypoints)
-        # local waypoints when it canot retrieve waypoints from backbone
+        # local waypoints when it cannot retrieve waypoints from backbone
         if waypoints is None:
             waypoints = [{'id': 41, 'x': 2850, 'y': 1800, 'z': 125},
                          {'id': 42, 'x': 1943, 'y': 544, 'z': 125},

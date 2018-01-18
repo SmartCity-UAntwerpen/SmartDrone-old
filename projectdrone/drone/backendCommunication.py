@@ -51,8 +51,7 @@ class BackendCommunicator:
                                         + "," + str(self.droneparameters.state))
                 print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
                       + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
-            # time.sleep(0.050)  # 30 Hz
-            time.sleep(2)
+            time.sleep(2) # Updates position to backend every 2 seconds
 
     # get an ID from the backbone (via backend) to use for this drone
     def get_id(self):
@@ -67,7 +66,9 @@ class BackendCommunicator:
             self.droneparameters.onJob))
         if not self.droneparameters.onJob:
             print("Got job through MQTT, processing")
+            # Get the coordinates
             coord = str(msg.payload).split(",")
+            # create a waypoint for the destination
             destinationWP = waypoint.Waypoint(int(float(coord[0])), int(float(coord[1])), int(float(coord[2])))
             print(
             "destinationWP: " + str(destinationWP.X) + " - " + str(destinationWP.Y) + " - " + str(destinationWP.Z))

@@ -7,6 +7,7 @@ import time
 class UDPReceiver:
 
     def __init__(self, posdata):
+        # Empty ip: receive from everyone (did not work when inserting camera's ip)
         self.CAM_IP = ''
         self.PORT = 5005
         self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -20,7 +21,7 @@ class UDPReceiver:
     def receive_position(self):
         while 1:
             payload, adrr = self.s.recvfrom(1024)
-            # splits the received string on ';' (format x;$
+            # splits the received string on ';' (format x;y;yaw;timestamp)
             splitdata = payload.split(';')
             if len(splitdata) == 4: # drone should receive 4 variables from camera: pixelX,pixelY,yaw,timestamp
                 if float((splitdata[0])) != -1 and float(splitdata[1]) != -1: # if camera can't see drone, values are -1

@@ -23,7 +23,9 @@ class DataFuser:
         self.heightmeasure_thread.daemon = True
         print("height measure thread started (in datafusion)")
 
+        # Start thread to measure height
         self.heightmeasure_thread.start()
+        # Start thread to receive pixelcoordinates from the camera
         self.UDPreceiver_thread.start()
         print("position receiver thread started (in datafusion)")
 
@@ -35,7 +37,7 @@ class DataFuser:
                 diffLastPacket = self.time_diff(int(time.time() * 1000), self.posdata.time2)
 
                 if diffLastPacket > 5000:
-                    self.droneparameters.commState = 3  # lost connection (initiate landing seq)
+                    self.droneparameters.commState = 3  # lost connection: danger, drone doesn't know position
                 elif diffLastPacket > 100:
                     self.droneparameters.commState = 2  # poor connection, >0.1sec delay
                 else:
@@ -43,7 +45,7 @@ class DataFuser:
                         self.droneparameters.commState = 0  # good status
                     else:
                         self.droneparameters.commState = 1  # 1 packet delay
-                time.sleep(0.050)  # 30 Hz
+                time.sleep(0.050)  # 20 Hz
 
     def height_correction(self, height):
         return math.floor(

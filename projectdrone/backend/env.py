@@ -1,4 +1,4 @@
-# Parameters for calculation
+# Parameters for calculation #fixme this are old paramters used when drone navigated using GPS, should be reviewed
 fly_height = 500
 speed_takeoff = 2000
 speed_landing = 2000

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="rpi-irpos-template" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="armbcm2708hardfplinuxgnueabi" />
+		<Build>
+			<Target title="Debug">
+				<Option output="rpi-irpos-template" prefix_auto="1" extension_auto="1" />
+				<Option object_output="/home/eric/ProgrammingExamples/Examples/rs485/.objs" />
+				<Option type="1" />
+				<Option compiler="armbcm2708hardfplinuxgnueabi" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile" />
+		<Unit filename="rpi-irpos-template.cpp" />
+		<Unit filename="rpi-irpos-template.hpp" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion>
+				<search_path add="/home/lubuntu/minimod/Libs" />
+				<search_path add="/home/lubuntu/rpi/tools/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/arm-bcm2708hardfp-linux-gnueabi/sysroot/usr/include" />
+				<search_path add="/usr/local/include" />
+				<search_path add="/home/lubuntu/rpi-cp/usr/local/include" />
+			</code_completion>
+			<debugger>
+				<search_path add="/home/lubuntu/robotica/rpi-irpos-template/" />
+				<remote_debugging>
+					<options conn_type="0" serial_baud="115200" ip_address="robot1" ip_port="5000" />
+				</remote_debugging>
+				<remote_debugging target="Debug">
+					<options conn_type="0" serial_baud="115200" ip_address="robot1" ip_port="5000" />
+				</remote_debugging>
+			</debugger>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

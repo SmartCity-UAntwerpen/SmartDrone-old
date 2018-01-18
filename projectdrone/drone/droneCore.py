@@ -20,10 +20,13 @@ def run():
     backendcommunicator.get_id()
     backendcommunicator.register_jobs()
 
+    # Create thread for position calculation
     position_receive_thread = threading.Thread(target=datafuser.calculate_position)
     position_receive_thread.daemon = True
     position_receive_thread.start()
     print("Datafusion thread started")
+
+    # Create thread for position update to backend
     position_update_thread = threading.Thread(target=backendcommunicator.update_position)
     position_update_thread.daemon = True
     position_update_thread.start()

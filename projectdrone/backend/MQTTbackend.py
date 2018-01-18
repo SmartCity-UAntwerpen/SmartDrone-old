@@ -82,14 +82,8 @@ class BackendMQTT:
         msgtopic = msg.topic.split("/")
         droneparam = self.id_droneparam.get(str(msgtopic[2]))
         if not droneparam is None:
-            msgmsg = msg.payload.split(",")  # was LLA , now NED
-            # convert latitude, longitude, altitude to north, east down
-            # NED = navpy.lla2ned(float(msgmsg[0]), float(msgmsg[1]), float(msgmsg[2]), env.homelat, env.homelon,
-            #                     env.homealt)  # (lat, lon, alt, lat_ref, lon_ref, alt_ref, latlon_unit='deg', alt_unit='m', model='wgs84')
+            msgmsg = msg.payload.split(",")
 
-            # droneparam.x = NED[0]
-            # droneparam.y = NED[1]
-            # droneparam.z = NED[2]
             droneparam.x = int(msgmsg[0])
             droneparam.y = int(msgmsg[1])
             droneparam.z = int(msgmsg[2])
@@ -99,7 +93,7 @@ class BackendMQTT:
             droneparam.timestamp = time.time()
             # if the drone is busy with a job
             if droneparam.busy == 1:
-                # calc total jobtime
+                # calculate total jobtime
                 weighttotal = Calculator.calc_time_between_points(self.waypoints.get(str(droneparam.idStart)),
                                                                   self.waypoints.get(str(droneparam.idEnd)),
                                                                   droneparam.speedfactor)
@@ -113,13 +107,10 @@ class BackendMQTT:
                     weight = Calculator.calc_time_between_points(droneparam,
                                                                  self.waypoints.get(str(droneparam.idEnd)),
                                                                  droneparam.speedfactor)
-                # calc percentage
+                # calc percentage #fixme: should be reviewed with new drone (new speed,...)
                 droneparam.percentage = (weighttotal - weight) / weighttotal * 100
-                # print("Weight total: " + str(weighttotal) + " ; Weight: " + str(weight))
-                # print ("ID: " + str(msgtopic[2]) + " - " + str(droneparam.percentage) + " %")
 
-            else:  # not busy, when the drone move by hand, change the waypoint to the right one
-
+            else:  # not busy, when the drone is moved by hand, change the waypoint to the right one
                 droneparam.idEnd = int(Calculator.calc_waypoint(self.waypoints, droneparam))
                 if droneparam.idStart == -1:  # first time? Set startpoint right!
                     droneparam.idStart = droneparam.idEnd

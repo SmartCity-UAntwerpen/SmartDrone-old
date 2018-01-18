@@ -1,7 +1,5 @@
 from random import randint
-
 import cherrypy
-
 from MQTTbackend import BackendMQTT
 from backendrequest import BackendRequest
 from calculator import Calculator
@@ -21,7 +19,7 @@ class RESTBackend:
 
 
 class restserver:
-    # give waypoint, droneparam lists to the RESTserver
+    # give waypoint, droneparameters lists to the RESTserver
     def __init__(self, id_droneparam, waypoints):
         self.id_droneparam = id_droneparam
         self.waypoints = waypoints
@@ -45,7 +43,7 @@ class restserver:
     @cherrypy.tools.json_out()
     def posAll(self):  # long vehicleID, long startID, long EndID, int percentage
         jsonstring = []
-        # Iterate over all droneparam and parse them to a Json
+        # Iterate over all droneparameters and parse them to Json
         for key, value in self.id_droneparam.items():
             droneparam = self.id_droneparam.get(key)
             if droneparam.available == 1:
@@ -93,7 +91,7 @@ class restserver:
 
     @cherrypy.expose
     @cherrypy.tools.gzip()
-    def advertise(self, simdrone=0):  # param simdrone, if 1 haertbeat has no effect
+    def advertise(self, simdrone=0):  # param simdrone, if 1 heartbeat has no effect
         id = BackendRequest.sendRequest(env.addrnewid)  # ask for id
         if id is None:  # if the server is unavailable, use randint for debugging
             id = randint(0, 99)
