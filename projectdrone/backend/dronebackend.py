@@ -56,10 +56,10 @@ class DroneBackend:
         # local waypoints when it canot retrieve waypoints from backbone
         if waypoints is None:
             waypoints = [{'id': 41, 'x': 2850, 'y': 1800, 'z': 125},
-                        {'id': 42, 'x': 2350, 'y': 1300, 'z': 125},
-                        {'id': 43, 'x': 3350, 'y': 1300, 'z': 125},
-                        {'id': 44, 'x': 3350, 'y': 2300, 'z': 125},
-                        {'id': 45, 'x': 2350, 'y': 2300, 'z': 125}]
+                        {'id': 42, 'x': 1962, 'y': 799, 'z': 125},
+                        {'id': 43, 'x': 3635, 'y': 929, 'z': 125},
+                        {'id': 44, 'x': 2357, 'y': 2959, 'z': 125},
+                        {'id': 45, 'x': 3624, 'y': 2905, 'z': 125}]
         else:
             # Returns the json-encoded content of a response, if any.
             waypoints = waypoints.json()

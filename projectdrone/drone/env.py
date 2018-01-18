@@ -10,7 +10,7 @@ addrwaypoints = "http://smartcity.ddns.net:10000/map/stringmapjson/drone"
 
 addrnewid = "http://smartcity.ddns.net:10000/bot/newBot/drone"
 addrkillid = "http://smartcity.ddns.net:10000/bot/delete"
-addradvertise = "http://172.16.0.12:8082/advertise"
+addradvertise = "http://smartcity.ddns.net:8082/advertise"
 addrjobdone = "http://smartcity.ddns.net:8090/completeJob"
 
 mqttbroker = "smartcity.ddns.net"
