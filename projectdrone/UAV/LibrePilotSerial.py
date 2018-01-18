@@ -1,10 +1,12 @@
 """python implementation of the librepilotserial libraries
 note this file should not need editing unless a newer version changes these communication protocols"""
-import serial
 import struct
-import time
 import threading
-from projectdrone.env import env
+import time
+
+import serial
+
+from projectdrone.drone.env import env
 
 # variables
 CRC_TABLE = [

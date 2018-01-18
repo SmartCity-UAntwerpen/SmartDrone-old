@@ -1,6 +1,5 @@
 import math
-
-from projectdrone.drone import env
+import env
 
 
 class Calculator:
@@ -16,16 +15,16 @@ class Calculator:
     # Calc the weight of a given 2 points and a speedfactor.
     @staticmethod
     def calc_time_between_points(point1,point2, speedfactor):
-        time = abs(env.fly_height - point1.z) / env.speed_takeoff/speedfactor
-        time += abs(env.fly_height -point2.z) / env.speed_landing/speedfactor
-        time += env.settletime/speedfactor
+        time = abs(env.fly_height - point1.z) / env.speed_takeoff / speedfactor
+        time += abs(env.fly_height - point2.z) / env.speed_landing / speedfactor
+        time += env.settletime / speedfactor
         time += Calculator.calc_dist(point1.x, point1.y, point2.x, point2.y) / env.speed_horizontal / speedfactor
         return time
 
     # Calc the time to land given 2 points and a speedfactor
     @staticmethod
     def calc_time_land(point1, point2, speedfactor):
-        time = abs(point1.z - point2.z) / env.speed_landing/speedfactor
+        time = abs(point1.z - point2.z) / env.speed_landing / speedfactor
         return time
 
     # Calc the best mashing waypoint given a NED coordinate and a waypointlist

@@ -1,12 +1,12 @@
 """This module fuses the position received from the camera with the height measured on the drone.
 (check references from E. Paillet to understand why this is necessary)"""
+import math
 import threading
 import time
-import math
-import positionReceiver
-import heightMeasure
-import env
 
+import heightMeasure
+import positionReceiver
+import env
 
 
 class DataFuser:

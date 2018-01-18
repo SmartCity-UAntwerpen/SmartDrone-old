@@ -1,6 +1,6 @@
 """ this file contains globally defined parameters for the drone such as position.
 This way these parameters can be accessed from all modules"""
-import waypoint
+
 
 class DroneParameters:
 

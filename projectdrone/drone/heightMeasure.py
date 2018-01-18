@@ -1,10 +1,9 @@
 """This module is used to measure the drones hieght with the VL53L0X.
 It uses a python library called 'VL53L0X'."""
 
-import threading
 import time
 import VL53L0X
-import positionData
+
 
 class HeightMeasurer:
 

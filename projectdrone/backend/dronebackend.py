@@ -1,11 +1,10 @@
 import threading
 import time
 
-from RESTbackend import RESTBackend
-#from simdronebackend import SimDroneBackend
 from MQTTbackend import BackendMQTT
+from RESTbackend import RESTBackend
 from backendrequest import BackendRequest
-from projectdrone.drone import env
+import env
 from waypoint import Waypoints
 
 
@@ -32,8 +31,8 @@ class DroneBackend:
         while 1:
             # Check every second
             time.sleep(1.0)
-            timeout = time.time()-env.haertbeattime
-            timedead = time.time()-env.haertbeattimedead
+            timeout = time.time() - env.haertbeattime
+            timedead = time.time() - env.haertbeattimedead
             # for each drone
             for key, value in self.id_droneparam.items():
                 # drone hasn't posted MQTT msg for env.haertbeattime

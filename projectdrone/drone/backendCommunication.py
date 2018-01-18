@@ -1,8 +1,10 @@
 """This class takes care of all communication between drone and backend"""
 
+import time
+
 import paho.mqtt.client as mqttclient
 import requests
-import time
+
 import pathplanner
 import waypoint
 import env
@@ -46,8 +48,8 @@ class BackendCommunicator:
         while True:
             if self.posdata.isVisible and self.droneparameters.commState <= 2:
                 self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
-                                 + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
-                                 + "," + str(self.droneparameters.state))
+                                        + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
+                                        + "," + str(self.droneparameters.state))
                 print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
                      + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
             #time.sleep(0.050)  # 30 Hz
