@@ -115,8 +115,8 @@ class BackendMQTT:
                                                                  droneparam.speedfactor)
                 # calc percentage
                 droneparam.percentage = (weighttotal - weight) / weighttotal * 100
-                #print("Weight total: " + str(weighttotal) + " ; Weight: " + str(weight))
-                #print ("ID: " + str(msgtopic[2]) + " - " + str(droneparam.percentage) + " %")
+                # print("Weight total: " + str(weighttotal) + " ; Weight: " + str(weight))
+                # print ("ID: " + str(msgtopic[2]) + " - " + str(droneparam.percentage) + " %")
 
             else:  # not busy, when the drone move by hand, change the waypoint to the right one
 

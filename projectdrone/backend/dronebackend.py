@@ -16,10 +16,11 @@ class DroneBackend:
         # Map of waypoints. K=str(id), V=waypoint object
         self.waypoints = {}
         self.getWaypoints()
-        # start MQTT, RESTSERVER, heartbeat and simcore
+        # start MQTT, RESTSERVER, heartbeat
         BackendMQTT(self.id_droneparam, self.waypoints)
         RESTBackend(self.id_droneparam, self.waypoints)
         threadHaert = threading.Thread(target=self.heartbeatcheck)
+        threadHaert.daemon = True
         threadHaert.start()
         print ("Waypoints: " + str(self.waypoints))
 
