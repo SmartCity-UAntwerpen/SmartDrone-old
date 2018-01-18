@@ -24,4 +24,4 @@ mqttTopicPos = "drone/pos"
 
 # Heartbeat
 haertbeattime = 10
-haertbeattimedead = 60 * 60 * 0.5
+haertbeattimedead = 30 #30seconds

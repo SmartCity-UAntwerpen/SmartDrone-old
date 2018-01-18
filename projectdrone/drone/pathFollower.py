@@ -27,14 +27,15 @@ class Pathfollower:
                     print("ARRIVED AT WAYPOINT, USING NEXT ONE")
                     self.droneparameters.currentwaypointID += 1
                     self.droneparameters.targetWP = self.droneparameters.path[self.droneparameters.currentwaypointID]
-            time.sleep(2)
+                    print("next waypoint: " + str(self.droneparameters.targetWP.X) + "," + str(self.droneparameters.targetWP.Y) + "," + str(self.droneparameters.targetWP.Z))
+            #time.sleep(2)
 
     # TODO insert right threshold values.
     def check_drone_proximity(self, waypoint):
-        print("Waypoint XYZ: " + str(waypoint.X) + " - " + str(waypoint.Y) + " - " + str(waypoint.Z))
-        if waypoint.X - 50 <= self.droneparameters.X <= waypoint.X + 50 \
-                and waypoint.Y - 50 <= self.droneparameters.Y <= waypoint.Y + 50 \
-                and waypoint.Z - 50 <= self.droneparameters.Z <= waypoint.Z + 50:
+        #print("Waypoint XYZ: " + str(waypoint.X) + " - " + str(waypoint.Y) + " - " + str(waypoint.Z))
+        if waypoint.X - 200 <= self.droneparameters.X <= waypoint.X + 200 \
+                and waypoint.Y - 200 <= self.droneparameters.Y <= waypoint.Y + 200 \
+                and waypoint.Z - 200 <= self.droneparameters.Z <= waypoint.Z + 200:
             return True
         else:
             return False
