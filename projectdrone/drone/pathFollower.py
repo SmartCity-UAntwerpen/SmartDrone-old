@@ -4,7 +4,6 @@ import time
 
 
 class Pathfollower:
-
     def __init__(self, droneparameters):
         self.droneparameters = droneparameters
 
@@ -12,8 +11,9 @@ class Pathfollower:
         isArrived = False
         while not isArrived:
             # checks if drone is within threshold of target waypoint
-            if self.check_drone_proximity(self.droneparameters.targetWP):   # checks of drone is at the target waypoint
-                if self.check_drone_proximity(self.droneparameters.path[len(self.droneparameters.path)-1]):    # checks if drone is at destination waypoint (= last waypoint in path list)
+            if self.check_drone_proximity(self.droneparameters.targetWP):  # checks of drone is at the target waypoint
+                if self.check_drone_proximity(self.droneparameters.path[len(
+                        self.droneparameters.path) - 1]):  # checks if drone is at destination waypoint (= last waypoint in path list)
                     isArrived = True
                     print("JOB COMPLETED: AT DESTINATION")
                     self.droneparameters.onJob = False
@@ -29,7 +29,7 @@ class Pathfollower:
                     self.droneparameters.targetWP = self.droneparameters.path[self.droneparameters.currentwaypointID]
             time.sleep(2)
 
-    #TODO insert right threshold values.
+    # TODO insert right threshold values.
     def check_drone_proximity(self, waypoint):
         print("Waypoint XYZ: " + str(waypoint.X) + " - " + str(waypoint.Y) + " - " + str(waypoint.Z))
         if waypoint.X - 50 <= self.droneparameters.X <= waypoint.X + 50 \

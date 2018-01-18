@@ -10,11 +10,11 @@ class Calculator:
     def calc_dist(x1, y1, x2, y2):
         a = pow(x2 - x1, 2)
         b = pow(y2 - y1, 2)
-        return math.sqrt(a+b)
+        return math.sqrt(a + b)
 
     # Calc the weight of a given 2 points and a speedfactor.
     @staticmethod
-    def calc_time_between_points(point1,point2, speedfactor):
+    def calc_time_between_points(point1, point2, speedfactor):
         time = abs(env.fly_height - point1.z) / env.speed_takeoff / speedfactor
         time += abs(env.fly_height - point2.z) / env.speed_landing / speedfactor
         time += env.settletime / speedfactor

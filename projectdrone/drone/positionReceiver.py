@@ -33,6 +33,6 @@ class UDPReceiver:
                     self.positiondata.yaw = splitdata[2]
                 self.positiondata.time1 = int(splitdata[3]) # timestamp: cameratime on send
                 self.positiondata.time2 = int(time.time() * 1000) # current time on drone in ms
-            #print("received from camera: [" + str(splitdata[0]) + "," + str(splitdata[1]) + ",] and yaw: " + str(splitdata[2]))
+            # print("received from camera: [" + str(splitdata[0]) + "," + str(splitdata[1]) + ",] and yaw: " + str(splitdata[2]))
         # cannot be reached with while 1
         conn.close()

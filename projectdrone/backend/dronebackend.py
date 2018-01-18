@@ -9,7 +9,6 @@ from waypoint import Waypoints
 
 
 class DroneBackend:
-
     def __init__(self):
         # map changes in coreREST.advertise
         # Map of drones: K=id , V=droneparamters object
@@ -22,10 +21,7 @@ class DroneBackend:
         RESTBackend(self.id_droneparam, self.waypoints)
         threadHaert = threading.Thread(target=self.heartbeatcheck)
         threadHaert.start()
-
         print ("Waypoints: " + str(self.waypoints))
-        #self.simbackend = SimDroneBackend(self.waypoints, self.id_droneparam)
-
 
     def heartbeatcheck(self):
         while 1:
@@ -41,12 +37,12 @@ class DroneBackend:
                     print ("Unavailable: " + key)
                 # drone hasn't posted MQTT msg for env.haertbeattimedead and he is a real drone
                 elif value.timestamp <= timedead and value.timestamp != 0 and not value.simdrone:
-                        # Delete drone from map
-                        self.id_droneparam.get(key).kill()
-                        self.id_droneparam.pop(key, None)
-                        # Send msg the backbone
-                        BackendRequest.sendRequest(env.addrkillid + "/" + str(key))
-                        print ("Killed: " + str(key))
+                    # Delete drone from map
+                    self.id_droneparam.get(key).kill()
+                    self.id_droneparam.pop(key, None)
+                    # Send msg the backbone
+                    BackendRequest.sendRequest(env.addrkillid + "/" + str(key))
+                    print ("Killed: " + str(key))
             time.sleep(0.5)
 
     def getWaypoints(self):
@@ -55,20 +51,20 @@ class DroneBackend:
         # local waypoints when it canot retrieve waypoints from backbone
         if waypoints is None:
             waypoints = [{'id': 41, 'x': 2850, 'y': 1800, 'z': 125},
-                        {'id': 42, 'x': 1943, 'y': 544, 'z': 125},
-                        {'id': 43, 'x': 3635, 'y': 929, 'z': 125},
-                        {'id': 44, 'x': 2357, 'y': 2959, 'z': 125},
-                        {'id': 45, 'x': 3624, 'y': 2905, 'z': 125}]
+                         {'id': 42, 'x': 1943, 'y': 544, 'z': 125},
+                         {'id': 43, 'x': 3635, 'y': 929, 'z': 125},
+                         {'id': 44, 'x': 2357, 'y': 2959, 'z': 125},
+                         {'id': 45, 'x': 3624, 'y': 2905, 'z': 125}]
         else:
             # Returns the json-encoded content of a response, if any.
             waypoints = waypoints.json()
         # make 'waypoints' objects and add them to the self.waypoints map. K= str(id), V=waypoint object
         for index in waypoints:
-            waypoint=Waypoints()
-            waypoint.x=index['x']
-            waypoint.y=index['y']
-            waypoint.z=index['z']
-            self.waypoints[str(index['id'])]=waypoint
+            waypoint = Waypoints()
+            waypoint.x = index['x']
+            waypoint.y = index['y']
+            waypoint.z = index['z']
+            self.waypoints[str(index['id'])] = waypoint
         return None
 
 

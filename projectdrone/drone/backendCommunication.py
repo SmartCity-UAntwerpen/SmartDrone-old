@@ -1,7 +1,6 @@
 """This class takes care of all communication between drone and backend"""
 
 import time
-
 import paho.mqtt.client as mqttclient
 import requests
 
@@ -11,7 +10,6 @@ import env
 
 
 class BackendCommunicator:
-
     def __init__(self, droneparameters, positiondata, pathfollower):
         self.droneparameters = droneparameters
         self.posdata = positiondata
@@ -47,12 +45,13 @@ class BackendCommunicator:
     def update_position(self):
         while True:
             if self.posdata.isVisible and self.droneparameters.commState <= 2:
-                self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID), str(self.droneparameters.X)
+                self.pos_client.publish(env.mqttTopicPos + "/" + str(self.droneparameters.ID),
+                                        str(self.droneparameters.X)
                                         + "," + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z)
                                         + "," + str(self.droneparameters.state))
                 print("BackendCommunication: updating position: [" + str(self.droneparameters.X) + ","
-                     + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
-            #time.sleep(0.050)  # 30 Hz
+                      + str(self.droneparameters.Y) + "," + str(self.droneparameters.Z) + "]")
+            # time.sleep(0.050)  # 30 Hz
             time.sleep(2)
 
     # get an ID from the backbone (via backend) to use for this drone
@@ -64,12 +63,14 @@ class BackendCommunicator:
     # execute the job from mqtt channel
     def process_job(self, client, userdata, msg):
         # msg is of format: str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
-        print("topic: " + str(env.mqttTopicJob) + "/" + str(self.droneparameters.ID) + " - onjob: " + str(self.droneparameters.onJob))
+        print("topic: " + str(env.mqttTopicJob) + "/" + str(self.droneparameters.ID) + " - onjob: " + str(
+            self.droneparameters.onJob))
         if not self.droneparameters.onJob:
             print("Got job through MQTT, processing")
             coord = str(msg.payload).split(",")
             destinationWP = waypoint.Waypoint(int(float(coord[0])), int(float(coord[1])), int(float(coord[2])))
-            print("destinationWP: " + str(destinationWP.X) + " - " + str(destinationWP.Y) + " - " + str(destinationWP.Z))
+            print(
+            "destinationWP: " + str(destinationWP.X) + " - " + str(destinationWP.Y) + " - " + str(destinationWP.Z))
             pathplanner.plan_path(self.droneparameters, destinationWP)
             print("pathplanning done")
             self.pathfollower.check_position()
@@ -77,4 +78,3 @@ class BackendCommunicator:
             self.job_client.publish(env.mqttTopicJobdone + "/" + str(self.droneparameters.ID), "done")
         else:
             print("Already on a job")
-

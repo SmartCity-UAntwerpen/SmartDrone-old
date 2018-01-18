@@ -1,7 +1,6 @@
 """This class is the droneCore, it is the top module on the drone"""
 
 import threading
-
 import time
 
 import droneParameters
@@ -32,14 +31,5 @@ def run():
 
     while True:
         time.sleep(1)
-
-    #droneparameters.onJob = True
-    #droneparameters.path.append(waypoint.Waypoint(3500,515,25))
-    #droneparameters.targetWP = droneparameters.path[0]
-
-    #while True:
-        #while droneparameters.onJob:
-            #pathfollower.check_position()
-
 
 run()

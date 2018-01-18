@@ -2,7 +2,6 @@ import time
 from random import randint
 
 import paho.mqtt.client as mqttclient
-
 from backendrequest import BackendRequest
 from calculator import Calculator
 import env
