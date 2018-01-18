@@ -53,6 +53,7 @@ class DroneBackend:
     def getWaypoints(self):
         # sent REST request to map/stringmapjson/drone
         waypoints = BackendRequest.sendRequest(env.addrwaypoints)
+        # local waypoints when it canot retrieve waypoints from backbone
         if waypoints is None:
             waypoints = [{'id': 41, 'x': 2850, 'y': 1800, 'z': 125},
                         {'id': 42, 'x': 2350, 'y': 1300, 'z': 125},

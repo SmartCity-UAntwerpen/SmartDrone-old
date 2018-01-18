@@ -42,13 +42,14 @@ class restserver:
     @cherrypy.expose
     @cherrypy.tools.gzip()
     @cherrypy.tools.json_out()
-    def posAll(self): # long vehicleID, long startID, long EndID, int percentage
+    def posAll(self):  # long vehicleID, long startID, long EndID, int percentage
         jsonstring = []
         # Iterate over all droneparam and parse them to a Json
         for key, value in self.id_droneparam.items():
-            droneparam=self.id_droneparam.get(key)
-            if droneparam.available==1:
-                jsonstring.append({'idVehicle':int(key), 'idStart': droneparam.idStart,'idEnd': droneparam.idEnd,'percentage': droneparam.percentage})
+            droneparam = self.id_droneparam.get(key)
+            if droneparam.available == 1:
+                jsonstring.append({'idVehicle': int(key), 'idStart': droneparam.idStart, 'idEnd': droneparam.idEnd,
+                                   'percentage': droneparam.percentage})
         return jsonstring  # response
 
     @cherrypy.expose
@@ -56,20 +57,20 @@ class restserver:
     def executeJob(self, idJob, idVehicle, idStart, idEnd):
         # Check if idStart en idEnd are correct
         if self.waypoints.get(str(idStart)) is None or self.waypoints.get(str(idEnd)) is None:
-            raise cherrypy.HTTPError(404,"Wrong start or end ID")
+            raise cherrypy.HTTPError(404, "Wrong start or end ID")
         # Check if idVehicle is correct
-        droneparam= self.id_droneparam.get(str(idVehicle))
+        droneparam = self.id_droneparam.get(str(idVehicle))
         if droneparam is None:
             raise cherrypy.HTTPError(404, "Wrong idVehicle")
         # Check if Vehicle is available
-        if droneparam.available==0:
+        if droneparam.available == 0:
             raise cherrypy.HTTPError(404, "Drone is unavailable")
         # Check if idVehicle is busy
-        if droneparam.busy==1:
+        if droneparam.busy == 1:
             raise cherrypy.HTTPError(404, "Drone is busy")
 
         # If the drone is not at the right waypoint, firstly send a job to go to the startwaypoint else start flying to the endpoint
-        print(str(droneparam.idStart) + " - " + str(droneparam.idEnd)+ " - " + str(idStart)+ " - " + str(idEnd))
+        print(str(droneparam.idStart) + " - " + str(droneparam.idEnd) + " - " + str(idStart) + " - " + str(idEnd))
         if not int(droneparam.idEnd) == int(idStart):
             droneparam.idStart = droneparam.idEnd
             droneparam.idEnd = idStart
@@ -89,14 +90,14 @@ class restserver:
         BackendMQTT.sendMQTT(env.mqttTopicJob + "/" + idVehicle, str(coord.x) + "," + str(coord.y) + "," + str(coord.z))
         return "ACK"
 
-
     @cherrypy.expose
     @cherrypy.tools.gzip()
     def advertise(self, simdrone=0):  # param simdrone, if 1 haertbeat has no effect
         id = BackendRequest.sendRequest(env.addrnewid)  # ask for id
         if id is None:  # if the server is unavailable, use randint for debugging
             id = randint(0, 99)
-            print ("ID server unavailable: got random id: " + str(id)) # changed from: print ("I give the drone self an id")
+            print (
+            "ID server unavailable: got random id: " + str(id))  # changed from: print ("I give the drone self an id")
         else:
             id = id.text
             print ("Received ID from backbone: " + str(id))
@@ -105,7 +106,7 @@ class restserver:
         if self.id_droneparam.get(str(id)) is None:
             newdroneparameters = DroneParameters()
             newdroneparameters.simdrone = int(simdrone)
-            self.id_droneparam[str(id)] = newdroneparameters # store droneparam
+            self.id_droneparam[str(id)] = newdroneparameters  # store droneparam
         return str(id)
 
     @cherrypy.expose
@@ -127,14 +128,17 @@ class restserver:
                     weightToStart = 0
                 else:
                     waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
-                    weightToStart=Calculator.calc_time_between_points(value, waypointEndPrevJob, value.speedfactor)
+                    weightToStart = Calculator.calc_time_between_points(value, waypointEndPrevJob, value.speedfactor)
 
-                #  flytime = time to reach initial point + time to reach end point
+                # flytime = time to reach initial point + time to reach end point
                 if not str(value.idEnd) == str(idStart):
                     waypointEndPrevJob = self.waypoints.get(str(value.idEnd))
                     weightToStart += Calculator.calc_time_between_points(waypointEndPrevJob, coorda, value.speedfactor)
                 # time to fly from a to b
                 weight = Calculator.calc_time_between_points(coorda, coordb, value.speedfactor)
+                weightToStart = randint(0, 5)
+                weight = randint(0, 70)
+                # fixme: weight calculation needs to be redone (originally when it used GPS)
                 jsonstring.append(
                     {'status': value.busy, 'weightToStart': weightToStart, 'weight': weight, 'idVehicle': key})
         return jsonstring
