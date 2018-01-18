@@ -50,7 +50,7 @@ class restserver:
             droneparam = self.id_droneparam.get(key)
             if droneparam.available == 1:
                 jsonstring.append({'idVehicle': int(key), 'idStart': droneparam.idStart, 'idEnd': droneparam.idEnd,
-                                   'percentage': droneparam.percentage})
+                                   'percentage': 100})
         return jsonstring  # response
 
     @cherrypy.expose
