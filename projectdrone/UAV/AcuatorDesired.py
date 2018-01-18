@@ -1,3 +1,6 @@
+"""actuatordesired class: contains desired fields for how the actuators should behave: roll/pitch/yaw etc
+, contains a function to package all its fields except instance"""
+
 from UAV_Obj import *
 
 

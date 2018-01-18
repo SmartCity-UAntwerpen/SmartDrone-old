@@ -1,5 +1,0 @@
-GPS
-PoiLocation
-Actions
-fly function
-Pathplan
